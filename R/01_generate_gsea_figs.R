@@ -1,40 +1,12 @@
 #!/usr/bin/env Rscript
 
-# Created:
-# 2026-06-19
-#
-# Inputs:
-# - functions/gsea_waterfall_plot.R: plots ranked NES waterfalls
-# - functions/gsea_volcano_plot.R: plots symmetric NES volcanoes
-# - functions/gsea_half_volcano_plot.R: plots directional half-volcanoes
-# - functions/gsea_nes_scatter_plot.R: plots cross-contrast NES scatterplots
-# - tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv: minimal example GSEA table
-# - tutorial/data/GSE122380_gsea_day9_vs_day6.csv: minimal scatter x-axis GSEA table
-# - tutorial/data/GSE122380_gsea_day3_vs_day1.csv: minimal scatter y-axis GSEA table
-#
-# Outputs:
-# - tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg
-# - tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg
-# - tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg
-# - tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg
-# - tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg
-# - tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg
-#
-# Purpose:
-# Generate the waterfall, volcano, half-volcano, and comparative NES scatterplot
-# figures used by the tutorial site.
-#
-# Notes:
-# The script starts from precomputed GSEA result tables. It does not run DESeq2,
-# build ranked gene vectors, or calculate GSEA enrichment.
-
-# 1.1 source files -----------------
+# load standalone plotting functions
 base::source('functions/gsea_waterfall_plot.R')
 base::source('functions/gsea_volcano_plot.R')
 base::source('functions/gsea_half_volcano_plot.R')
 base::source('functions/gsea_nes_scatter_plot.R')
 
-# 1.2 load canonical inputs -----------------
+# load minimal precomputed gsea examples
 gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csvs(
   'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv')
 gsea_day9_vs_day6 <- read_gsea_result_csvs(
@@ -42,7 +14,7 @@ gsea_day9_vs_day6 <- read_gsea_result_csvs(
 gsea_day3_vs_day1 <- read_gsea_result_csvs(
   'tutorial/data/GSE122380_gsea_day3_vs_day1.csv')
 
-# 1.3 define parameters -----------------
+# keep dimensions synchronized across tutorial figures
 figure_family = 'Nimbus Sans'
 display_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 figure_width = 9
@@ -54,7 +26,6 @@ figure_height_waterfall = 4.3
 figure_height_directional = 4.3
 figure_height_scatter = 6.375
 
-# 1.4 define local helper functions -----------------
 save_svg <- function(plot, path, width, height) {
   ggplot2::ggsave(
     filename = path,
@@ -73,6 +44,7 @@ save_svg <- function(plot, path, width, height) {
     fix_text_size = FALSE,
     bg = 'white',
     limitsize = FALSE)
+  # embed nimbus sans for portable svg rendering
   embed_nimbus_svg_fonts(path)
 }
 
@@ -84,10 +56,9 @@ save_figure_svg <- function(plot, path_stub, width, height) {
     height = height)
 }
 
-# 1.5 create directories -----------------
 base::dir.create('tutorial/assets/figures', recursive = TRUE, showWarnings = FALSE)
 
-# 2.0 define reusable term groups and labels -----------------
+# group positive terms by cardiac-relevant biology
 positive_term_groups <- base::list(
   'Ion channel' = base::c(
     'Calcium', 'Sodium', 'Potassium', 'Ion', 'Voltage', 'Channel',
@@ -129,6 +100,8 @@ negative_term_group_colors <- base::c(
   'Ribosomal' = '#377EB8',
   'Mitosis' = '#984EA3',
   'DNA replication' = '#E41A1C')
+
+# label spread across high and moderate volcano significance
 positive_volcano_label_terms <- base::c(
   'cardiac muscle contraction',
   'muscle cell differentiation',
@@ -172,7 +145,6 @@ all_quadrants_scatter_label_terms <- base::c(
   'oxidative phosphorylation',
   'regulation of nuclear division')
 
-# 3.0 save ranked waterfall figures -----------------
 save_figure_svg(
   plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
@@ -202,7 +174,6 @@ save_figure_svg(
   width = figure_width_waterfall,
   height = figure_height_waterfall)
 
-# 4.0 save volcano figures -----------------
 save_figure_svg(
   plot_gsea_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
@@ -240,7 +211,6 @@ save_figure_svg(
   width = figure_width_directional,
   height = figure_height_directional)
 
-# 5.0 save comparative NES scatterplots -----------------
 save_figure_svg(
   plot_gsea_nes_scatter(
     gsea_x = gsea_day9_vs_day6,
@@ -258,7 +228,6 @@ save_figure_svg(
   width = figure_width,
   height = figure_height_scatter)
 
-# 6.0 remove script scratch objects -----------------
 base::rm(
   list = base::c(
     'gsea_cardiomyocyte_vs_mesoderm',

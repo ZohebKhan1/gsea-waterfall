@@ -1,8 +1,8 @@
-# standalone helpers for GSEA plotting functions.
+# standalone helpers for gsea plotting functions
 if (!base::exists('standardize_gsea_results', mode = 'function')) {
-  # comparative ranked GSEA plotting utilities.
+  # comparative ranked gsea plotting utilities
 
-  # plotting requires term names, NES, nominal p-values, and adjusted p-values.
+  # plotting requires term names, nes, nominal p-values, and adjusted p-values
   standardize_gsea_results <- function(gsea_results) {
     resolve_col <- function(candidates) {
       found <- candidates[candidates %in% base::names(gsea_results)]
@@ -731,14 +731,14 @@ make_gsea_volcano <- function(gsea_results,
   label_match <- base::match(label_tbl$go_term_id, repel_tbl$go_term_id)
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   repel_tbl$plot_neg_log10_padj[label_match] <- label_tbl$plot_neg_log10_padj
-  # Inward nudges use the central open space and avoid clipped edge labels.
+  # inward nudges use central open space and avoid clipped edge labels
   label_nudge_x_values <- base::ifelse(label_tbl$NES < 0, label_nudge_x, -label_nudge_x)
   repel_tbl$label_nudge_x[label_match] <- label_nudge_x_values
   repel_tbl$label_nudge_y[label_match] <- label_nudge_y +
     base::rep(base::c(0.18, -0.12, 0.08, -0.18), length.out = base::length(label_match))
   negative_count <- base::sum(plot_tbl$significant & plot_tbl$NES < 0, na.rm = TRUE)
   positive_count <- base::sum(plot_tbl$significant & plot_tbl$NES > 0, na.rm = TRUE)
-  # Place count boxes away from the upper GO labels.
+  # place count boxes away from upper go labels
   count_y <- y_min + 0.35
   x_axis_label <- if (base::is.null(contrast_label)) {
     'Normalized enrichment score (NES)'

@@ -1,30 +1,5 @@
 #!/usr/bin/env Rscript
 
-# Created:
-# 2026-06-19
-#
-# Inputs:
-# - tutorial/tutorial.Rmd: bookdown source file
-# - tutorial/style.css: tutorial stylesheet
-# - tutorial/assets/figures/*.svg: tutorial figure assets
-# - tutorial/assets/fonts/*.otf: tutorial and SVG font assets
-#
-# Outputs:
-# - docs/index.html
-# - docs/style.css
-# - docs/search_index.json
-# - docs/assets: synced figure and font assets
-# - docs/libs: synced bookdown JavaScript and CSS assets
-#
-# Purpose:
-# Render the bookdown tutorial and sync the current single-page HTML into `docs`
-# for GitHub Pages.
-#
-# Notes:
-# bookdown writes tutorial/index.html in this repository, so this script keeps
-# the publishable `docs` directory current.
-
-# 1.1 define local helper functions -----------------
 strip_html_text <- function(html) {
   text <- base::gsub('<script[^>]*>.*?</script>', ' ', html)
   text <- base::gsub('<style[^>]*>.*?</style>', ' ', text)
@@ -63,12 +38,11 @@ sync_asset_directory <- function(source_dir, output_dir) {
   base::file.copy(source_dir, base::dirname(output_dir), recursive = TRUE, overwrite = TRUE)
 }
 
-# 1.2 create directories -----------------
 base::dir.create('docs', recursive = TRUE, showWarnings = FALSE)
 base::dir.create('docs/assets', recursive = TRUE, showWarnings = FALSE)
 base::dir.create('docs/libs', recursive = TRUE, showWarnings = FALSE)
 
-# 2.0 render and sync tutorial site -----------------
+# render the single-page tutorial before syncing assets
 bookdown::render_book('tutorial')
 
 rendered_html <- if (base::file.exists('tutorial/index.html')) 'tutorial/index.html' else 'tutorial/_site/index.html'
@@ -77,16 +51,19 @@ bookdown_lib_dir <- if (base::dir.exists('tutorial/_site/libs')) 'tutorial/_site
 base::file.copy(rendered_html, 'docs/index.html', overwrite = TRUE)
 base::file.copy('tutorial/style.css', 'docs/style.css', overwrite = TRUE)
 strip_trailing_whitespace('docs/index.html')
+
+# keep github pages assets aligned with the tutorial source
 sync_asset_directory('tutorial/assets', 'docs/assets')
 if (base::dir.exists(bookdown_lib_dir)) {
   sync_asset_directory(bookdown_lib_dir, 'docs/libs')
 }
 write_search_index('docs/index.html', 'docs/search_index.json')
+
+# remove bookdown intermediates after docs has been synced
 base::unlink('tutorial/index.html')
 base::unlink('tutorial/libs', recursive = TRUE)
 base::unlink('tutorial/_site', recursive = TRUE)
 
-# 3.0 remove script scratch objects -----------------
 base::rm(
   list = base::c(
     'strip_html_text',

@@ -1,8 +1,8 @@
-# standalone helpers for GSEA plotting functions.
+# standalone helpers for gsea plotting functions
 if (!base::exists('standardize_gsea_results', mode = 'function')) {
-  # comparative ranked GSEA plotting utilities.
+  # comparative ranked gsea plotting utilities
 
-  # plotting requires term names, NES, nominal p-values, and adjusted p-values.
+  # plotting requires term names, nes, nominal p-values, and adjusted p-values
   standardize_gsea_results <- function(gsea_results) {
     resolve_col <- function(candidates) {
       found <- candidates[candidates %in% base::names(gsea_results)]

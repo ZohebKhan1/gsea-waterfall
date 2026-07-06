@@ -1,5 +1,6 @@
-# R session files
+# r session files
 .Rproj.user/
+*.Rproj
 .Rhistory
 .RData
 .Ruserdata
@@ -26,5 +27,5 @@
 /coding_guidelines.md
 /AGENTS.md
 
-# Windows metadata
+# windows metadata
 *:Zone.Identifier

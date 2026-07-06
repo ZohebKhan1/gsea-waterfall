@@ -32,8 +32,8 @@ source("gsea_nes_scatter_plot.R")
 .
 ├── README.md
 ├── R/
-│   ├── 01_generate_tutorial_figures.R
-│   └── render_tutorial_site.R
+│   ├── 01_generate_gsea_figs.R
+│   └── 02_render_github_pgs.R
 ├── docs/
 │   └── index.html
 ├── functions/
@@ -98,8 +98,8 @@ to be labeled directly.
 ## Reproduce The Tutorial
 
 ```r
-source("R/01_generate_tutorial_figures.R")
-source("R/render_tutorial_site.R")
+source("R/01_generate_gsea_figs.R")
+source("R/02_render_github_pgs.R")
 ```
 
 The rendered site is written to `docs/index.html` for GitHub Pages.
