@@ -1,0 +1,30 @@
+# R session files
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# local scratch and generated intermediates
+/tmp/
+/tutorial/.quarto/
+/tutorial/_site/
+
+# private analysis inputs and full result tables
+/data/
+/results/
+/ref/
+/scripts/internal/
+
+# local agent and runner state
+/.agents/
+/.codex/
+/.claude/
+/.cursor/
+/.aider*
+/.roo/
+/tools/
+/coding_guidelines.md
+/AGENTS.md
+
+# Windows metadata
+*:Zone.Identifier
