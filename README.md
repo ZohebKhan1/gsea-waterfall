@@ -26,46 +26,72 @@ source("gsea_half_volcano_plot.R")
 source("gsea_nes_scatter_plot.R")
 ```
 
-## Repository Layout
-
-```text
-.
-├── README.md
-├── R/
-│   ├── 01_generate_gsea_figs.R
-│   └── 02_render_github_pgs.R
-├── docs/
-│   └── index.html
-├── functions/
-│   ├── gsea_half_volcano_plot.R
-│   ├── gsea_nes_scatter_plot.R
-│   ├── gsea_volcano_plot.R
-│   └── gsea_waterfall_plot.R
-└── tutorial/
-    ├── data/
-    ├── assets/
-    │   ├── figures/
-    │   └── fonts/
-    ├── style.css
-    └── tutorial.Rmd
-```
-
 ## Function Overview
 
-`plot_gsea_waterfall()` ranks enriched GO terms in one NES direction and supports
-manual biological category coloring.
+### `plot_gsea_waterfall()`
 
-`plot_gsea_volcano()` shows positive, negative, and non-significant GSEA terms in
-one symmetric NES volcano plot.
+Ranks enriched GO terms in one NES direction and colors manually defined
+biological categories. This is the main ranked-pathway view for showing broad
+positive or negative GSEA structure without reducing the result to only a small
+top-term list.
 
-`plot_gsea_half_volcano()` expands one NES direction into a larger directional
-volcano panel.
+<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES waterfall" width="760">
 
-`plot_gsea_nes_scatter()` compares NES values for matched GO terms across two
-GSEA contrasts and can color terms by significance class or biological category.
+**Figure 1.** Positive NES GO biological-process waterfall for Cardiomyocyte vs. Mesoderm.
+Terms are ranked by NES, colored by manually defined cardiac-relevant GO term
+groups, and labeled with selected high-priority terms.
 
-The helper `read_gsea_result_csvs()` reads one or more GSEA CSV files and
-standardizes the columns used by the plotting functions.
+<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES waterfall" width="760">
+
+**Figure 2.** Negative NES GO biological-process waterfall for the same contrast. The selected
+groups highlight ribosomal, mitotic, and DNA-replication programs.
+
+### `plot_gsea_volcano()`
+
+Shows positive, negative, and non-significant GSEA terms in one symmetric NES
+volcano plot. This view is useful when the user needs the full bidirectional
+contrast in a single panel.
+
+<img src="tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg" alt="Symmetric GSEA volcano" width="560">
+
+**Figure 3.** Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs. Mesoderm. NES
+is shown on the x-axis, adjusted p-value on the y-axis, and point color marks
+significant positive, significant negative, or non-significant enrichment.
+
+### `plot_gsea_half_volcano()`
+
+Expands one NES direction into a larger directional volcano panel. This is meant
+for closer inspection of either enriched or depleted programs while retaining
+the same biological grouping logic used by the waterfall plots.
+
+<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES half-volcano" width="760">
+
+**Figure 4.** Positive NES half-volcano for Cardiomyocyte vs. Mesoderm. The enlarged
+directional view uses the same labeled positive terms as the positive NES
+waterfall plot.
+
+<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES half-volcano" width="760">
+
+**Figure 5.** Negative NES half-volcano for Cardiomyocyte vs. Mesoderm. The selected terms
+emphasize DNA replication, checkpoint, and ribosome-associated programs.
+
+### `plot_gsea_nes_scatter()`
+
+Compares NES values for matched GO terms across two GSEA contrasts. This is the
+cross-contrast view for identifying GO terms that are shared, contrast-specific,
+or directionally divergent.
+
+<img src="tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg" alt="Comparative NES scatterplot" width="900">
+
+**Figure 6.** Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3
+vs. Day 1. The fitted line summarizes the NES relationship across plotted GO
+terms, while point color indicates whether each GO term is significant in one,
+both, or neither contrast.
+
+### `read_gsea_result_csvs()`
+
+Reads one or more GSEA CSV files and standardizes the columns used by the
+plotting functions. It is a small input helper, not a plotting function.
 
 ## Required Input
 
@@ -103,55 +129,6 @@ source("R/02_render_github_pgs.R")
 ```
 
 The rendered site is written to `docs/index.html` for GitHub Pages.
-
-## Figures
-
-### Figure 1. Positive NES waterfall
-
-<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES waterfall" width="760">
-
-**Figure 1.** Positive NES GO biological-process waterfall for Cardiomyocyte vs. Mesoderm.
-Terms are ranked by NES, colored by manually defined cardiac-relevant GO term
-groups, and labeled with selected high-priority terms.
-
-### Figure 2. Negative NES waterfall
-
-<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES waterfall" width="760">
-
-**Figure 2.** Negative NES GO biological-process waterfall for the same contrast. The selected
-groups highlight ribosomal, mitotic, and DNA-replication programs.
-
-### Figure 3. Symmetric GSEA volcano
-
-<img src="tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg" alt="Symmetric GSEA volcano" width="560">
-
-**Figure 3.** Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs. Mesoderm. NES
-is shown on the x-axis, adjusted p-value on the y-axis, and point color marks
-significant positive, significant negative, or non-significant enrichment.
-
-### Figure 4. Positive NES half-volcano
-
-<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES half-volcano" width="760">
-
-**Figure 4.** Positive NES half-volcano for Cardiomyocyte vs. Mesoderm. The enlarged
-directional view uses the same labeled positive terms as the positive NES
-waterfall plot.
-
-### Figure 5. Negative NES half-volcano
-
-<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES half-volcano" width="760">
-
-**Figure 5.** Negative NES half-volcano for Cardiomyocyte vs. Mesoderm. The selected terms
-emphasize DNA replication, checkpoint, and ribosome-associated programs.
-
-### Figure 6. Comparative NES scatterplot
-
-<img src="tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg" alt="Comparative NES scatterplot" width="900">
-
-**Figure 6.** Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3
-vs. Day 1. The fitted line summarizes the NES relationship across plotted GO
-terms, while point color indicates whether each GO term is significant in one,
-both, or neither contrast.
 
 ## Function Reference
 
