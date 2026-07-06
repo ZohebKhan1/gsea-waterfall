@@ -63,7 +63,7 @@ tutorial_bioc_version <- if (requireNamespace("BiocManager", quietly = TRUE)) {
 
 # Overview
 
-This workflow provides sourceable R plotting functions for precomputed Gene Set Enrichment Analysis (GSEA) results. It does not run DESeq2, build ranked gene lists, or calculate enrichment. Those steps should stay in the analysis pipeline that produced the GSEA result table.
+`gsea-waterfall` is a visualization package for precomputed Gene Set Enrichment Analysis (GSEA) results. It provides R functions for ranked NES waterfall plots, symmetric volcano plots, directional half-volcano plots, and comparative NES scatterplots.
 
 Rendered tutorial: `https://zohebkhan1.github.io/gsea-waterfall/`
 
@@ -76,9 +76,9 @@ The plotting functions generate four figure types:
 
 The worked example uses GO biological-process GSEA results from GSE122380 cardiomyocyte differentiation contrasts. The example input CSVs are deliberately small and contain only the columns needed for plotting.
 
-# Get The Functions
+# Download The Functions
 
-Download only the plotting functions from GitHub:
+Download the plotting functions and source them in R:
 
 ```r
 # set the raw github function path
@@ -95,8 +95,6 @@ source("gsea_half_volcano_plot.R")
 source("gsea_nes_scatter_plot.R")
 ```
 
-Cloning the repository downloads the public tutorial source, plotting functions, minimal example CSVs, rendered assets, and GitHub Pages site. Private inputs, full result tables, reference folders, internal scripts, and local agent files are excluded by `.gitignore`.
-
 # Input Table
 
 Each plot function expects a precomputed GSEA result table. Use this header:
@@ -109,6 +107,12 @@ Each plot function expects a precomputed GSEA result table. Use this header:
 | `padj` | yes | adjusted p-value |
 
 These four columns are the only columns users need for the plotting workflow shown here.
+
+# Waterfall Plot Rationale
+
+The ranked GSEA waterfall visualization was heavily inspired by pathway-level waterfall plots used in recent developmental and stem-cell genomics studies. This project turns that visual style into a parameterizable, reusable R function for precomputed GSEA results.
+
+The advantage of these plots is breadth. Instead of showing only a small subset of enriched terms, such as the top 10 GO terms, the waterfall view can rank up to 200 GO terms by NES and color them by biological class. This gives a broader overview of enriched and depleted pathways while still allowing selected terms to be labeled directly.
 
 # Waterfall Plots
 
@@ -372,6 +376,72 @@ knitr::include_graphics("assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 
 <div class="tutorial-figure-caption"><strong>Figure 6.</strong> Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day 1. The fitted line summarizes the NES relationship across plotted GO terms, while point color indicates whether each GO term is significant in one, both, or neither contrast.</div>
 
+# Function Reference
+
+## `plot_gsea_waterfall()`
+
+Ranks GO terms in one NES direction and colors selected biological categories.
+
+| Parameter | Meaning |
+|:---|:---|
+| `gsea_results` | GSEA result table. |
+| `direction` | `"positive"` or `"negative"`. |
+| `top_n` | Number of ranked terms to plot. |
+| `rank_by` | Column used for ordering terms, usually `"NES"`. |
+| `x_label` | X-axis title. |
+| `label_n` | Number of automatic labels when `label_terms` is not supplied. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
+| `category_n` | Expected number of groups in `term_groups`. |
+| `term_group_colors` | Optional named colors for biological groups. |
+| `include_descendants` | Include GO offspring for GO-ID group seeds. |
+
+## `plot_gsea_volcano()`
+
+Plots positive, negative, and non-significant GSEA terms in one symmetric NES volcano.
+
+| Parameter | Meaning |
+|:---|:---|
+| `gsea_results` | GSEA result table. |
+| `padj_cutoff` | Adjusted p-value cutoff for significance. |
+| `label_n` | Number of significant terms to label automatically. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `contrast_label` | Short contrast name used in the x-axis title. |
+| `label_words_per_line` | Number of words per line in wrapped GO labels. |
+| `point_size` | Point size. |
+| `label_size` | GO label text size. |
+
+## `plot_gsea_half_volcano()`
+
+Expands one NES direction into a directional volcano panel.
+
+| Parameter | Meaning |
+|:---|:---|
+| `gsea_results` | GSEA result table. |
+| `direction` | `"positive"` or `"negative"`. |
+| `p_col` | P-value column shown on the y-axis, usually `"padj"`. |
+| `padj_cutoff` | Adjusted p-value cutoff for significance. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
+| `term_group_colors` | Optional named colors for biological groups. |
+| `inner_nes_limit` | Inner NES boundary shown on the x-axis. |
+| `contrast_label` | Short contrast name used in the x-axis title. |
+
+## `plot_gsea_nes_scatter()`
+
+Compares NES values for matched GO terms across two GSEA contrasts.
+
+| Parameter | Meaning |
+|:---|:---|
+| `gsea_x`, `gsea_y` | GSEA result tables for the x- and y-axis contrasts. |
+| `x_label`, `y_label` | Axis titles. |
+| `color_by` | `"significance"` or `"term_group"`. |
+| `x_name`, `y_name` | Short contrast names used in legend labels. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `include_nonsignificant` | Keep terms not significant in either contrast. |
+| `equal_axis_limits` | Use matched x/y limits. |
+| `show_fit_line` | Draw a linear best-fit line. |
+
 # Session Info
 
 ```{r session-info}
@@ -385,4 +455,8 @@ sessionInfo()
 <li>Korotkevich G, Sukhov V, Budin N, Shpak B, Artyomov MN, Sergushichev A. Fast gene set enrichment analysis. <a href="https://www.biorxiv.org/content/10.1101/060012v3">https://www.biorxiv.org/content/10.1101/060012v3</a></li>
 <li>Bioconductor `fgsea`: Fast Gene Set Enrichment Analysis. <a href="https://bioconductor.org/packages/fgsea/">https://bioconductor.org/packages/fgsea/</a></li>
 <li>The Gene Ontology Consortium. The Gene Ontology resource. <a href="https://geneontology.org/">https://geneontology.org/</a></li>
+<li>Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. <em>Nature</em>. 2024;626:881-890. <a href="https://doi.org/10.1038/s41586-023-06984-8">https://doi.org/10.1038/s41586-023-06984-8</a></li>
+<li>Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. <em>Nature Cell Biology</em>. 2025;27:1411-1421. <a href="https://doi.org/10.1038/s41556-025-01751-5">https://doi.org/10.1038/s41556-025-01751-5</a></li>
+<li>Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. <em>Science</em>. 2026;392:eaea1259. <a href="https://doi.org/10.1126/science.aea1259">https://doi.org/10.1126/science.aea1259</a></li>
+<li>Risgaard RD, et al. Molecular and cellular processes disrupted in the early postnatal Down syndrome prefrontal cortex. <em>Science</em>. 2026;392:eaea1549. <a href="https://doi.org/10.1126/science.aea1549">https://doi.org/10.1126/science.aea1549</a></li>
 </ol>

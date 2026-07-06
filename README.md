@@ -1,10 +1,30 @@
 # gsea-waterfall
 
-Sourceable R functions for visualizing precomputed Gene Set Enrichment Analysis
-(GSEA) results. The repository is intentionally not an R package; users can
-download and source the plotting functions directly.
+`gsea-waterfall` is a visualization package for Gene Set Enrichment Analysis
+(GSEA) results. It provides R functions for ranked NES waterfall plots,
+symmetric volcano plots, directional half-volcano plots, and cross-contrast NES
+scatterplots.
 
 GitHub Pages: `https://zohebkhan1.github.io/gsea-waterfall/`
+
+## Download The Functions
+
+Download the plotting functions and source them in R:
+
+```r
+# set the raw github function path
+base_url <- "https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions"
+
+download.file(paste0(base_url, "/gsea_waterfall_plot.R"), "gsea_waterfall_plot.R")
+download.file(paste0(base_url, "/gsea_volcano_plot.R"), "gsea_volcano_plot.R")
+download.file(paste0(base_url, "/gsea_half_volcano_plot.R"), "gsea_half_volcano_plot.R")
+download.file(paste0(base_url, "/gsea_nes_scatter_plot.R"), "gsea_nes_scatter_plot.R")
+
+source("gsea_waterfall_plot.R")
+source("gsea_volcano_plot.R")
+source("gsea_half_volcano_plot.R")
+source("gsea_nes_scatter_plot.R")
+```
 
 ## Repository Layout
 
@@ -28,25 +48,6 @@ GitHub Pages: `https://zohebkhan1.github.io/gsea-waterfall/`
     │   └── fonts/
     ├── style.css
     └── tutorial.Rmd
-```
-
-## Get The Functions
-
-Download only the plotting functions from GitHub:
-
-```r
-# set the raw github function path
-base_url <- "https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions"
-
-download.file(paste0(base_url, "/gsea_waterfall_plot.R"), "gsea_waterfall_plot.R")
-download.file(paste0(base_url, "/gsea_volcano_plot.R"), "gsea_volcano_plot.R")
-download.file(paste0(base_url, "/gsea_half_volcano_plot.R"), "gsea_half_volcano_plot.R")
-download.file(paste0(base_url, "/gsea_nes_scatter_plot.R"), "gsea_nes_scatter_plot.R")
-
-source("gsea_waterfall_plot.R")
-source("gsea_volcano_plot.R")
-source("gsea_half_volcano_plot.R")
-source("gsea_nes_scatter_plot.R")
 ```
 
 ## Function Overview
@@ -80,6 +81,19 @@ columns:
 
 GO IDs, ontology labels, leading-edge genes, and term sizes can be present, but
 they are optional for the plotting workflow.
+
+## Waterfall Plot Rationale
+
+The ranked GSEA waterfall visualization was heavily inspired by pathway-level
+waterfall plots used in recent developmental and stem-cell genomics studies.
+This project turns that visual style into a parameterizable, reusable R function
+for precomputed GSEA results.
+
+The advantage of these plots is breadth. Instead of showing only a small subset
+of enriched terms, such as the top 10 GO terms, the waterfall view can rank up
+to 200 GO terms by NES and color them by biological class. This gives a broader
+overview of enriched and depleted pathways while still allowing selected terms
+to be labeled directly.
 
 ## Reproduce The Tutorial
 
@@ -139,12 +153,77 @@ vs. Day 1. The fitted line summarizes the NES relationship across plotted GO
 terms, while point color indicates whether each GO term is significant in one,
 both, or neither contrast.
 
+## Function Reference
+
+### `plot_gsea_waterfall()`
+
+Ranks GO terms in one NES direction and colors selected biological categories.
+
+| Parameter | Meaning |
+| :--- | :--- |
+| `gsea_results` | GSEA result table. |
+| `direction` | `"positive"` or `"negative"`. |
+| `top_n` | Number of ranked terms to plot. |
+| `rank_by` | Column used for ordering terms, usually `"NES"`. |
+| `x_label` | X-axis title. |
+| `label_n` | Number of automatic labels when `label_terms` is not supplied. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
+| `category_n` | Expected number of groups in `term_groups`. |
+| `term_group_colors` | Optional named colors for biological groups. |
+| `include_descendants` | Include GO offspring for GO-ID group seeds. |
+
+### `plot_gsea_volcano()`
+
+Plots positive, negative, and non-significant GSEA terms in one symmetric NES
+volcano.
+
+| Parameter | Meaning |
+| :--- | :--- |
+| `gsea_results` | GSEA result table. |
+| `padj_cutoff` | Adjusted p-value cutoff for significance. |
+| `label_n` | Number of significant terms to label automatically. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `contrast_label` | Short contrast name used in the x-axis title. |
+| `label_words_per_line` | Number of words per line in wrapped GO labels. |
+| `point_size` | Point size. |
+| `label_size` | GO label text size. |
+
+### `plot_gsea_half_volcano()`
+
+Expands one NES direction into a directional volcano panel.
+
+| Parameter | Meaning |
+| :--- | :--- |
+| `gsea_results` | GSEA result table. |
+| `direction` | `"positive"` or `"negative"`. |
+| `p_col` | P-value column shown on the y-axis, usually `"padj"`. |
+| `padj_cutoff` | Adjusted p-value cutoff for significance. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
+| `term_group_colors` | Optional named colors for biological groups. |
+| `inner_nes_limit` | Inner NES boundary shown on the x-axis. |
+| `contrast_label` | Short contrast name used in the x-axis title. |
+
+### `plot_gsea_nes_scatter()`
+
+Compares NES values for matched GO terms across two GSEA contrasts.
+
+| Parameter | Meaning |
+| :--- | :--- |
+| `gsea_x`, `gsea_y` | GSEA result tables for the x- and y-axis contrasts. |
+| `x_label`, `y_label` | Axis titles. |
+| `color_by` | `"significance"` or `"term_group"`. |
+| `x_name`, `y_name` | Short contrast names used in legend labels. |
+| `label_terms` | Exact GO descriptions or GO IDs to label. |
+| `include_nonsignificant` | Keep terms not significant in either contrast. |
+| `equal_axis_limits` | Use matched x/y limits. |
+| `show_fit_line` | Draw a linear best-fit line. |
+
 ## Notes On GSEA And fgsea
 
-These functions plot GSEA results; they do not run DESeq2, build ranked gene
-lists, or calculate enrichment. The example tables can come from any GSEA
-workflow that reports GO term names, NES, nominal p-values, and adjusted
-p-values.
+The example tables can come from any GSEA workflow that reports GO term names,
+NES, nominal p-values, and adjusted p-values.
 
 The original GSEA method is described by Subramanian et al. The `fgsea`
 Bioconductor package provides a fast implementation for preranked GSEA and can
@@ -161,3 +240,16 @@ produce input tables for these plots.
   https://bioconductor.org/packages/fgsea/
 - The Gene Ontology Consortium. The Gene Ontology resource.
   https://geneontology.org/
+- Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing
+  of human neuronal maturation. Nature. 2024;626:881-890.
+  https://doi.org/10.1038/s41586-023-06984-8
+- Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin
+  and SUZ12 as regulators of human developmental timing. Nature Cell Biology.
+  2025;27:1411-1421. https://doi.org/10.1038/s41556-025-01751-5
+- Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies
+  molecular and gene-regulatory mechanisms dysregulated in developing Down
+  syndrome neocortex. Science. 2026;392:eaea1259.
+  https://doi.org/10.1126/science.aea1259
+- Risgaard RD, et al. Molecular and cellular processes disrupted in the early
+  postnatal Down syndrome prefrontal cortex. Science. 2026;392:eaea1549.
+  https://doi.org/10.1126/science.aea1549
