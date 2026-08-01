@@ -1,1886 +1,695 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="" xml:lang="">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>
-      Comparative ranked GSEA waterfall, volcano, scatter-style plots
-    </title>
-    <meta
-      name="description"
-      content="R functions for plotting ranked GSEA GO terms and comparative cross-contrast NES scatterplots."
-    />
-    <meta
-      name="generator"
-      content="bookdown #bookdown:version# and GitBook 2.6.7"
-    />
+<head>
 
-    <meta
-      property="og:title"
-      content="Comparative ranked GSEA waterfall, volcano, scatter-style plots"
-    />
-    <meta property="og:type" content="book" />
-    <meta
-      property="og:description"
-      content="R functions for plotting ranked GSEA GO terms and comparative cross-contrast NES scatterplots."
-    />
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Comparative ranked GSEA waterfall, volcano, scatter-style plots</title>
+  <meta name="description" content="Standalone R functions for plotting precomputed GSEA results." />
+  <meta name="generator" content="bookdown 0.47 and GitBook 2.6.7" />
 
-    <meta name="twitter:card" content="summary" />
-    <meta
-      name="twitter:title"
-      content="Comparative ranked GSEA waterfall, volcano, scatter-style plots"
-    />
-    <meta
-      name="twitter:description"
-      content="R functions for plotting ranked GSEA GO terms and comparative cross-contrast NES scatterplots."
-    />
+  <meta property="og:title" content="Comparative ranked GSEA waterfall, volcano, scatter-style plots" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Standalone R functions for plotting precomputed GSEA results." />
+  
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <!--bookdown:link_prev-->
-    <!--bookdown:link_next-->
-    <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
-    <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-    <link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
-    <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-    <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-    <link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-    <link
-      href="libs/gitbook-2.6.7/css/plugin-fontsettings.css"
-      rel="stylesheet"
-    />
-    <link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
-    <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-    <script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
-    <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-    <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-    <script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-    <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-    <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
-    <script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
-    <link
-      href="libs/anchor-sections-1.1.0/anchor-sections.css"
-      rel="stylesheet"
-    />
-    <link
-      href="libs/anchor-sections-1.1.0/anchor-sections-hash.css"
-      rel="stylesheet"
-    />
-    <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-    <style type="text/css">
-      html {
-        -webkit-text-size-adjust: 100%;
-      }
-      pre > code.sourceCode {
-        white-space: pre;
-        position: relative;
-      }
-      pre > code.sourceCode > span {
-        display: inline-block;
-        line-height: 1.25;
-      }
-      pre > code.sourceCode > span:empty {
-        height: 1.2em;
-      }
-      .sourceCode {
-        overflow: visible;
-      }
-      code.sourceCode > span {
-        color: inherit;
-        text-decoration: inherit;
-      }
-      div.sourceCode {
-        margin: 1em 0;
-      }
-      pre.sourceCode {
-        margin: 0;
-      }
-      @media screen {
-        div.sourceCode {
-          overflow: auto;
-        }
-      }
-      @media print {
-        pre > code.sourceCode {
-          white-space: pre-wrap;
-        }
-        pre > code.sourceCode > span {
-          text-indent: -5em;
-          padding-left: 5em;
-        }
-      }
-      pre.numberSource code {
-        counter-reset: source-line 0;
-      }
-      pre.numberSource code > span {
-        position: relative;
-        left: -4em;
-        counter-increment: source-line;
-      }
-      pre.numberSource code > span > a:first-child::before {
-        content: counter(source-line);
-        position: relative;
-        left: -1em;
-        text-align: right;
-        vertical-align: baseline;
-        border: none;
-        display: inline-block;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        padding: 0 4px;
-        width: 4em;
-        color: #aaaaaa;
-      }
-      pre.numberSource {
-        margin-left: 3em;
-        border-left: 1px solid #aaaaaa;
-        padding-left: 4px;
-      }
-      div.sourceCode {
-      }
-      @media screen {
-        pre > code.sourceCode > span > a:first-child::before {
-          text-decoration: underline;
-        }
-      }
-      code span.al {
-        color: #ff0000;
-        font-weight: bold;
-      } /* Alert */
-      code span.an {
-        color: #60a0b0;
-        font-weight: bold;
-        font-style: italic;
-      } /* Annotation */
-      code span.at {
-        color: #7d9029;
-      } /* Attribute */
-      code span.bn {
-        color: #40a070;
-      } /* BaseN */
-      code span.bu {
-        color: #008000;
-      } /* BuiltIn */
-      code span.cf {
-        color: #007020;
-        font-weight: bold;
-      } /* ControlFlow */
-      code span.ch {
-        color: #4070a0;
-      } /* Char */
-      code span.cn {
-        color: #880000;
-      } /* Constant */
-      code span.co {
-        color: #60a0b0;
-        font-style: italic;
-      } /* Comment */
-      code span.cv {
-        color: #60a0b0;
-        font-weight: bold;
-        font-style: italic;
-      } /* CommentVar */
-      code span.do {
-        color: #ba2121;
-        font-style: italic;
-      } /* Documentation */
-      code span.dt {
-        color: #902000;
-      } /* DataType */
-      code span.dv {
-        color: #40a070;
-      } /* DecVal */
-      code span.er {
-        color: #ff0000;
-        font-weight: bold;
-      } /* Error */
-      code span.ex {
-      } /* Extension */
-      code span.fl {
-        color: #40a070;
-      } /* Float */
-      code span.fu {
-        color: #06287e;
-      } /* Function */
-      code span.im {
-        color: #008000;
-        font-weight: bold;
-      } /* Import */
-      code span.in {
-        color: #60a0b0;
-        font-weight: bold;
-        font-style: italic;
-      } /* Information */
-      code span.kw {
-        color: #007020;
-        font-weight: bold;
-      } /* Keyword */
-      code span.op {
-        color: #666666;
-      } /* Operator */
-      code span.ot {
-        color: #007020;
-      } /* Other */
-      code span.pp {
-        color: #bc7a00;
-      } /* Preprocessor */
-      code span.sc {
-        color: #4070a0;
-      } /* SpecialChar */
-      code span.ss {
-        color: #bb6688;
-      } /* SpecialString */
-      code span.st {
-        color: #4070a0;
-      } /* String */
-      code span.va {
-        color: #19177c;
-      } /* Variable */
-      code span.vs {
-        color: #4070a0;
-      } /* VerbatimString */
-      code span.wa {
-        color: #60a0b0;
-        font-weight: bold;
-        font-style: italic;
-      } /* Warning */
-    </style>
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Comparative ranked GSEA waterfall, volcano, scatter-style plots" />
+  
+  <meta name="twitter:description" content="Standalone R functions for plotting precomputed GSEA results." />
+  
 
-    <style type="text/css">
 
-        margin-left: 1.5em;
-        text-indent: -1.5em;
-      }
-    </style>
-    <link rel="stylesheet" href="style.css" type="text/css" />
-  </head>
 
-  <body>
-    <!--bookdown:title:start-->
-    <div id="header">
-      <h1 class="title">
-        Comparative ranked GSEA waterfall, volcano, scatter-style plots
-      </h1>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Comparative ranked GSEA plots</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a></li>
+<li class="chapter" data-level="2" data-path=""><a href="#install-and-source-the-functions"><i class="fa fa-check"></i><b>2</b> Install And Source The Functions</a></li>
+<li class="chapter" data-level="3" data-path=""><a href="#input-contract"><i class="fa fa-check"></i><b>3</b> Input Contract</a></li>
+<li class="chapter" data-level="4" data-path=""><a href="#waterfall-plots"><i class="fa fa-check"></i><b>4</b> Waterfall Plots</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path=""><a href="#positive-nes-waterfall"><i class="fa fa-check"></i><b>4.1</b> Positive NES waterfall</a></li>
+<li class="chapter" data-level="4.2" data-path=""><a href="#negative-nes-waterfall"><i class="fa fa-check"></i><b>4.2</b> Negative NES waterfall</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path=""><a href="#volcano-plots"><i class="fa fa-check"></i><b>5</b> Volcano Plots</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path=""><a href="#symmetric-volcano"><i class="fa fa-check"></i><b>5.1</b> Symmetric volcano</a></li>
+<li class="chapter" data-level="5.2" data-path=""><a href="#directional-half-volcano-plots"><i class="fa fa-check"></i><b>5.2</b> Directional half-volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path=""><a href="#comparative-nes-scatterplot"><i class="fa fa-check"></i><b>6</b> Comparative NES Scatterplot</a></li>
+<li class="chapter" data-level="7" data-path=""><a href="#function-reference"><i class="fa fa-check"></i><b>7</b> Function Reference</a></li>
+<li class="chapter" data-level="8" data-path=""><a href="#reproduce-the-repository"><i class="fa fa-check"></i><b>8</b> Reproduce The Repository</a></li>
+<li class="chapter" data-level="9" data-path=""><a href="#references"><i class="fa fa-check"></i><b>9</b> References</a></li>
+<li class="divider"></li>
+<li><a href="https://bookdown.org" target="_blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
     </div>
-    <!--bookdown:title:end-->
 
-    <!--bookdown:toc:start-->
-    <div
-      class="book without-animation with-summary font-size-2 font-family-1"
-      data-basepath="."
-    >
-      <div class="book-summary">
-        <nav role="navigation">
-          <!--bookdown:toc2:start-->
-          <ul>
-            <li>
-              <a href="#overview" id="toc-overview"
-                ><span class="toc-section-number">1</span> Overview</a
-              >
-            </li>
-            <li>
-              <a href="#download-the-functions" id="toc-download-the-functions"
-                ><span class="toc-section-number">2</span> Download The
-                Functions</a
-              >
-            </li>
-            <li>
-              <a href="#input-table" id="toc-input-table"
-                ><span class="toc-section-number">3</span> Input Table</a
-              >
-            </li>
-            <li>
-              <a
-                href="#waterfall-plot-rationale"
-                id="toc-waterfall-plot-rationale"
-                ><span class="toc-section-number">4</span> Waterfall Plot
-                Rationale</a
-              >
-            </li>
-            <li>
-              <a href="#waterfall-plots" id="toc-waterfall-plots"
-                ><span class="toc-section-number">5</span> Waterfall Plots</a
-              >
-              <ul>
-                <li>
-                  <a
-                    href="#positive-nes-waterfall"
-                    id="toc-positive-nes-waterfall"
-                    ><span class="toc-section-number">5.1</span> Positive NES
-                    waterfall</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#negative-nes-waterfall"
-                    id="toc-negative-nes-waterfall"
-                    ><span class="toc-section-number">5.2</span> Negative NES
-                    waterfall</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#volcano-plots" id="toc-volcano-plots"
-                ><span class="toc-section-number">6</span> Volcano Plots</a
-              >
-              <ul>
-                <li>
-                  <a href="#symmetric-volcano" id="toc-symmetric-volcano"
-                    ><span class="toc-section-number">6.1</span> Symmetric
-                    volcano</a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#directional-half-volcano-plots"
-                    id="toc-directional-half-volcano-plots"
-                    ><span class="toc-section-number">6.2</span> Directional
-                    half-volcano plots</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a
-                href="#comparative-nes-scatterplots"
-                id="toc-comparative-nes-scatterplots"
-                ><span class="toc-section-number">7</span> Comparative NES
-                Scatterplots</a
-              >
-              <ul>
-                <li>
-                  <a href="#all-quadrants" id="toc-all-quadrants"
-                    ><span class="toc-section-number">7.1</span> All
-                    quadrants</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#function-reference" id="toc-function-reference"
-                ><span class="toc-section-number">8</span> Function Reference</a
-              >
-              <ul>
-                <li>
-                  <a href="#plot_gsea_waterfall" id="toc-plot_gsea_waterfall"
-                    ><span class="toc-section-number">8.1</span>
-                    <code>plot_gsea_waterfall()</code></a
-                  >
-                </li>
-                <li>
-                  <a href="#plot_gsea_volcano" id="toc-plot_gsea_volcano"
-                    ><span class="toc-section-number">8.2</span>
-                    <code>plot_gsea_volcano()</code></a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#plot_gsea_half_volcano"
-                    id="toc-plot_gsea_half_volcano"
-                    ><span class="toc-section-number">8.3</span>
-                    <code>plot_gsea_half_volcano()</code></a
-                  >
-                </li>
-                <li>
-                  <a
-                    href="#plot_gsea_nes_scatter"
-                    id="toc-plot_gsea_nes_scatter"
-                    ><span class="toc-section-number">8.4</span>
-                    <code>plot_gsea_nes_scatter()</code></a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="#session-info" id="toc-session-info"
-                ><span class="toc-section-number">9</span> Session Info</a
-              >
-            </li>
-            <li>
-              <a href="#references" id="toc-references"
-                ><span class="toc-section-number">10</span> References</a
-              >
-            </li>
-          </ul>
-          <!--bookdown:toc2:end-->
-        </nav>
-      </div>
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Comparative ranked GSEA waterfall, volcano, scatter-style plots</a>
+          </h1>
+        </div>
 
-      <div class="book-body">
-        <div class="body-inner">
-          <div class="book-header" role="navigation">
-            <h1>
-              <i class="fa fa-circle-o-notch fa-spin"></i
-              ><a href="./"
-                >Comparative ranked GSEA waterfall, volcano, scatter-style
-                plots</a
-              >
-            </h1>
-          </div>
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
 
-          <div class="page-wrapper" tabindex="-1" role="main">
-            <div class="page-inner">
-              <section class="normal" id="section-">
-                <!--bookdown:toc:end-->
-                <!--bookdown:body:start-->
-                <div class="tutorial-title-block">
-                  <h1 class="title">
-                    Comparative ranked GSEA waterfall, volcano, scatter-style
-                    plots
-                  </h1>
-                  <div class="tutorial-subtitle">
-                    R functions for plotting ranked GSEA GO terms and
-                    categorizing them by biological function, as well as
-                    comparative cross-contrast GSEA NES scatterplots.
-                  </div>
-                  <div class="tutorial-meta-block">
-                    <div><span>Authors:</span> Zoheb Khan</div>
-                    <div><span>Modified:</span> January 24, 2026</div>
-                    <div><span>Compiled:</span> May 9, 2026</div>
-                    <div>
-                      <span>Environment:</span> R version 4.6.0 (2026-04-24);
-                      Bioconductor 3.23
-                    </div>
-                    <div>
-                      <span>Dependencies:</span> base64enc {0.1.6}; BiocManager
-                      {1.30.27}; bookdown {0.46}; ggplot2 {4.0.3}; ggrepel
-                      {0.9.8}; jsonlite {2.0.0}; RColorBrewer {1.1.3}; scales
-                      {1.4.0}; svglite {2.2.2}; systemfonts {1.3.2}
-                    </div>
-                    <div><span>Source:</span> ZohebKhan1/gsea-waterfall</div>
-                  </div>
-                </div>
-                <div id="overview" class="section level1 hasAnchor" number="1">
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">1</span> Overview<a
-                      href="#overview"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    <code>gsea-waterfall</code> is a visualization package for
-                    precomputed Gene Set Enrichment Analysis (GSEA) results. It
-                    provides R functions for ranked NES waterfall plots,
-                    symmetric volcano plots, directional half-volcano plots, and
-                    comparative NES scatterplots.
-                  </p>
-                  <p>
-                    Rendered tutorial:
-                    <code>https://zohebkhan1.github.io/gsea-waterfall/</code>
-                  </p>
-                  <p>The plotting functions generate four figure types:</p>
-                  <ol style="list-style-type: decimal">
-                    <li>ranked positive and negative NES waterfall plots</li>
-                    <li>a symmetric GSEA volcano plot</li>
-                    <li>directional half-volcano plots</li>
-                    <li>
-                      comparative NES scatterplots across two GSEA contrasts
-                    </li>
-                  </ol>
-                  <p>
-                    The worked example uses GO biological-process GSEA results
-                    from GSE122380 cardiomyocyte differentiation contrasts. The
-                    example input CSVs are deliberately small and contain only
-                    the columns needed for plotting.
-                  </p>
-                  <p>
-                    The ranked waterfall layout is inspired by pathway-level
-                    figures in
-                    <a href="https://doi.org/10.1038/s41586-023-06984-8"
-                      >Ciceri, <em>Nature</em>, 2024</a
-                    >,
-                    <a href="https://doi.org/10.1038/s41556-025-01751-5"
-                      >Xu, <em>Nature Cell Biology</em>, 2025</a
-                    >,
-                    <a href="https://doi.org/10.1126/science.aea1259"
-                      >Vuong, <em>Science</em>, 2026</a
-                    >, and
-                    <a href="https://doi.org/10.1126/science.aea1549"
-                      >Risgaard, <em>Science</em>, 2026</a
-                    >.
-                  </p>
-                </div>
-                <div
-                  id="download-the-functions"
-                  class="section level1 hasAnchor"
-                  number="2"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">2</span> Download The
-                    Functions<a
-                      href="#download-the-functions"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>Download the plotting functions and source them in R:</p>
-                  <div class="sourceCode" id="cb1">
-                    <pre
-                      class="sourceCode r"
-                    ><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># set the raw github function path</span></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>base_url <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions&quot;</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&quot;/gsea_plot_utils.R&quot;</span>), <span class="st">&quot;gsea_plot_utils.R&quot;</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&quot;/gsea_waterfall_plot.R&quot;</span>), <span class="st">&quot;gsea_waterfall_plot.R&quot;</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&quot;/gsea_volcano_plot.R&quot;</span>), <span class="st">&quot;gsea_volcano_plot.R&quot;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&quot;/gsea_half_volcano_plot.R&quot;</span>), <span class="st">&quot;gsea_half_volcano_plot.R&quot;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&quot;/gsea_nes_scatter_plot.R&quot;</span>), <span class="st">&quot;gsea_nes_scatter_plot.R&quot;</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;gsea_plot_utils.R&quot;</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;gsea_waterfall_plot.R&quot;</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;gsea_volcano_plot.R&quot;</span>)</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;gsea_half_volcano_plot.R&quot;</span>)</span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;gsea_nes_scatter_plot.R&quot;</span>)</span></code></pre>
-                  </div>
-                </div>
-                <div
-                  id="input-table"
-                  class="section level1 hasAnchor"
-                  number="3"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">3</span> Input Table<a
-                      href="#input-table"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    Each plot function expects a precomputed GSEA result table.
-                    Use this header:
-                  </p>
-                  <table>
-                    <thead>
-                      <tr class="header">
-                        <th align="left">Column</th>
-                        <th align="left">Required</th>
-                        <th align="left">Meaning</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="odd">
-                        <td align="left"><code>go_description</code></td>
-                        <td align="left">yes</td>
-                        <td align="left">GO term name</td>
-                      </tr>
-                      <tr class="even">
-                        <td align="left"><code>NES</code></td>
-                        <td align="left">yes</td>
-                        <td align="left">normalized enrichment score</td>
-                      </tr>
-                      <tr class="odd">
-                        <td align="left"><code>pval</code></td>
-                        <td align="left">yes</td>
-                        <td align="left">nominal GSEA p-value</td>
-                      </tr>
-                      <tr class="even">
-                        <td align="left"><code>padj</code></td>
-                        <td align="left">yes</td>
-                        <td align="left">adjusted p-value</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <p>
-                    These four columns are the only columns users need for the
-                    plotting workflow shown here.
-                  </p>
-                </div>
-                <div
-                  id="waterfall-plot-rationale"
-                  class="section level1 hasAnchor"
-                  number="4"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">4</span> Waterfall Plot
-                    Rationale<a
-                      href="#waterfall-plot-rationale"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    The ranked GSEA waterfall visualization was heavily inspired
-                    by pathway-level waterfall plots used in recent
-                    developmental and stem-cell genomics studies. This project
-                    turns that visual style into a parameterizable, reusable R
-                    function for precomputed GSEA results.
-                  </p>
-                  <p>
-                    The advantage of these plots is breadth. Instead of showing
-                    only a small subset of enriched terms, such as the top 10 GO
-                    terms, the waterfall view can rank up to 200 GO terms by NES
-                    and color them by biological class. This gives a broader
-                    overview of enriched and depleted pathways while still
-                    allowing selected terms to be labeled directly.
-                  </p>
-                </div>
-                <div
-                  id="waterfall-plots"
-                  class="section level1 hasAnchor"
-                  number="5"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">5</span> Waterfall
-                    Plots<a
-                      href="#waterfall-plots"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    Use <code>plot_gsea_waterfall()</code> for a ranked view of
-                    enriched GO terms in one NES direction. Terms can be ranked
-                    by <code>NES</code>, <code>padj</code>, or
-                    <code>pvalue</code>. Labels can be selected by exact term
-                    name, GO ID when available, plotted rank, or automatic
-                    rank-based selection.
-                  </p>
-                  <p>
-                    <code>term_groups</code> and <code>label_terms</code> are
-                    intentionally separate. <code>term_groups</code> defines
-                    broad biological categories for point colors;
-                    <code>label_terms</code> defines the smaller set of GO terms
-                    that should receive text labels. Category matching uses
-                    exact GO IDs when provided through <code>id_col</code>, plus
-                    text seeds matched against GO term names.
-                  </p>
-                  <div
-                    id="positive-nes-waterfall"
-                    class="section level2 hasAnchor"
-                    number="5.1"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">5.1</span> Positive
-                      NES waterfall<a
-                        href="#positive-nes-waterfall"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <div class="sourceCode" id="cb2">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># define color groups</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>positive_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="st">&quot;Ion channel&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="st">&quot;Calcium&quot;</span>, <span class="st">&quot;Sodium&quot;</span>, <span class="st">&quot;Potassium&quot;</span>, <span class="st">&quot;Ion&quot;</span>, <span class="st">&quot;Voltage&quot;</span>, <span class="st">&quot;Channel&quot;</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="st">&quot;electrical&quot;</span>, <span class="st">&quot;Action potential&quot;</span>, <span class="st">&quot;transmembrane&quot;</span>, <span class="st">&quot;conduction&quot;</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  ),</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="st">&quot;Metabolism&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    <span class="st">&quot;Metabolic&quot;</span>, <span class="st">&quot;Metabolism&quot;</span>, <span class="st">&quot;Electron transport chain&quot;</span>, <span class="st">&quot;Mitochondria&quot;</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>    <span class="st">&quot;Mitochondrial&quot;</span>, <span class="st">&quot;Oxidative&quot;</span>, <span class="st">&quot;Phosphorylation&quot;</span>, <span class="st">&quot;ATP&quot;</span>, <span class="st">&quot;lipid&quot;</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>    <span class="st">&quot;biosynthetic&quot;</span>, <span class="st">&quot;respiration&quot;</span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  ),</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="st">&quot;Muscle contraction&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>    <span class="st">&quot;Muscle contraction&quot;</span>, <span class="st">&quot;Muscle cell differentiation&quot;</span>, <span class="st">&quot;Striated&quot;</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>    <span class="st">&quot;Sarcomere&quot;</span>, <span class="st">&quot;Myofibril&quot;</span>, <span class="st">&quot;Actin&quot;</span>, <span class="st">&quot;Muscle&quot;</span></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  ),</span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="st">&quot;Heart development&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>    <span class="st">&quot;atrial&quot;</span>, <span class="st">&quot;ventricular&quot;</span>, <span class="st">&quot;heart&quot;</span>, <span class="st">&quot;cardiac&quot;</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  )</span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>)</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a><span class="co"># define labeled terms</span></span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>positive_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  <span class="st">&quot;myofibril assembly&quot;</span>,</span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle contraction&quot;</span>,</span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle cell action potential&quot;</span>,</span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  <span class="st">&quot;calcium-mediated signaling&quot;</span>,</span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  <span class="st">&quot;electron transport chain&quot;</span>,</span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  <span class="st">&quot;muscle cell differentiation&quot;</span>,</span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  <span class="st">&quot;ATP metabolic process&quot;</span>,</span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>  <span class="st">&quot;cardiac cell development&quot;</span>,</span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  <span class="st">&quot;cardiac chamber morphogenesis&quot;</span>,</span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  <span class="st">&quot;muscle contraction&quot;</span>,</span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>  <span class="st">&quot;cardiac conduction&quot;</span>,</span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle cell contraction&quot;</span>,</span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  <span class="st">&quot;heart growth&quot;</span>,</span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>  <span class="st">&quot;cardiac atrium development&quot;</span>,</span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>  <span class="st">&quot;heart trabecula morphogenesis&quot;</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>)</span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a></span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co"># plot ranked positive terms</span></span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>positive_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span>,</span>
-<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&quot;NES&quot;</span>,</span>
-<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&quot;Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm&quot;</span>,</span>
-<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span>,</span>
-<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_label_terms,</span>
-<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
-<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>  <span class="at">category_n =</span> <span class="dv">4</span></span>
-<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div
-                      id="fig-positive-waterfall"
-                      class="figure-anchor"
-                    ></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg"
-                        alt=""
-                        width="80%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 1.</strong> Positive NES GO
-                      biological-process waterfall for Cardiomyocyte
-                      vs. Mesoderm. Terms are ranked by NES, colored by manually
-                      defined cardiac-relevant GO term groups, and labeled with
-                      selected high-priority terms.
-                    </div>
-                  </div>
-                  <div
-                    id="negative-nes-waterfall"
-                    class="section level2 hasAnchor"
-                    number="5.2"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">5.2</span> Negative
-                      NES waterfall<a
-                        href="#negative-nes-waterfall"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <div class="sourceCode" id="cb3">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># define negative color groups</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>negative_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="st">&quot;Ribosomal&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>    <span class="st">&quot;ribosome&quot;</span>, <span class="st">&quot;ribosomal&quot;</span>, <span class="st">&quot;spliceosomal&quot;</span>, <span class="st">&quot;rRNA&quot;</span>, <span class="st">&quot;RNA&quot;</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  ),</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="st">&quot;Mitosis&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="st">&quot;Mitosis&quot;</span>, <span class="st">&quot;Meiosis&quot;</span>, <span class="st">&quot;Nuclear division&quot;</span>, <span class="st">&quot;cell cycle&quot;</span>, <span class="st">&quot;telomere&quot;</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>    <span class="st">&quot;spindle&quot;</span>, <span class="st">&quot;Mitotic&quot;</span>, <span class="st">&quot;Meiotic&quot;</span></span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  ),</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="st">&quot;DNA replication&quot;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    <span class="st">&quot;chromosome&quot;</span>, <span class="st">&quot;DNA&quot;</span>, <span class="st">&quot;base&quot;</span>, <span class="st">&quot;repair&quot;</span>, <span class="st">&quot;DNA-&quot;</span></span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  )</span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>)</span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co"># set negative group colors</span></span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>negative_term_group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="st">&quot;Ribosomal&quot;</span> <span class="ot">=</span> <span class="st">&quot;#377EB8&quot;</span>,</span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  <span class="st">&quot;Mitosis&quot;</span> <span class="ot">=</span> <span class="st">&quot;#984EA3&quot;</span>,</span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  <span class="st">&quot;DNA replication&quot;</span> <span class="ot">=</span> <span class="st">&quot;#E41A1C&quot;</span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>)</span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>negative_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
-<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&quot;negative&quot;</span>,</span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span>,</span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&quot;NES&quot;</span>,</span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&quot;Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm&quot;</span>,</span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span>,</span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>  <span class="at">term_group_colors =</span> negative_term_group_colors</span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div
-                      id="fig-negative-waterfall"
-                      class="figure-anchor"
-                    ></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg"
-                        alt=""
-                        width="80%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 2.</strong> Negative NES GO
-                      biological-process waterfall for the same contrast. The
-                      selected groups highlight ribosomal, mitotic, and
-                      DNA-replication programs.
-                    </div>
-                  </div>
-                </div>
-                <div
-                  id="volcano-plots"
-                  class="section level1 hasAnchor"
-                  number="6"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">6</span> Volcano Plots<a
-                      href="#volcano-plots"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    Use <code>plot_gsea_volcano()</code> when positive and
-                    negative enrichment should be inspected in one symmetric
-                    view. Use <code>plot_gsea_half_volcano()</code> when one NES
-                    direction needs a larger directional panel.
-                  </p>
-                  <div
-                    id="symmetric-volcano"
-                    class="section level2 hasAnchor"
-                    number="6.1"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">6.1</span> Symmetric
-                      volcano<a
-                        href="#symmetric-volcano"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <div class="sourceCode" id="cb4">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># define volcano labels</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle contraction&quot;</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="st">&quot;muscle cell differentiation&quot;</span>,</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="st">&quot;cardiac chamber morphogenesis&quot;</span>,</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="st">&quot;heart growth&quot;</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="st">&quot;heart valve development&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>negative_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="st">&quot;mitotic nuclear division&quot;</span>,</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="st">&quot;DNA replication initiation&quot;</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  <span class="st">&quot;mitotic G2/M transition checkpoint&quot;</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="st">&quot;centriole assembly&quot;</span>,</span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="st">&quot;ribosome assembly&quot;</span></span>
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Comparative ranked GSEA waterfall, volcano, scatter-style plots</h1>
+</div>
+<div class="tutorial-title-block">
+<h1 class="title">
+Comparative ranked GSEA waterfall, volcano, scatter-style plots
+</h1>
+<div class="tutorial-subtitle">
+Standalone R functions for ranked GSEA GO terms, directional volcano plots, and cross-contrast NES comparisons.
+</div>
+<div class="tutorial-meta-block">
+<div>
+<span>Author:</span> Zoheb Khan
+</div>
+<div>
+<span>Example:</span> GSE122380 GO biological-process GSEA contrasts
+</div>
+<div>
+<span>Source:</span> <a href="https://github.com/ZohebKhan1/gsea-waterfall">ZohebKhan1/gsea-waterfall</a>
+</div>
+</div>
+</div>
+<div id="overview" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> Overview<a href="#overview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><code>gsea-waterfall</code> is a copyable R plotting toolkit for <strong>precomputed</strong> Gene Set Enrichment Analysis (GSEA) results. It provides ranked positive and negative NES waterfall plots, a symmetric volcano plot, directional half-volcano plots, and comparative NES scatterplots.</p>
+<p>The functions do not run GSEA or modify supplied enrichment statistics. They select and display rows according to explicit plotting arguments. The worked example uses GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts.</p>
+<p>Rendered tutorial: <a href="https://zohebkhan1.github.io/gsea-waterfall/" class="uri">https://zohebkhan1.github.io/gsea-waterfall/</a></p>
+<p>The waterfall layout is inspired by pathway-level figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri, <em>Nature</em>, 2024</a>, <a href="https://doi.org/10.1038/s41556-025-01751-5">Xu, <em>Nature Cell Biology</em>, 2025</a>, <a href="https://doi.org/10.1126/science.aea1259">Vuong, <em>Science</em>, 2026</a>, and <a href="https://doi.org/10.1126/science.aea1549">Risgaard, <em>Science</em>, 2026</a>.</p>
+</div>
+<div id="install-and-source-the-functions" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> Install And Source The Functions<a href="#install-and-source-the-functions" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Install the plotting dependencies once:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;RColorBrewer&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
+<p>Download the shared utilities first, then the plot modules you need:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>base_url <span class="ot">&lt;-</span> <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions&#39;</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_plot_utils.R&#39;</span>), <span class="st">&#39;gsea_plot_utils.R&#39;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_waterfall_plot.R&#39;</span>), <span class="st">&#39;gsea_waterfall_plot.R&#39;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_volcano_plot.R&#39;</span>), <span class="st">&#39;gsea_volcano_plot.R&#39;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_half_volcano_plot.R&#39;</span>), <span class="st">&#39;gsea_half_volcano_plot.R&#39;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_nes_scatter_plot.R&#39;</span>), <span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_plot_utils.R&#39;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_waterfall_plot.R&#39;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_volcano_plot.R&#39;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_half_volcano_plot.R&#39;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span></code></pre></div>
+</div>
+<div id="input-contract" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> Input Contract<a href="#input-contract" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Each table represents one GSEA contrast with one row per unique term. The default columns are:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Column</th>
+<th align="left">Required</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>go_description</code></td>
+<td align="left">yes</td>
+<td align="left">unique GO term name and default matching key</td>
+</tr>
+<tr class="even">
+<td align="left"><code>NES</code></td>
+<td align="left">yes</td>
+<td align="left">normalized enrichment score</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pval</code></td>
+<td align="left">yes</td>
+<td align="left">nominal GSEA p-value in <code>[0, 1]</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>padj</code></td>
+<td align="left">yes</td>
+<td align="left">adjusted p-value in <code>[0, 1]</code></td>
+</tr>
+</tbody>
+</table>
+<p>All four columns must be complete, and NES values must be finite. If descriptions are not unique, supply a complete unique identifier column through <code>id_col</code>. Comparative scatterplots use the exact shared identifier intersection; they do not impute absent terms.</p>
+<p>Load the bundled examples from the repository root:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>gsea_day9_vs_day6 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day9_vs_day6.csv&#39;</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>gsea_day3_vs_day1 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="waterfall-plots" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Waterfall Plots<a href="#waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks terms by <code>NES</code>, <code>padj</code>, or <code>pvalue</code>, and displays the first <code>top_n</code> rows. <code>term_groups</code> controls point colors; <code>label_terms</code> independently controls direct labels. Text seeds are matched case-insensitively against term descriptions, while supplied term IDs are matched exactly after case normalization.</p>
+<div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Positive NES waterfall<a href="#positive-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>positive_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="st">&#39;Ion channel&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>    <span class="st">&#39;Calcium&#39;</span>, <span class="st">&#39;Sodium&#39;</span>, <span class="st">&#39;Potassium&#39;</span>, <span class="st">&#39;Ion&#39;</span>, <span class="st">&#39;Voltage&#39;</span>, <span class="st">&#39;Channel&#39;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="st">&#39;electrical&#39;</span>, <span class="st">&#39;Action potential&#39;</span>, <span class="st">&#39;transmembrane&#39;</span>, <span class="st">&#39;conduction&#39;</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  ),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="st">&#39;Metabolism&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>    <span class="st">&#39;Metabolic&#39;</span>, <span class="st">&#39;Metabolism&#39;</span>, <span class="st">&#39;Electron transport chain&#39;</span>, <span class="st">&#39;Mitochondria&#39;</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="st">&#39;Mitochondrial&#39;</span>, <span class="st">&#39;Oxidative&#39;</span>, <span class="st">&#39;Phosphorylation&#39;</span>, <span class="st">&#39;ATP&#39;</span>, <span class="st">&#39;lipid&#39;</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="st">&#39;biosynthetic&#39;</span>, <span class="st">&#39;respiration&#39;</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  ),</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="st">&#39;Muscle contraction&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    <span class="st">&#39;Muscle contraction&#39;</span>, <span class="st">&#39;Muscle cell differentiation&#39;</span>, <span class="st">&#39;Striated&#39;</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>    <span class="st">&#39;Sarcomere&#39;</span>, <span class="st">&#39;Myofibril&#39;</span>, <span class="st">&#39;Actin&#39;</span>, <span class="st">&#39;Muscle&#39;</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  ),</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="st">&#39;Heart development&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;atrial&#39;</span>, <span class="st">&#39;ventricular&#39;</span>, <span class="st">&#39;heart&#39;</span>, <span class="st">&#39;cardiac&#39;</span>)</span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>)</span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>symmetric_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span>,</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="at">label_terms =</span> <span class="fu">c</span>(positive_volcano_label_terms, negative_volcano_label_terms),</span>
-<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&quot;Cardiomyocyte vs. Mesoderm&quot;</span>,</span>
-<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>  <span class="at">label_words_per_line =</span> <span class="dv">3</span></span>
-<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div id="fig-symmetric-volcano" class="figure-anchor"></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg"
-                        alt=""
-                        width="58%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 3.</strong> Symmetric GO biological-process
-                      GSEA volcano for Cardiomyocyte vs. Mesoderm. NES is shown
-                      on the x-axis, adjusted p-value on the y-axis, and point
-                      color marks significant positive, significant negative, or
-                      non-significant enrichment.
-                    </div>
-                  </div>
-                  <div
-                    id="directional-half-volcano-plots"
-                    class="section level2 hasAnchor"
-                    number="6.2"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">6.2</span> Directional
-                      half-volcano plots<a
-                        href="#directional-half-volcano-plots"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <div class="sourceCode" id="cb5">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>positive_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="st">&quot;myofibril assembly&quot;</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle contraction&quot;</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="st">&quot;cardiac muscle cell action potential&quot;</span>,</span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="st">&quot;electron transport chain&quot;</span>,</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="st">&quot;muscle cell differentiation&quot;</span>,</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="st">&quot;cardiac cell development&quot;</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="st">&quot;cardiac chamber morphogenesis&quot;</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="st">&quot;muscle contraction&quot;</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="st">&quot;cardiac conduction&quot;</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="st">&quot;heart growth&quot;</span>,</span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="st">&quot;heart trabecula morphogenesis&quot;</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>)</span>
-<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>positive_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&quot;positive&quot;</span>,</span>
-<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span>,</span>
-<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_half_volcano_label_terms,</span>
-<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
-<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  <span class="at">category_n =</span> <span class="dv">4</span>,</span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&quot;Cardiomyocyte vs. Mesoderm&quot;</span></span>
-<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div
-                      id="fig-positive-half-volcano"
-                      class="figure-anchor"
-                    ></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg"
-                        alt=""
-                        width="72%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 4.</strong> Positive NES half-volcano for
-                      Cardiomyocyte vs. Mesoderm. The enlarged directional view
-                      uses the same labeled positive terms as the positive NES
-                      waterfall plot.
-                    </div>
-                    <div class="sourceCode" id="cb6">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># define negative labels</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>negative_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="st">&quot;DNA-templated DNA replication&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="st">&quot;DNA replication&quot;</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="st">&quot;cell cycle checkpoint signaling&quot;</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="st">&quot;mitotic cell cycle checkpoint signaling&quot;</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="st">&quot;ribosome biogenesis&quot;</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="st">&quot;recombinational repair&quot;</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="st">&quot;DNA replication initiation&quot;</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="st">&quot;cell cycle DNA replication&quot;</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="st">&quot;spindle organization&quot;</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>positive_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle contraction&#39;</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell action potential&#39;</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>  <span class="st">&#39;calcium-mediated signaling&#39;</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>  <span class="st">&#39;electron transport chain&#39;</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>  <span class="st">&#39;muscle cell differentiation&#39;</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>  <span class="st">&#39;ATP metabolic process&#39;</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>  <span class="st">&#39;cardiac cell development&#39;</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>  <span class="st">&#39;cardiac chamber morphogenesis&#39;</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>  <span class="st">&#39;muscle contraction&#39;</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>  <span class="st">&#39;cardiac conduction&#39;</span>,</span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell contraction&#39;</span>,</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>  <span class="st">&#39;heart growth&#39;</span>,</span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>  <span class="st">&#39;cardiac atrium development&#39;</span>,</span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>  <span class="st">&#39;heart trabecula morphogenesis&#39;</span></span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>)</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>positive_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_label_terms,</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups</span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-positive-waterfall" class="figure-anchor">
+
+</div>
+<p><img src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="" width="80%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 1.</strong> Positive NES GO biological-process waterfall for Cardiomyocyte vs. Mesoderm. Terms are ranked by NES, colored by manually defined cardiac-relevant groups, and labeled with selected terms.
+</div>
+</div>
+<div id="negative-nes-waterfall" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Negative NES waterfall<a href="#negative-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>negative_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="st">&#39;Ribosomal&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;ribosome&#39;</span>, <span class="st">&#39;ribosomal&#39;</span>, <span class="st">&#39;spliceosomal&#39;</span>, <span class="st">&#39;rRNA&#39;</span>, <span class="st">&#39;RNA&#39;</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="st">&#39;Mitosis&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>    <span class="st">&#39;Mitosis&#39;</span>, <span class="st">&#39;Meiosis&#39;</span>, <span class="st">&#39;Nuclear division&#39;</span>, <span class="st">&#39;cell cycle&#39;</span>, <span class="st">&#39;telomere&#39;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>    <span class="st">&#39;spindle&#39;</span>, <span class="st">&#39;Mitotic&#39;</span>, <span class="st">&#39;Meiotic&#39;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  ),</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;chromosome&#39;</span>, <span class="st">&#39;DNA&#39;</span>, <span class="st">&#39;base&#39;</span>, <span class="st">&#39;repair&#39;</span>, <span class="st">&#39;DNA-&#39;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>negative_term_group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="st">&#39;Ribosomal&#39;</span> <span class="ot">=</span> <span class="st">&#39;#377EB8&#39;</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="st">&#39;Mitosis&#39;</span> <span class="ot">=</span> <span class="st">&#39;#984EA3&#39;</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="st">&#39;#E41A1C&#39;</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>)</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>negative_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span><span class="dt">L</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>  <span class="at">term_group_colors =</span> negative_term_group_colors</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-negative-waterfall" class="figure-anchor">
+
+</div>
+<p><img src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="" width="80%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 2.</strong> Negative NES GO biological-process waterfall for the same contrast. The selected groups highlight ribosomal, mitotic, and DNA-replication programs.
+</div>
+</div>
+</div>
+<div id="volcano-plots" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">5</span> Volcano Plots<a href="#volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for a larger directional view. The example retains the established adjusted p-value cutoff of 0.05.</p>
+<div id="symmetric-volcano" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Symmetric volcano<a href="#symmetric-volcano" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle contraction&#39;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="st">&#39;muscle cell differentiation&#39;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="st">&#39;cardiac chamber morphogenesis&#39;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="st">&#39;heart growth&#39;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="st">&#39;heart valve development&#39;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="st">&#39;DNA replication initiation&#39;</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="st">&#39;mitotic G2/M transition checkpoint&#39;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="st">&#39;centriole assembly&#39;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="st">&#39;ribosome assembly&#39;</span></span>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
 <span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>negative_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>symmetric_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
 <span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&quot;negative&quot;</span>,</span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span>,</span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_label_terms,</span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  <span class="at">term_group_colors =</span> negative_term_group_colors,</span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&quot;Cardiomyocyte vs. Mesoderm&quot;</span></span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div
-                      id="fig-negative-half-volcano"
-                      class="figure-anchor"
-                    ></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg"
-                        alt=""
-                        width="72%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 5.</strong> Negative NES half-volcano for
-                      Cardiomyocyte vs. Mesoderm. The selected terms emphasize
-                      DNA replication, checkpoint, and ribosome-associated
-                      programs.
-                    </div>
-                  </div>
-                </div>
-                <div
-                  id="comparative-nes-scatterplots"
-                  class="section level1 hasAnchor"
-                  number="7"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">7</span> Comparative NES
-                    Scatterplots<a
-                      href="#comparative-nes-scatterplots"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <p>
-                    Use <code>plot_gsea_nes_scatter()</code> to compare the same
-                    GO terms across two GSEA result tables. The scatterplots
-                    below compare late and early cardiomyocyte differentiation
-                    intervals.
-                  </p>
-                  <div class="sourceCode" id="cb7">
-                    <pre
-                      class="sourceCode r"
-                    ><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># define all-quadrant labels</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>all_quadrants_scatter_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="st">&quot;mesenchyme development&quot;</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="st">&quot;mesoderm development&quot;</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="st">&quot;mesodermal cell differentiation&quot;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="st">&quot;myofibril assembly&quot;</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="st">&quot;heart process&quot;</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="st">&quot;oxidative phosphorylation&quot;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="st">&quot;regulation of nuclear division&quot;</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>)</span></code></pre>
-                  </div>
-                  <div
-                    id="all-quadrants"
-                    class="section level2 hasAnchor"
-                    number="7.1"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">7.1</span> All
-                      quadrants<a
-                        href="#all-quadrants"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <div class="sourceCode" id="cb8">
-                      <pre
-                        class="sourceCode r"
-                      ><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># plot all NES quadrants</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>all_quadrants_scatter <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&quot;Day 9 vs. Day 6 NES&quot;</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&quot;Day 3 vs. Day 1 NES&quot;</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&quot;significance&quot;</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&quot;all&quot;</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&quot;Day 9 vs. Day 6&quot;</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&quot;Day 3 vs. Day 1&quot;</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  <span class="at">label_terms =</span> all_quadrants_scatter_label_terms,</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>)</span></code></pre>
-                    </div>
-                    <div
-                      id="fig-all-quadrants-scatter"
-                      class="figure-anchor"
-                    ></div>
-                    <p>
-                      <img
-                        src="assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg"
-                        alt=""
-                        width="100%"
-                        style="display: block; margin: auto"
-                      />
-                    </p>
-                    <div class="tutorial-figure-caption">
-                      <strong>Figure 6.</strong> Comparative GO
-                      biological-process NES scatterplot for Day 9 vs. Day 6 and
-                      Day 3 vs. Day 1. The fitted line summarizes the NES
-                      relationship across plotted GO terms, while point color
-                      indicates whether each GO term is significant in one,
-                      both, or neither contrast.
-                    </div>
-                  </div>
-                </div>
-                <div
-                  id="function-reference"
-                  class="section level1 hasAnchor"
-                  number="8"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">8</span> Function
-                    Reference<a
-                      href="#function-reference"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <div
-                    id="plot_gsea_waterfall"
-                    class="section level2 hasAnchor"
-                    number="8.1"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">8.1</span>
-                      <code>plot_gsea_waterfall()</code
-                      ><a
-                        href="#plot_gsea_waterfall"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <p>
-                      Ranks GO terms in one NES direction and colors selected
-                      biological categories.
-                    </p>
-                    <table>
-                      <colgroup>
-                        <col width="50%" />
-                        <col width="50%" />
-                      </colgroup>
-                      <thead>
-                        <tr class="header">
-                          <th align="left">Parameter</th>
-                          <th align="left">Meaning</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="odd">
-                          <td align="left"><code>gsea_results</code></td>
-                          <td align="left">GSEA result table.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>term_col</code></td>
-                          <td align="left">Column containing GO term names.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>nes_col</code></td>
-                          <td align="left">Column containing NES values.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>pvalue_col</code></td>
-                          <td align="left">
-                            Column containing nominal GSEA p-values.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>padj_col</code></td>
-                          <td align="left">
-                            Column containing adjusted p-values.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>id_col</code></td>
-                          <td align="left">
-                            Optional column containing GO IDs.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>direction</code></td>
-                          <td align="left">
-                            <code>"positive"</code> or <code>"negative"</code>.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>top_n</code></td>
-                          <td align="left">Number of ranked terms to plot.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>rank_by</code></td>
-                          <td align="left">
-                            Column used for ordering terms, usually
-                            <code>"NES"</code>.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>x_label</code></td>
-                          <td align="left">X-axis title.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>label_n</code></td>
-                          <td align="left">
-                            Number of automatic labels when
-                            <code>label_terms</code> is not supplied.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>label_terms</code></td>
-                          <td align="left">
-                            Exact GO descriptions or GO IDs to label.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>term_groups</code></td>
-                          <td align="left">
-                            Named list of biological groups and matching text
-                            seeds or GO IDs.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>category_n</code></td>
-                          <td align="left">
-                            Expected number of groups in
-                            <code>term_groups</code>.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>term_group_colors</code></td>
-                          <td align="left">
-                            Optional named colors for biological groups.
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div
-                    id="plot_gsea_volcano"
-                    class="section level2 hasAnchor"
-                    number="8.2"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">8.2</span>
-                      <code>plot_gsea_volcano()</code
-                      ><a
-                        href="#plot_gsea_volcano"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <p>
-                      Plots positive, negative, and non-significant GSEA terms
-                      in one symmetric NES volcano.
-                    </p>
-                    <table>
-                      <colgroup>
-                        <col width="50%" />
-                        <col width="50%" />
-                      </colgroup>
-                      <thead>
-                        <tr class="header">
-                          <th align="left">Parameter</th>
-                          <th align="left">Meaning</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="odd">
-                          <td align="left"><code>gsea_results</code></td>
-                          <td align="left">GSEA result table.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>term_col</code></td>
-                          <td align="left">Column containing GO term names.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>nes_col</code></td>
-                          <td align="left">Column containing NES values.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>pvalue_col</code></td>
-                          <td align="left">
-                            Column containing nominal GSEA p-values.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>padj_col</code></td>
-                          <td align="left">
-                            Column containing adjusted p-values.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>id_col</code></td>
-                          <td align="left">
-                            Optional column containing GO IDs.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>padj_cutoff</code></td>
-                          <td align="left">
-                            Adjusted p-value cutoff for significance.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>label_n</code></td>
-                          <td align="left">
-                            Number of significant terms to label automatically.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>label_terms</code></td>
-                          <td align="left">
-                            Exact GO descriptions or GO IDs to label.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>contrast_label</code></td>
-                          <td align="left">
-                            Short contrast name used in the x-axis title.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left">
-                            <code>label_words_per_line</code>
-                          </td>
-                          <td align="left">
-                            Number of words per line in wrapped GO labels.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>point_size</code></td>
-                          <td align="left">Point size.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>label_size</code></td>
-                          <td align="left">GO label text size.</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div
-                    id="plot_gsea_half_volcano"
-                    class="section level2 hasAnchor"
-                    number="8.3"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">8.3</span>
-                      <code>plot_gsea_half_volcano()</code
-                      ><a
-                        href="#plot_gsea_half_volcano"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <p>
-                      Expands one NES direction into a directional volcano
-                      panel.
-                    </p>
-                    <table>
-                      <colgroup>
-                        <col width="50%" />
-                        <col width="50%" />
-                      </colgroup>
-                      <thead>
-                        <tr class="header">
-                          <th align="left">Parameter</th>
-                          <th align="left">Meaning</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="odd">
-                          <td align="left"><code>gsea_results</code></td>
-                          <td align="left">GSEA result table.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>term_col</code></td>
-                          <td align="left">Column containing GO term names.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>nes_col</code></td>
-                          <td align="left">Column containing NES values.</td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>pvalue_col</code></td>
-                          <td align="left">
-                            Column containing nominal GSEA p-values.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>padj_col</code></td>
-                          <td align="left">
-                            Column containing adjusted p-values.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>id_col</code></td>
-                          <td align="left">
-                            Optional column containing GO IDs.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>direction</code></td>
-                          <td align="left">
-                            <code>"positive"</code> or <code>"negative"</code>.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>p_col</code></td>
-                          <td align="left">
-                            P-value column shown on the y-axis, usually
-                            <code>"padj"</code>.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>padj_cutoff</code></td>
-                          <td align="left">
-                            Adjusted p-value cutoff for significance.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>label_terms</code></td>
-                          <td align="left">
-                            Exact GO descriptions or GO IDs to label.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>term_groups</code></td>
-                          <td align="left">
-                            Named list of biological groups and matching text
-                            seeds or GO IDs.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>term_group_colors</code></td>
-                          <td align="left">
-                            Optional named colors for biological groups.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>inner_nes_limit</code></td>
-                          <td align="left">
-                            Inner NES boundary shown on the x-axis.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>contrast_label</code></td>
-                          <td align="left">
-                            Short contrast name used in the x-axis title.
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div
-                    id="plot_gsea_nes_scatter"
-                    class="section level2 hasAnchor"
-                    number="8.4"
-                  >
-                    <h2 class="hasAnchor">
-                      <span class="header-section-number">8.4</span>
-                      <code>plot_gsea_nes_scatter()</code
-                      ><a
-                        href="#plot_gsea_nes_scatter"
-                        class="anchor-section"
-                        aria-label="Anchor link to header"
-                      ></a>
-                    </h2>
-                    <p>
-                      Compares NES values for matched GO terms across two GSEA
-                      contrasts.
-                    </p>
-                    <table>
-                      <colgroup>
-                        <col width="50%" />
-                        <col width="50%" />
-                      </colgroup>
-                      <thead>
-                        <tr class="header">
-                          <th align="left">Parameter</th>
-                          <th align="left">Meaning</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="odd">
-                          <td align="left">
-                            <code>gsea_x</code>, <code>gsea_y</code>
-                          </td>
-                          <td align="left">
-                            GSEA result tables for the x- and y-axis contrasts.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left">
-                            <code>x_label</code>, <code>y_label</code>
-                          </td>
-                          <td align="left">Axis titles.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>term_col</code></td>
-                          <td align="left">
-                            Column containing GO term names in both tables.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>nes_col</code></td>
-                          <td align="left">
-                            Column containing NES values in both tables.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>pvalue_col</code></td>
-                          <td align="left">
-                            Column containing nominal GSEA p-values in both
-                            tables.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>padj_col</code></td>
-                          <td align="left">
-                            Column containing adjusted p-values in both tables.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>id_col</code></td>
-                          <td align="left">
-                            Optional column containing GO IDs in both tables.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>color_by</code></td>
-                          <td align="left">
-                            <code>"significance"</code> or
-                            <code>"term_group"</code>.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left">
-                            <code>x_name</code>, <code>y_name</code>
-                          </td>
-                          <td align="left">
-                            Short contrast names used in legend labels.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>label_terms</code></td>
-                          <td align="left">
-                            Exact GO descriptions or GO IDs to label.
-                          </td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left">
-                            <code>include_nonsignificant</code>
-                          </td>
-                          <td align="left">
-                            Keep terms not significant in either contrast.
-                          </td>
-                        </tr>
-                        <tr class="even">
-                          <td align="left"><code>equal_axis_limits</code></td>
-                          <td align="left">Use matched x/y limits.</td>
-                        </tr>
-                        <tr class="odd">
-                          <td align="left"><code>show_fit_line</code></td>
-                          <td align="left">Draw a linear best-fit line.</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div
-                  id="session-info"
-                  class="section level1 hasAnchor"
-                  number="9"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">9</span> Session Info<a
-                      href="#session-info"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <pre><code>## R version 4.6.0 (2026-04-24)
-## Platform: x86_64-pc-linux-gnu
-## Running under: Ubuntu 24.04.4 LTS
-##
-## Matrix products: default
-## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0
-## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0  LAPACK version 3.12.0
-##
-## locale:
-##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8
-##  [4] LC_COLLATE=C.UTF-8     LC_MONETARY=C.UTF-8    LC_MESSAGES=C.UTF-8
-##  [7] LC_PAPER=C.UTF-8       LC_NAME=C              LC_ADDRESS=C
-## [10] LC_TELEPHONE=C         LC_MEASUREMENT=C.UTF-8 LC_IDENTIFICATION=C
-##
-## time zone: America/Chicago
-## tzcode source: system (glibc)
-##
-## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base
-##
-## loaded via a namespace (and not attached):
-##  [1] gtable_0.3.6        jsonlite_2.0.0      dplyr_1.2.1
-##  [4] compiler_4.6.0      BiocManager_1.30.27 tidyselect_1.2.1
-##  [7] Rcpp_1.1.1-1.1      dichromat_2.0-0.1   jquerylib_0.1.4
-## [10] systemfonts_1.3.2   scales_1.4.0        textshaping_1.0.5
-## [13] yaml_2.3.12         fastmap_1.2.0       ggplot2_4.0.3
-## [16] R6_2.6.1            generics_0.1.4      knitr_1.51
-## [19] ggrepel_0.9.8       tibble_3.3.1        bookdown_0.46
-## [22] svglite_2.2.2       bslib_0.11.0        pillar_1.11.1
-## [25] RColorBrewer_1.1-3  rlang_1.2.0         cachem_1.1.0
-## [28] xfun_0.58           sass_0.4.10         S7_0.2.2
-## [31] otel_0.2.0          cli_3.6.6           magrittr_2.0.5
-## [34] digest_0.6.39       grid_4.6.0          rstudioapi_0.18.0
-## [37] base64enc_0.1-6     lifecycle_1.0.5     vctrs_0.7.3
-## [40] evaluate_1.0.5      glue_1.8.1          farver_2.1.2
-## [43] rmarkdown_2.31      tools_4.6.0         pkgconfig_2.0.3
-## [46] htmltools_0.5.9</code></pre>
-                </div>
-                <div
-                  id="references"
-                  class="section level1 hasAnchor"
-                  number="10"
-                >
-                  <h1 class="hasAnchor">
-                    <span class="header-section-number">10</span> References<a
-                      href="#references"
-                      class="anchor-section"
-                      aria-label="Anchor link to header"
-                    ></a>
-                  </h1>
-                  <ol class="reference-list">
-                    <li>
-                      Subramanian A, Tamayo P, Mootha VK, et al. Gene set
-                      enrichment analysis: a knowledge-based approach for
-                      interpreting genome-wide expression profiles.
-                      <em>PNAS</em>. 2005.
-                      <a href="https://www.pnas.org/doi/10.1073/pnas.0506580102"
-                        >https://www.pnas.org/doi/10.1073/pnas.0506580102</a
-                      >
-                    </li>
-                    <li>
-                      Korotkevich G, Sukhov V, Budin N, Shpak B, Artyomov MN,
-                      Sergushichev A. Fast gene set enrichment analysis.
-                      <a href="https://www.biorxiv.org/content/10.1101/060012v3"
-                        >https://www.biorxiv.org/content/10.1101/060012v3</a
-                      >
-                    </li>
-                    <li>
-                      Bioconductor <code>fgsea</code>: Fast Gene Set Enrichment
-                      Analysis.
-                      <a href="https://bioconductor.org/packages/fgsea/"
-                        >https://bioconductor.org/packages/fgsea/</a
-                      >
-                    </li>
-                    <li>
-                      The Gene Ontology Consortium. The Gene Ontology resource.
-                      <a href="https://geneontology.org/"
-                        >https://geneontology.org/</a
-                      >
-                    </li>
-                    <li>
-                      Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic
-                      barrier sets the timing of human neuronal maturation.
-                      <em>Nature</em>. 2024;626:881-890.
-                      <a href="https://doi.org/10.1038/s41586-023-06984-8"
-                        >https://doi.org/10.1038/s41586-023-06984-8</a
-                      >
-                    </li>
-                    <li>
-                      Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR
-                      screen identifies Menin and SUZ12 as regulators of human
-                      developmental timing. <em>Nature Cell Biology</em>.
-                      2025;27:1411-1421.
-                      <a href="https://doi.org/10.1038/s41556-025-01751-5"
-                        >https://doi.org/10.1038/s41556-025-01751-5</a
-                      >
-                    </li>
-                    <li>
-                      Vuong CK, Weber A, Seong P, et al. A single-cell multiomic
-                      analysis identifies molecular and gene-regulatory
-                      mechanisms dysregulated in developing Down syndrome
-                      neocortex. <em>Science</em>. 2026;392:eaea1259.
-                      <a href="https://doi.org/10.1126/science.aea1259"
-                        >https://doi.org/10.1126/science.aea1259</a
-                      >
-                    </li>
-                    <li>
-                      Risgaard RD, et al. Molecular and cellular processes
-                      disrupted in the early postnatal Down syndrome prefrontal
-                      cortex. <em>Science</em>. 2026;392:eaea1549.
-                      <a href="https://doi.org/10.1126/science.aea1549"
-                        >https://doi.org/10.1126/science.aea1549</a
-                      >
-                    </li>
-                  </ol>
-                  <!--chapter:end:tutorial.Rmd-->
-                </div>
-                <!--bookdown:body:end-->
-                <script>
-                  document.addEventListener("DOMContentLoaded", function () {
-                    const toc = document.querySelector(
-                      ".book-summary nav > ul",
-                    );
-                    if (toc && !toc.classList.contains("summary")) {
-                      toc.classList.add("summary");
-                    }
-                    if (toc && !toc.querySelector(".toc-title")) {
-                      const titleItem = document.createElement("li");
-                      titleItem.className = "toc-title";
-                      const titleLink = document.createElement("a");
-                      titleLink.href = "./";
-                      titleLink.textContent = "Comparative ranked GSEA plots";
-                      titleItem.appendChild(titleLink);
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  <span class="at">label_terms =</span> volcano_label_terms,</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  <span class="at">label_words_per_line =</span> <span class="dv">3</span><span class="dt">L</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-symmetric-volcano" class="figure-anchor">
 
-                      const dividerItem = document.createElement("li");
-                      dividerItem.className = "divider";
+</div>
+<p><img src="assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg" alt="" width="58%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 3.</strong> Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs. Mesoderm. Point color marks significant positive, significant negative, or non-significant enrichment.
+</div>
+</div>
+<div id="directional-half-volcano-plots" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Directional half-volcano plots<a href="#directional-half-volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>positive_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle contraction&#39;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell action potential&#39;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="st">&#39;electron transport chain&#39;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="st">&#39;muscle cell differentiation&#39;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="st">&#39;cardiac cell development&#39;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="st">&#39;cardiac chamber morphogenesis&#39;</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="st">&#39;muscle contraction&#39;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="st">&#39;cardiac conduction&#39;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  <span class="st">&#39;heart growth&#39;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="st">&#39;heart trabecula morphogenesis&#39;</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>)</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>positive_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_half_volcano_label_terms,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-positive-half-volcano" class="figure-anchor">
 
-                      toc.insertBefore(dividerItem, toc.firstChild);
-                      toc.insertBefore(titleItem, dividerItem);
-                    }
-                    if (toc) {
-                      toc.querySelectorAll("li").forEach(function (item) {
-                        if (
-                          !item.classList.contains("toc-title") &&
-                          !item.classList.contains("divider")
-                        ) {
-                          item.classList.add("chapter");
-                        }
-                      });
-                      toc
-                        .querySelectorAll("li.chapter > a")
-                        .forEach(function (link) {
-                          if (!link.querySelector("i.fa-check")) {
-                            const icon = document.createElement("i");
-                            icon.className = "fa fa-check";
-                            icon.setAttribute("aria-hidden", "true");
-                            link.insertBefore(icon, link.firstChild);
-                          }
-                        });
-                    }
+</div>
+<p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="" width="72%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 4.</strong> Positive NES half-volcano for Cardiomyocyte vs. Mesoderm. The enlarged view uses the same biological grouping logic as the waterfall plot.
+</div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>negative_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="st">&#39;cell cycle checkpoint signaling&#39;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="st">&#39;mitotic cell cycle checkpoint signaling&#39;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="st">&#39;ribosome biogenesis&#39;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="st">&#39;recombinational repair&#39;</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="st">&#39;DNA replication initiation&#39;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;cell cycle DNA replication&#39;</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="st">&#39;spindle organization&#39;</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>negative_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_half_volcano_label_terms,</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="at">term_group_colors =</span> negative_term_group_colors,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-negative-half-volcano" class="figure-anchor">
 
-                    if (!document.getElementById("code-block-theme")) {
-                      const style = document.createElement("style");
-                      style.id = "code-block-theme";
-                      style.textContent = `
-        .book .book-body .page-wrapper .page-inner section.normal pre:not(.mermaid),
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode,
-        .book .book-body .page-wrapper .page-inner section.normal pre.sourceCode,
-        .book .book-body .page-wrapper .page-inner section.normal code.sourceCode,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode pre,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code,
-        .book .book-body .page-wrapper .page-inner section.normal pre:not(.mermaid) code,
-        .book .book-body .page-wrapper .page-inner section.normal pre:not(.mermaid) code span {
-          background-color: #242424 !important;
-          color: #e6edf3 !important;
-          font-family: var(--tutorial-code-font) !important;
-          font-weight: 400;
-          font-variant-ligatures: none;
+</div>
+<p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="" width="72%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 5.</strong> Negative NES half-volcano for Cardiomyocyte vs. Mesoderm. Selected labels emphasize DNA replication, checkpoint, and ribosome-associated programs.
+</div>
+</div>
+</div>
+<div id="comparative-nes-scatterplot" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">6</span> Comparative NES Scatterplot<a href="#comparative-nes-scatterplot" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p><code>plot_gsea_nes_scatter()</code> compares the exact shared term-key intersection. The fitted line is descriptive; the helper does not calculate a new enrichment statistic.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>scatter_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="st">&#39;mesenchyme development&#39;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="st">&#39;mesoderm development&#39;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="st">&#39;mesodermal cell differentiation&#39;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="st">&#39;oxidative phosphorylation&#39;</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="st">&#39;regulation of nuclear division&#39;</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>)</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>all_quadrants_scatter <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&#39;Day 3 vs. Day 1 NES&#39;</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&#39;significance&#39;</span>,</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&#39;all&#39;</span>,</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&#39;Day 9 vs. Day 6&#39;</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&#39;Day 3 vs. Day 1&#39;</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>  <span class="at">label_terms =</span> scatter_label_terms,</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="at">show_fit_line =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>)</span></code></pre></div>
+<div id="fig-all-quadrants-scatter" class="figure-anchor">
+
+</div>
+<p><img src="assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg" alt="" width="100%" style="display: block; margin: auto;" /></p>
+<div class="tutorial-figure-caption">
+<strong>Figure 6.</strong> Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day 1. Point color shows significance in one, both, or neither contrast.
+</div>
+</div>
+<div id="function-reference" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> Function Reference<a href="#function-reference" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Function</th>
+<th align="left">Contract</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>read_gsea_result_csv()</code></td>
+<td align="left">reads and validates one precomputed CSV without filtering rows</td>
+</tr>
+<tr class="even">
+<td align="left"><code>plot_gsea_waterfall()</code></td>
+<td align="left">returns a ranked one-direction ggplot</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>plot_gsea_volcano()</code></td>
+<td align="left">returns a symmetric NES-versus-adjusted-p-value ggplot</td>
+</tr>
+<tr class="even">
+<td align="left"><code>plot_gsea_half_volcano()</code></td>
+<td align="left">returns a directional ggplot after the explicit NES boundary</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>plot_gsea_nes_scatter()</code></td>
+<td align="left">returns a ggplot from the exact shared term-key intersection</td>
+</tr>
+</tbody>
+</table>
+<p>All plot functions return ggplot objects and do not write files. Their source-level documentation defines the complete argument and return contracts. The common input-column arguments are <code>term_col</code>, <code>nes_col</code>, <code>pvalue_col</code>, <code>padj_col</code>, and optional <code>id_col</code>; visual arguments control labels, colors, dimensions inside the panel, and legends without changing the supplied enrichment values.</p>
+</div>
+<div id="reproduce-the-repository" class="section level1 hasAnchor" number="8">
+<h1><span class="header-section-number">8</span> Reproduce The Repository<a href="#reproduce-the-repository" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Install the rendering dependencies and run the maintained scripts from the repository root:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="st">&#39;base64enc&#39;</span>, <span class="st">&#39;bookdown&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;rmarkdown&#39;</span>, <span class="st">&#39;svglite&#39;</span>, <span class="st">&#39;systemfonts&#39;</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>))</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">Rscript</span> R/01_generate_gsea_figs.R</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="ex">Rscript</span> R/02_render_github_pgs.R</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="ex">Rscript</span> R/03_check_gsea_contracts.R</span></code></pre></div>
+<p>The first script writes the six editable, font-embedded SVGs under <code>tutorial/assets/figures/</code>. The second renders <code>tutorial/tutorial.Rmd</code> into <code>docs/</code> for GitHub Pages. The third verifies the fixed scientific counts, plot contracts, public API, identifier matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands recorded in <code>MAINTENANCE.md</code>.</p>
+</div>
+<div id="references" class="section level1 hasAnchor" number="9">
+<h1><span class="header-section-number">9</span> References<a href="#references" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<ol class="reference-list">
+<li>
+Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005. <a href="https://www.pnas.org/doi/10.1073/pnas.0506580102">https://www.pnas.org/doi/10.1073/pnas.0506580102</a>
+</li>
+<li>
+Korotkevich G, Sukhov V, Budin N, Shpak B, Artyomov MN, Sergushichev A. Fast gene set enrichment analysis. <a href="https://www.biorxiv.org/content/10.1101/060012v3">https://www.biorxiv.org/content/10.1101/060012v3</a>
+</li>
+<li>
+Bioconductor <code>fgsea</code>: Fast Gene Set Enrichment Analysis. <a href="https://bioconductor.org/packages/fgsea/">https://bioconductor.org/packages/fgsea/</a>
+</li>
+<li>
+The Gene Ontology Consortium. The Gene Ontology resource. <a href="https://geneontology.org/">https://geneontology.org/</a>
+</li>
+<li>
+Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. <em>Nature</em>. 2024;626:881-890. <a href="https://doi.org/10.1038/s41586-023-06984-8">https://doi.org/10.1038/s41586-023-06984-8</a>
+</li>
+<li>
+Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. <em>Nature Cell Biology</em>. 2025;27:1411-1421. <a href="https://doi.org/10.1038/s41556-025-01751-5">https://doi.org/10.1038/s41556-025-01751-5</a>
+</li>
+<li>
+Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. <em>Science</em>. 2026;392:eaea1259. <a href="https://doi.org/10.1126/science.aea1259">https://doi.org/10.1126/science.aea1259</a>
+</li>
+<li>
+Risgaard RD, et al. Molecular and cellular processes disrupted in the early postnatal Down syndrome prefrontal cortex. <em>Science</em>. 2026;392:eaea1549. <a href="https://doi.org/10.1126/science.aea1549">https://doi.org/10.1126/science.aea1549</a>
+</li>
+</ol>
+
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toc = document.querySelector(".book-summary nav > ul");
+
+    if (toc && !toc.classList.contains("summary")) {
+      toc.classList.add("summary");
+    }
+    if (toc && !toc.querySelector(".toc-title")) {
+      const titleItem = document.createElement("li");
+      titleItem.className = "toc-title";
+
+      const titleLink = document.createElement("a");
+      titleLink.href = "./";
+      titleLink.textContent = "Comparative ranked GSEA plots";
+      titleItem.appendChild(titleLink);
+
+      const dividerItem = document.createElement("li");
+      dividerItem.className = "divider";
+
+      toc.insertBefore(dividerItem, toc.firstChild);
+      toc.insertBefore(titleItem, dividerItem);
+    }
+    if (toc) {
+      toc.querySelectorAll("li").forEach(function (item) {
+        if (!item.classList.contains("toc-title") && !item.classList.contains("divider")) {
+          item.classList.add("chapter");
         }
-
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span {
-          background-color: transparent !important;
-          font-family: var(--tutorial-code-font) !important;
+      });
+      toc.querySelectorAll("li.chapter > a").forEach(function (link) {
+        if (!link.querySelector("i.fa-check")) {
+          const icon = document.createElement("i");
+          icon.className = "fa fa-check";
+          icon.setAttribute("aria-hidden", "true");
+          link.insertBefore(icon, link.firstChild);
         }
+      });
+    }
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.al,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.er {
-          color: #ff7b72 !important;
-          font-weight: 700;
-        }
+    document.querySelectorAll('.page-inner a[href^="http"]').forEach(function (link) {
+      link.setAttribute("target", "_blank");
+      link.setAttribute("rel", "noopener noreferrer");
+    });
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.an,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.co,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.cv,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.do,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.in,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.wa {
-          color: #8b949e !important;
-          font-style: italic;
-        }
+    document.querySelectorAll("div.sourceCode, pre.sourceCode").forEach(function (block) {
+      if (block.closest("details.code-fold")) return;
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.at,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.dt,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.va {
-          color: #ffa657 !important;
-        }
+      const details = document.createElement("details");
+      details.className = "code-fold";
+      details.open = true;
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.bn,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.cn,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.dv,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.fl {
-          color: #79c0ff !important;
-        }
+      const summary = document.createElement("summary");
+      summary.textContent = "Code";
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.bu,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.cf,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.im,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.kw,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.pp {
-          color: #ff7b72 !important;
-          font-weight: 700;
-        }
+      block.parentNode.insertBefore(details, block);
+      details.appendChild(summary);
+      details.appendChild(block);
+    });
+  });
+</script>
+            </section>
 
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.ch,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.sc,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.ss,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.st,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.vs {
-          color: #a5d6ff !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.fu {
-          color: #d2a8ff !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.op,
-        .book .book-body .page-wrapper .page-inner section.normal div.sourceCode code span.ot {
-          color: #ffab70 !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal details.code-fold {
-          background-color: #242424 !important;
-          border-color: #2f2f2f !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal details.code-fold summary {
-          color: #ffffff !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal details.code-fold summary,
-        .book .book-body .page-wrapper .page-inner section.normal details.code-fold summary * {
-          color: #ffffff !important;
-        }
-
-        .book .book-body .page-wrapper .page-inner section.normal #session-info pre,
-        .book .book-body .page-wrapper .page-inner section.normal #session-info pre code,
-        .book .book-body .page-wrapper .page-inner section.normal #session-info pre code span {
-          color: #a5d6ff !important;
-        }
-      `;
-                      document.head.appendChild(style);
-                    }
-
-                    const blocks = document.querySelectorAll(
-                      "div.sourceCode, pre.sourceCode",
-                    );
-
-                    document
-                      .querySelectorAll('.page-inner a[href^="http"]')
-                      .forEach(function (link) {
-                        link.setAttribute("target", "_blank");
-                        link.setAttribute("rel", "noopener noreferrer");
-                      });
-
-                    blocks.forEach(function (block) {
-                      if (block.closest("details.code-fold")) return;
-
-                      const details = document.createElement("details");
-                      details.className = "code-fold";
-                      details.open = true;
-
-                      const summary = document.createElement("summary");
-                      summary.textContent = "Code";
-                      summary.style.color = "#ffffff";
-
-                      block.parentNode.insertBefore(details, block);
-                      details.appendChild(summary);
-                      details.appendChild(block);
-                    });
-                  });
-                </script>
-                <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-                <script>
-                  document.addEventListener("DOMContentLoaded", function () {
-                    if (!window.mermaid) return;
-
-                    document
-                      .querySelectorAll("pre.mermaid > code")
-                      .forEach(function (code) {
-                        const diagram = document.createElement("div");
-                        diagram.className = "mermaid";
-                        diagram.textContent = code.textContent;
-                        code.parentNode.replaceWith(diagram);
-                      });
-
-                    mermaid.initialize({
-                      startOnLoad: true,
-                      securityLevel: "loose",
-                      htmlLabels: true,
-                      theme: "base",
-                      themeVariables: {
-                        fontFamily:
-                          '"Inter", "Latin Modern Sans", Arial, sans-serif',
-                        fontSize: "16px",
-                        primaryTextColor: "#111111",
-                        lineColor: "#555555",
-                      },
-                      flowchart: {
-                        curve: "basis",
-                        htmlLabels: true,
-                        useMaxWidth: true,
-                      },
-                    });
-                  });
-                </script>
-              </section>
-            </div>
           </div>
         </div>
-        <!--bookdown:link_prev-->
-        <!--bookdown:link_next-->
       </div>
+
+
     </div>
-    <!--bookdown:config-->
-  </body>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": null,
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": null,
+    "text": null
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+</body>
+
 </html>
