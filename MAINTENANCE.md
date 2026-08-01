@@ -17,8 +17,8 @@ membership.
 The maintained presentation decisions are:
 
 - one GO biological-process term per input row;
-- a complete, unique term description as the default key, or a caller-supplied
-  complete, unique stable key;
+- key precedence of explicit `id_col`, then `go_term_id` when present, otherwise
+  a complete, unique term description;
 - adjusted-p-value significance defined as `padj < 0.05`;
 - waterfall ranking by NES before selecting 100 terms per direction;
 - the established term groups and label selections; and
@@ -49,12 +49,13 @@ No compatibility function aliases or multi-file reader are supported.
 | Artifact | Unit and format | Writer | Consumer | Empty-result behavior |
 | :-- | :-- | :-- | :-- | :-- |
 | `tutorial/data/*.csv` | one GO term per row, CSV | bundled fixed input | reader, contract checks, figure script | not applicable |
-| `tutorial/assets/figures/*.svg` | one editable plot, SVG | `R/01_generate_gsea_figures.R` | README and tutorial | plotting fails before a file is written |
-| `docs/index.html`, `docs/search_index.json`, `docs/style.css`, `docs/libs/**`, `docs/assets/**` | one single-page bookdown site | `R/02_render_github_pages.R` | GitHub Pages | rendering fails; no empty site is admitted |
+| `tutorial/assets/figures/*.svg` | one editable plot, SVG | `R/01_generate_gsea_figures.R` | README and site renderer | plotting fails before a file is written |
+| `docs/index.html`, `docs/search_index.json`, `docs/style.css`, `docs/.nojekyll`, `docs/libs/**`, `docs/assets/**` | one single-page bookdown site | `R/02_render_github_pages.R` | GitHub Pages | rendering fails; no empty site is admitted |
 
-`tutorial/tutorial.Rmd` is the site source of truth. Do not edit generated files
-under `docs/` to correct source content. The site writer removes and recreates
-only its declared generated artifacts.
+`tutorial/tutorial.Rmd` owns site content. The tutorial YAML, CSS, HTML include,
+figures, and fonts are maintained build and presentation sources. Do not edit
+generated files under `docs/`; the site writer removes and recreates only its
+declared generated artifacts.
 
 ## Canonical verification
 

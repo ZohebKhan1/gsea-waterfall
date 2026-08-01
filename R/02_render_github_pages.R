@@ -14,7 +14,10 @@
 # - tutorial/style.css
 # - tutorial/code-collapse.html
 # - tutorial/assets/figures/*.svg
-# - tutorial/assets/fonts/*.otf
+# - tutorial/assets/fonts/LatinModernSans-Regular.otf
+# - tutorial/assets/fonts/LatinModernSans-Bold.otf
+# - tutorial/assets/fonts/LatinModernSans-Oblique.otf
+# - tutorial/assets/fonts/LatinModernSans-BoldOblique.otf
 #
 # outputs:
 # - docs/index.html

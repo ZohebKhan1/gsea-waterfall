@@ -109,7 +109,6 @@ body > #header,
   border-left: 3px solid transparent;
   color: #2d3748;
   display: block;
-  font-size: 0.95rem;
   overflow: hidden;
   padding: 0.34rem 0.9rem;
   text-decoration: none;
@@ -485,7 +484,6 @@ body > #header,
 
 @media (max-width: 640px) {
   .book .book-body .page-wrapper .page-inner section.normal {
-    font-size: 17.5px;
     line-height: 1.56;
   }
 

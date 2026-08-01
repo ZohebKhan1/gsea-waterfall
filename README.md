@@ -15,7 +15,7 @@ Install the plotting dependencies:
 utils::install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
-Download the shared utilities first, followed by the plot modules you need:
+Download the shared utilities first, followed by the plot modules:
 
 ```r
 base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
@@ -52,22 +52,22 @@ Each input table represents one GSEA contrast with one row per unique term:
 
 | Column | Required | Meaning |
 | :-- | :-- | :-- |
-| `go_description` | yes | term description and default matching key |
+| `go_description` | yes | term description and fallback matching key |
+| `go_term_id` | no | stable matching key used automatically when present |
 | `NES` | yes | normalized enrichment score |
 | `pval` | yes | nominal GSEA p-value in `[0, 1]` |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-The columns must be complete, and NES values must be finite. Descriptions must
-be unique unless `id_col` names a separate complete, unique term key.
-Comparative plots use the exact shared-key intersection and do not impute absent
-terms.
+Required columns must be complete, and NES values must be finite. Key precedence
+is explicit `id_col`, then `go_term_id` when present, otherwise
+`go_description`. Comparative plots use the exact shared-key intersection and
+do not impute absent terms.
 
 ## Plot functions
 
 ### `plot_gsea_waterfall()`
 
-Ranks one NES direction and optionally colors manually defined biological term
-groups.
+Ranks one NES direction and colors default or caller-supplied term groups.
 
 <img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES waterfall" width="760">
 
@@ -77,7 +77,7 @@ Mesoderm.
 <img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES waterfall" width="760">
 
 **Figure 2.** Negative NES waterfall highlighting ribosomal, mitotic, and
-DNA-replication programs.
+DNA-replication term groups.
 
 ### `plot_gsea_volcano()`
 
@@ -91,7 +91,7 @@ Mesoderm.
 
 ### `plot_gsea_half_volcano()`
 
-Expands one NES direction while retaining the same term-group logic.
+Expands one NES direction and optionally applies caller-supplied term groups.
 
 <img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES half-volcano" width="760">
 
@@ -143,9 +143,9 @@ recorded in [`MAINTENANCE.md`](MAINTENANCE.md).
 
 ```text
 functions/          downloadable plotting functions and shared utilities
-R/                  figure generation and site rendering entry points
+R/                  figure generation, site rendering, and contract checks
 tutorial/data/      fixed precomputed example GSEA tables
-tutorial/assets/    source figures and bundled fonts
+tutorial/assets/    generated tutorial figures and bundled fonts
 tutorial/tutorial.Rmd
 docs/               generated GitHub Pages site
 ```

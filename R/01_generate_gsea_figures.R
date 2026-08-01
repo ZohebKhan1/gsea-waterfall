@@ -69,9 +69,6 @@ nes_scatter_figure_height = 6.38
 gsea_padj_cutoff = 0.05
 waterfall_top_n = 100L
 half_volcano_inner_nes_limit = 1
-nes_scatter_include_nonsignificant = TRUE
-nes_scatter_equal_axis_limits = TRUE
-nes_scatter_show_fit_line = TRUE
 
 gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
@@ -176,14 +173,15 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 # create inline web-font CSS before opening the SVG device
 make_embedded_font_face <- function(font_path, weight, style) {
   font_uri <- base64enc::dataURI(file = font_path, mime = 'font/otf')
-  css <- paste0(
-    '    @font-face {\n',
-    '      font-family: "', gsea_svg_font_family, '";\n',
-    '      src: url("', font_uri, '") format("opentype");\n',
-    '      font-weight: ', weight, ';\n',
-    '      font-style: ', style, ';\n',
-    '    }')
-  structure(css, class = c('font_face', 'character'))
+  structure(
+    paste0(
+      '    @font-face {\n',
+      '      font-family: "', gsea_svg_font_family, '";\n',
+      '      src: url("', font_uri, '") format("opentype");\n',
+      '      font-weight: ', weight, ';\n',
+      '      font-style: ', style, ';\n',
+      '    }'),
+    class = c('font_face', 'character'))
 }
 
 systemfonts::register_font(
@@ -329,9 +327,9 @@ save_gsea_figure(
     y_name = 'Day 3 vs. Day 1',
     label_terms = nes_scatter_label_terms,
     padj_cutoff = gsea_padj_cutoff,
-    include_nonsignificant = nes_scatter_include_nonsignificant,
-    equal_axis_limits = nes_scatter_equal_axis_limits,
-    show_fit_line = nes_scatter_show_fit_line,
+    include_nonsignificant = TRUE,
+    equal_axis_limits = TRUE,
+    show_fit_line = TRUE,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,

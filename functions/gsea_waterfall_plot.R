@@ -14,15 +14,16 @@
 #' Make a GSEA waterfall plot
 #'
 #' Positive and negative plots exclude zero NES values. Terms are ranked before
-#' `top_n` is applied. Term descriptions act as unique keys unless `id_col`
-#' supplies a separate complete, unique identifier.
+#' `top_n` is applied. Key precedence is explicit `id_col`, then `go_term_id`
+#' when present, otherwise `term_col`.
 #'
 #' @param gsea_results GSEA result table.
-#' @param term_col Column containing GO term names.
+#' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
 #' @param pvalue_col Column containing nominal GSEA p-values.
 #' @param padj_col Column containing adjusted p-values.
-#' @param id_col Optional column containing GO IDs.
+#' @param id_col Optional column containing unique stable term identifiers;
+#'   overrides an existing `go_term_id` column.
 #' @param direction Direction to plot.
 #' @param top_n Number of terms to show.
 #' @param rank_by Column used to rank terms before taking `top_n`. Use `NES`,
@@ -32,8 +33,9 @@
 #' @param label_ranks Optional plotted ranks to label after ranking and
 #'   filtering.
 #' @param label_n Number of labels to automatically select across the ranked
-#'   terms when `label_terms` is not supplied.
-#' @param term_groups Optional named GO category seeds for coloring.
+#'   terms when neither `label_terms` nor `label_ranks` is supplied.
+#' @param term_groups Optional named GO category seeds for coloring. When
+#'   omitted, built-in description-based categories are used.
 #' @param term_group_colors Optional named colors for `term_groups`.
 #' @param label_size Label font size in points.
 #' @param label_fontface Label font face.
@@ -52,7 +54,6 @@
 #'
 #' @return A ggplot object without file-system side effects
 #'
-#' @export
 plot_gsea_waterfall <- function(gsea_results,
                                 term_col = 'go_description',
                                 nes_col = 'NES',
@@ -85,7 +86,12 @@ plot_gsea_waterfall <- function(gsea_results,
     label_n <- .gsea_validate_count(label_n, 'label_n')
   }
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
-  .gsea_validate_positive_integer_vector(label_ranks, 'label_ranks')
+  if (!is.null(label_ranks) &&
+    (!is.numeric(label_ranks) || anyNA(label_ranks) ||
+      any(!is.finite(label_ranks)) || any(label_ranks != floor(label_ranks)) ||
+      any(label_ranks < 1) || any(label_ranks > .Machine$integer.max))) {
+    stop('`label_ranks` must contain positive integers.', call. = FALSE)
+  }
   gsea_results <- .gsea_standardize_results(
     gsea_results = gsea_results,
     term_col = term_col,
@@ -114,14 +120,10 @@ plot_gsea_waterfall <- function(gsea_results,
   color_values <- .gsea_resolve_term_group_colors(
     term_groups = term_groups,
     term_group_colors = term_group_colors)
-  label_requests <- .gsea_combine_label_requests(
-    label_terms = label_terms,
-    label_ranks = label_ranks)
   label_tbl <- .gsea_select_labels(
     plot_tbl = plot_tbl,
-    label_terms = label_requests,
+    label_terms = c(as.list(label_terms), as.list(as.integer(label_ranks))),
     label_n = label_n,
-    score_col = 'label_score',
     rank_col = 'waterfall_rank')
   label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
   y_limits <- .gsea_resolve_axis_limits(plot_tbl$NES, lower = y_min, upper = y_max)

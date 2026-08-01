@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 
 `gsea-waterfall` visualizes **precomputed** Gene Set Enrichment Analysis (GSEA) results as ranked NES waterfalls, symmetric or directional volcano plots, and cross-contrast NES scatterplots. The functions return ggplot objects without running GSEA, changing supplied statistics, or writing files.
 
-The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plotting choices control row selection, labels, grouping, and presentation; they do not redefine enrichment significance.
+The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plot controls select, group, and label displayed rows; significance classes use the explicit adjusted-p-value cutoff without altering the supplied statistics.
 
 The waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8), [Xu, *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5), [Vuong, *Science*, 2026](https://doi.org/10.1126/science.aea1259), and [Risgaard, *Science*, 2026](https://doi.org/10.1126/science.aea1549).
 
@@ -41,7 +41,7 @@ Install the plotting dependencies once:
 utils::install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
-Download the shared utilities first, then the plot modules you need:
+Download the shared utilities first, then the plot modules:
 
 ```r
 base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
@@ -65,12 +65,13 @@ Each table represents one GSEA contrast with one row per unique term. The defaul
 
 | Column | Required | Meaning |
 |:---|:---|:---|
-| `go_description` | yes | GO term description and default matching key |
+| `go_description` | yes | GO term description and fallback matching key |
+| `go_term_id` | no | stable matching key used automatically when present |
 | `NES` | yes | normalized enrichment score |
 | `pval` | yes | nominal GSEA p-value in `[0, 1]` |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-All four columns must be complete, and NES values must be finite. Descriptions must be unique unless `id_col` names a separate complete, unique term key. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
+Required columns must be complete, and NES values must be finite. Key precedence is explicit `id_col`, then `go_term_id` when present, otherwise `go_description`. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
 
 Load the bundled examples from the repository root:
 
@@ -88,7 +89,7 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 
 # Ranked waterfall plots
 
-`plot_gsea_waterfall()` selects one NES direction, ranks terms by `NES`, `padj`, or `pvalue`, and displays the first `top_n` rows. `term_groups` controls point colors; `label_terms` independently controls direct labels. Text seeds are matched case-insensitively against term descriptions, while supplied term IDs are matched exactly after case normalization.
+`plot_gsea_waterfall()` selects one NES direction, ranks by `NES`, `padj`, `pvalue`, or `pval`, and retains `top_n` terms. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
 
 ## Positive NES waterfall
 
@@ -139,12 +140,12 @@ positive_waterfall_plot <- plot_gsea_waterfall(
 )
 ```
 
-```{r positive-waterfall-figure, echo=FALSE, results='asis', out.width='80%', fig.align='center'}
+```{r positive-waterfall-figure, results='asis', out.width='80%', fig.alt='Positive NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 1.</strong> Positive NES terms ranked by NES, with selected cardiac-relevant groups and labels.</div>
+<div class="tutorial-figure-caption"><strong>Figure 1.</strong> Positive NES terms ranked by NES, with selected term groups and labels.</div>
 
 ## Negative NES waterfall
 
@@ -176,16 +177,16 @@ negative_waterfall_plot <- plot_gsea_waterfall(
 )
 ```
 
-```{r negative-waterfall-figure, echo=FALSE, results='asis', out.width='80%', fig.align='center'}
+```{r negative-waterfall-figure, results='asis', out.width='80%', fig.alt='Negative NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES terms highlighting ribosomal, mitotic, and DNA-replication programs.</div>
+<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES terms highlighting ribosomal, mitotic, and DNA-replication term groups.</div>
 
 # Volcano plots
 
-Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_half_volcano()` for a larger directional view. The example retains the established adjusted p-value cutoff of 0.05.
+Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_half_volcano()` for a directional view. All examples use the established adjusted p-value cutoff of 0.05.
 
 ## Symmetric volcano
 
@@ -203,7 +204,7 @@ volcano_label_terms <- c(
   'ribosome assembly'
 )
 
-gsea_volcano_plot <- plot_gsea_volcano(
+symmetric_volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   padj_cutoff = 0.05,
   label_terms = volcano_label_terms,
@@ -212,7 +213,7 @@ gsea_volcano_plot <- plot_gsea_volcano(
 )
 ```
 
-```{r symmetric-volcano-figure, echo=FALSE, results='asis', out.width='58%', fig.align='center'}
+```{r symmetric-volcano-figure, results='asis', out.width='58%', fig.alt='Symmetric GSEA volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-symmetric-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg')
 ```
@@ -248,7 +249,7 @@ positive_half_volcano_plot <- plot_gsea_half_volcano(
 )
 ```
 
-```{r positive-half-volcano-figure, echo=FALSE, results='asis', out.width='72%', fig.align='center'}
+```{r positive-half-volcano-figure, results='asis', out.width='72%', fig.alt='Positive NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
@@ -281,7 +282,7 @@ negative_half_volcano_plot <- plot_gsea_half_volcano(
 )
 ```
 
-```{r negative-half-volcano-figure, echo=FALSE, results='asis', out.width='72%', fig.align='center'}
+```{r negative-half-volcano-figure, results='asis', out.width='72%', fig.alt='Negative NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
@@ -290,10 +291,10 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyt
 
 # Comparative NES scatterplot
 
-`plot_gsea_nes_scatter()` compares the exact shared term-key intersection. The fitted line is descriptive; the helper does not calculate a new enrichment statistic.
+`plot_gsea_nes_scatter()` compares exact shared term keys. The fitted line is descriptive and does not alter enrichment statistics.
 
 ```r
-scatter_label_terms <- c(
+nes_scatter_label_terms <- c(
   'mesenchyme development',
   'mesoderm development',
   'mesodermal cell differentiation',
@@ -303,7 +304,7 @@ scatter_label_terms <- c(
   'regulation of nuclear division'
 )
 
-comparative_nes_scatter_plot <- plot_gsea_nes_scatter(
+nes_scatter_plot <- plot_gsea_nes_scatter(
   gsea_x = gsea_day9_vs_day6,
   gsea_y = gsea_day3_vs_day1,
   x_label = 'Day 9 vs. Day 6 NES',
@@ -312,7 +313,7 @@ comparative_nes_scatter_plot <- plot_gsea_nes_scatter(
   quadrant = 'all',
   x_name = 'Day 9 vs. Day 6',
   y_name = 'Day 3 vs. Day 1',
-  label_terms = scatter_label_terms,
+  label_terms = nes_scatter_label_terms,
   padj_cutoff = 0.05,
   include_nonsignificant = TRUE,
   equal_axis_limits = TRUE,
@@ -320,7 +321,7 @@ comparative_nes_scatter_plot <- plot_gsea_nes_scatter(
 )
 ```
 
-```{r all-quadrants-scatter-figure, echo=FALSE, results='asis', out.width='100%', fig.align='center'}
+```{r all-quadrants-scatter-figure, results='asis', out.width='100%', fig.alt='Comparative NES scatterplot for Day 9 versus Day 6 and Day 3 versus Day 1'}
 cat('<div id="fig-all-quadrants-scatter" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg')
 ```
@@ -337,7 +338,7 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 | `plot_gsea_half_volcano()` | returns a directional ggplot after the explicit NES boundary |
 | `plot_gsea_nes_scatter()` | returns a ggplot from the exact shared term-key intersection |
 
-All plot functions return ggplot objects without writing files. Their source documentation defines the complete argument contracts. Common column arguments are `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col`.
+Source documentation defines the complete argument contracts, including the common `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col` arguments.
 
 # Reproduce the repository
 
@@ -361,9 +362,6 @@ The figure script writes six editable, font-embedded SVGs under `tutorial/assets
 
 <ol class="reference-list">
 <li>Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005. <a href="https://www.pnas.org/doi/10.1073/pnas.0506580102">https://www.pnas.org/doi/10.1073/pnas.0506580102</a></li>
-<li>Korotkevich G, Sukhov V, Budin N, Shpak B, Artyomov MN, Sergushichev A. Fast gene set enrichment analysis. <a href="https://www.biorxiv.org/content/10.1101/060012v3">https://www.biorxiv.org/content/10.1101/060012v3</a></li>
-<li>Bioconductor `fgsea`: Fast Gene Set Enrichment Analysis. <a href="https://bioconductor.org/packages/fgsea/">https://bioconductor.org/packages/fgsea/</a></li>
-<li>The Gene Ontology Consortium. The Gene Ontology resource. <a href="https://geneontology.org/">https://geneontology.org/</a></li>
 <li>Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. <em>Nature</em>. 2024;626:881-890. <a href="https://doi.org/10.1038/s41586-023-06984-8">https://doi.org/10.1038/s41586-023-06984-8</a></li>
 <li>Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. <em>Nature Cell Biology</em>. 2025;27:1411-1421. <a href="https://doi.org/10.1038/s41556-025-01751-5">https://doi.org/10.1038/s41556-025-01751-5</a></li>
 <li>Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. <em>Science</em>. 2026;392:eaea1259. <a href="https://doi.org/10.1126/science.aea1259">https://doi.org/10.1126/science.aea1259</a></li>

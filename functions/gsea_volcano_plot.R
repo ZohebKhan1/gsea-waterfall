@@ -21,15 +21,17 @@
 #' modified in the input table.
 #'
 #' @param gsea_results GSEA result table.
-#' @param term_col Column containing GO term names.
+#' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
 #' @param pvalue_col Column containing nominal GSEA p-values.
 #' @param padj_col Column containing adjusted p-values.
-#' @param id_col Optional column containing GO IDs.
+#' @param id_col Optional column containing unique stable term identifiers;
+#'   overrides an existing `go_term_id` column.
 #' @param padj_cutoff Adjusted p-value cutoff for coloring and shaded regions.
 #' @param label_n Number of significant terms to label.
 #' @param label_terms Optional exact term descriptions or GO IDs to label.
-#' @param y_max Upper y-axis limit for capped -log10 adjusted p-values.
+#' @param y_max Finite display cap for -log10 adjusted p-values. The coordinate
+#'   range includes additional annotation space above this value.
 #' @param y_min Lower y-axis limit for capped -log10 adjusted p-values.
 #' @param point_size Point size.
 #' @param point_colors Optional named colors for `Significantly up`,
@@ -46,7 +48,6 @@
 #'
 #' @return A ggplot object without file-system side effects
 #'
-#' @export
 plot_gsea_volcano <- function(gsea_results,
                               term_col = 'go_description',
                               nes_col = 'NES',
@@ -95,7 +96,7 @@ plot_gsea_volcano <- function(gsea_results,
   plot_tbl$point_group <- factor(
     plot_tbl$point_group,
     levels = c('Significantly up', 'Significantly down', 'Not significant'))
-  color_values <- .gsea_direction_colors()[levels(plot_tbl$point_group)]
+  color_values <- .gsea_direction_colors[levels(plot_tbl$point_group)]
   custom_colors <- .gsea_resolve_named_colors(
     color_values = point_colors,
     required_names = levels(plot_tbl$point_group),
@@ -104,9 +105,8 @@ plot_gsea_volcano <- function(gsea_results,
     color_values <- custom_colors
   }
   plot_tbl$label_score <- abs(plot_tbl$NES) * plot_tbl$plot_neg_log10_padj
-  label_requests <- .gsea_combine_label_requests(label_terms = label_terms)
-  if (!is.null(label_requests) && length(label_requests) > 0L) {
-    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = label_requests)
+  if (length(label_terms) > 0L) {
+    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = as.list(label_terms))
   } else {
     label_tbl <- .gsea_select_volcano_labels(plot_tbl, label_n = label_n)
   }
@@ -121,8 +121,10 @@ plot_gsea_volcano <- function(gsea_results,
   label_match <- match(label_tbl$go_term_id, repel_tbl$go_term_id)
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   repel_tbl$plot_neg_log10_padj[label_match] <- label_tbl$plot_neg_log10_padj
-  label_nudge_x_values <- ifelse(label_tbl$NES < 0, label_nudge_x, -label_nudge_x)
-  repel_tbl$label_nudge_x[label_match] <- label_nudge_x_values
+  repel_tbl$label_nudge_x[label_match] <- ifelse(
+    label_tbl$NES < 0,
+    label_nudge_x,
+    -label_nudge_x)
   repel_tbl$label_nudge_y[label_match] <- label_nudge_y +
     rep(c(0.18, -0.12, 0.08, -0.18), length.out = length(label_match))
   negative_count <- sum(plot_tbl$significant & plot_tbl$NES < 0, na.rm = TRUE)
@@ -138,8 +140,7 @@ plot_gsea_volcano <- function(gsea_results,
     group_col = 'point_group',
     background_groups = 'Not significant')
 
-  volcano_plot <- ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$NES, y = .data$plot_neg_log10_padj))
-  volcano_plot <- volcano_plot +
+  ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$NES, y = .data$plot_neg_log10_padj)) +
     ggplot2::geom_point(
       data = point_layers$background,
       ggplot2::aes(color = .data$point_group),
@@ -232,6 +233,4 @@ plot_gsea_volcano <- function(gsea_results,
       legend.box = 'horizontal',
       legend.justification = 'center',
       plot.margin = ggplot2::margin(10, 18, 8, 12))
-
-  volcano_plot
 }

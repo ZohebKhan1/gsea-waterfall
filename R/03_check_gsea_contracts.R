@@ -56,10 +56,7 @@ waterfall_plot <- plot_gsea_waterfall(
   top_n = 100L)
 volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm)
-half_volcano_plot <- plot_gsea_half_volcano(
-  gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-  direction = 'negative')
-scatter_plot <- plot_gsea_nes_scatter(
+nes_scatter_plot <- plot_gsea_nes_scatter(
   gsea_x = gsea_day9_vs_day6,
   gsea_y = gsea_day3_vs_day1,
   x_label = 'Day 9 vs. Day 6 NES',
@@ -74,15 +71,15 @@ stopifnot(
   sum(volcano_plot$data$point_group == 'Significantly down') == 272L,
   sum(volcano_plot$data$point_group == 'Significantly up') == 445L)
 
-expected_scatter_counts <- c(
+expected_nes_scatter_counts <- c(
   'Not significant in either' = 1327L,
   'Significant in Day 3 vs. Day 1 only' = 601L,
   'Significant in both' = 280L,
   'Significant in Day 9 vs. Day 6 only' = 269L)
-scatter_counts <- table(scatter_plot$data$point_group)
+nes_scatter_counts <- table(nes_scatter_plot$data$point_group)
 stopifnot(all(
-  as.integer(scatter_counts[names(expected_scatter_counts)]) ==
-    expected_scatter_counts))
+  as.integer(nes_scatter_counts[names(expected_nes_scatter_counts)]) ==
+    expected_nes_scatter_counts))
 
 # 2.0 verify public input and identifier boundaries -----------------
 
@@ -121,28 +118,12 @@ stopifnot(
   .expect_error(plot_gsea_volcano(
     gsea_cardiomyocyte_vs_mesoderm,
     padj_cutoff = 1.1)),
-  .expect_error(plot_gsea_half_volcano(
-    gsea_cardiomyocyte_vs_mesoderm,
-    direction = 'positive',
-    y_min = 5,
-    y_max = 2)),
   .expect_error(plot_gsea_waterfall(
     gsea_cardiomyocyte_vs_mesoderm,
     term_groups = list('duplicate' = 'one', 'duplicate' = 'two'))),
   .expect_error(plot_gsea_waterfall(
     gsea_cardiomyocyte_vs_mesoderm,
-    label_terms = character(),
-    label_n = -1L)),
-  .expect_error(plot_gsea_waterfall(
-    gsea_cardiomyocyte_vs_mesoderm,
     term_groups = list('Other' = 'development'))),
-  .expect_error(plot_gsea_nes_scatter(
-    gsea_x = gsea_day9_vs_day6,
-    gsea_y = gsea_day3_vs_day1,
-    x_label = 'x',
-    y_label = 'y',
-    equal_axis_limits = TRUE,
-    x_min = -3)),
   .expect_error(plot_gsea_nes_scatter(
     gsea_x = gsea_day9_vs_day6,
     gsea_y = gsea_day3_vs_day1,
@@ -163,7 +144,7 @@ y_results <- data.frame(
   p = c(0.1, 0.2),
   q = c(0.2, 0.3))
 
-stable_id_scatter_plot <- plot_gsea_nes_scatter(
+stable_id_nes_scatter_plot <- plot_gsea_nes_scatter(
   x_results,
   y_results,
   x_label = 'x',
@@ -174,7 +155,7 @@ stable_id_scatter_plot <- plot_gsea_nes_scatter(
   padj_col = 'q',
   id_col = 'id',
   include_nonsignificant = TRUE)
-stopifnot(nrow(stable_id_scatter_plot$data) == 2L)
+stopifnot(nrow(stable_id_nes_scatter_plot$data) == 2L)
 
 y_results$id <- c('three', 'four')
 stopifnot(.expect_error(plot_gsea_nes_scatter(

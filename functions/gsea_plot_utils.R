@@ -18,8 +18,9 @@
   if (is.null(id_col) && 'go_term_id' %in% names(gsea_results)) {
     id_col <- 'go_term_id'
   }
-  required_cols <- c(term_col, nes_col, pvalue_col, padj_col, id_col)
-  missing_cols <- setdiff(required_cols, names(gsea_results))
+  missing_cols <- setdiff(
+    c(term_col, nes_col, pvalue_col, padj_col, id_col),
+    names(gsea_results))
   if (length(missing_cols) > 0L) {
     stop(
       'Missing required GSEA plotting column(s): ',
@@ -48,8 +49,10 @@
       call. = FALSE)
   }
 
-  numeric_columns <- c(nes_col, pvalue_col, padj_col)
-  if (!all(vapply(gsea_results[numeric_columns], is.numeric, logical(1)))) {
+  if (!all(vapply(
+    gsea_results[c(nes_col, pvalue_col, padj_col)],
+    is.numeric,
+    logical(1)))) {
     stop('GSEA NES and p-value columns must be numeric.', call. = FALSE)
   }
 
@@ -79,19 +82,20 @@
 #'
 #' The input must contain one row per unique term and numeric NES, nominal
 #' p-value, and adjusted p-value columns. No filtering or GSEA calculation is
-#' performed. When `id_col` is omitted, `term_col` is the unique matching key.
+#' performed. Matching uses `id_col` when supplied, then `go_term_id` when
+#' present, and otherwise `term_col`.
 #'
 #' @param path Path to one CSV file
 #' @param term_col Column containing term descriptions
 #' @param nes_col Column containing normalized enrichment scores
 #' @param pvalue_col Column containing nominal GSEA p-values
 #' @param padj_col Column containing adjusted p-values
-#' @param id_col Optional column containing unique stable term identifiers
+#' @param id_col Optional column containing unique stable term identifiers;
+#'   overrides an existing `go_term_id` column
 #'
 #' @return A data frame with `go_term_id`, `go_description`, `NES`, `pvalue`,
 #'   `pval`, and `padj` columns
 #'
-#' @export
 read_gsea_result_csv <- function(path,
                                  term_col = 'go_description',
                                  nes_col = 'NES',
@@ -116,30 +120,24 @@ read_gsea_result_csv <- function(path,
 .gsea_neutral_color <- '#9E9E9E'
 .gsea_nonsignificant_color <- '#D9D9D9'
 
-.gsea_direction_colors <- function() {
-  c(
-    'Significantly up' = '#CC79A7',
-    'Significantly down' = '#0072B2',
-    'Not significant' = .gsea_nonsignificant_color)
-}
+.gsea_direction_colors <- c(
+  'Significantly up' = '#CC79A7',
+  'Significantly down' = '#0072B2',
+  'Not significant' = .gsea_nonsignificant_color)
 
-.gsea_default_term_group_colors <- function() {
-  c(
-    'Development/morphogenesis' = '#1B9E77',
-    'Neuronal/signaling' = '#4F61BD',
-    'Cell cycle/genome' = '#D73027',
-    'Metabolism/translation' = '#7A5195',
-    'Other' = .gsea_neutral_color)
-}
+.gsea_default_term_group_colors <- c(
+  'Development/morphogenesis' = '#1B9E77',
+  'Neuronal/signaling' = '#4F61BD',
+  'Cell cycle/genome' = '#D73027',
+  'Metabolism/translation' = '#7A5195',
+  'Other' = .gsea_neutral_color)
 
 .gsea_validate_number <- function(value,
                                   parameter_name,
                                   minimum = -Inf,
                                   maximum = Inf) {
-  if (length(value) != 1L || !is.numeric(value) || is.na(value) || !is.finite(value)) {
-    stop('`', parameter_name, '` has an invalid numeric value.', call. = FALSE)
-  }
-  if (value < minimum || value > maximum) {
+  if (length(value) != 1L || !is.numeric(value) || is.na(value) ||
+    !is.finite(value) || value < minimum || value > maximum) {
     stop('`', parameter_name, '` has an invalid numeric value.', call. = FALSE)
   }
   as.numeric(value)
@@ -174,22 +172,7 @@ read_gsea_result_csv <- function(path,
   invisible(NULL)
 }
 
-.gsea_validate_positive_integer_vector <- function(value, parameter_name) {
-  if (is.null(value)) {
-    return(invisible(NULL))
-  }
-  if (!is.numeric(value) || anyNA(value) || any(!is.finite(value)) ||
-    any(value != floor(value)) || any(value < 1) ||
-    any(value > .Machine$integer.max)) {
-    stop('`', parameter_name, '` must contain positive integers.', call. = FALSE)
-  }
-  invisible(NULL)
-}
-
-.gsea_validate_term_groups <- function(term_groups = NULL) {
-  if (is.null(term_groups)) {
-    return(invisible(NULL))
-  }
+.gsea_validate_term_groups <- function(term_groups) {
   valid_values <- is.list(term_groups) && length(term_groups) > 0L &&
     all(vapply(term_groups, function(group) {
       length(group) > 0L && !anyNA(group) && all(nzchar(trimws(as.character(group))))
@@ -230,16 +213,12 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_resolve_term_group_colors <- function(term_groups = NULL,
-                                            term_group_colors = NULL,
-                                            default_group = 'Other') {
+                                            term_group_colors = NULL) {
   if (is.null(term_groups)) {
-    return(.gsea_default_term_group_colors())
+    return(.gsea_default_term_group_colors)
   }
   group_names <- names(term_groups)
   if (is.null(term_group_colors)) {
-    if (!requireNamespace('RColorBrewer', quietly = TRUE)) {
-      stop('The RColorBrewer package is required for default term-group colors.', call. = FALSE)
-    }
     brewer_n <- min(9L, max(3L, length(group_names)))
     palette_colors <- RColorBrewer::brewer.pal(brewer_n, 'Set1')
     if (length(group_names) > brewer_n) {
@@ -254,7 +233,7 @@ read_gsea_result_csv <- function(path,
     color_values = term_group_colors,
     required_names = group_names,
     parameter_name = 'term_group_colors')
-  c(term_group_colors[group_names], stats::setNames(.gsea_neutral_color, default_group))
+  c(term_group_colors[group_names], 'Other' = .gsea_neutral_color)
 }
 
 .gsea_wrap_label <- function(labels,
@@ -285,28 +264,27 @@ read_gsea_result_csv <- function(path,
 
 # define default biological groups when callers do not supply category seeds
 .gsea_classify_terms <- function(go_description) {
-  term <- tolower(as.character(go_description))
-  category <- rep('Other', length(term))
+  term_text <- tolower(as.character(go_description))
+  term_group <- rep('Other', length(term_text))
 
-  category[grepl(
+  term_group[grepl(
     'cell cycle|mitotic|meiotic|chromosom|spindle|centromer|kinetochore|dna replication|dna repair|recombination',
-    term)] <- 'Cell cycle/genome'
-  category[category == 'Other' & grepl(
+    term_text)] <- 'Cell cycle/genome'
+  term_group[term_group == 'Other' & grepl(
     'development|morphogenesis|differentiation|mesoderm|mesenchyme|embryo|organogenesis|migration|pattern specification',
-    term)] <- 'Development/morphogenesis'
-  category[category == 'Other' & grepl(
+    term_text)] <- 'Development/morphogenesis'
+  term_group[term_group == 'Other' & grepl(
     'synap|neuro|axon|dendrit|transmitter|ion channel|receptor|signaling|signal transduction|membrane potential|secretion',
-    term)] <- 'Neuronal/signaling'
-  category[category == 'Other' & grepl(
+    term_text)] <- 'Neuronal/signaling'
+  term_group[term_group == 'Other' & grepl(
     'ribosom|translation|rrna|metabolic|biosynthetic|mitochond|oxidative|protein folding|rna processing',
-    term)] <- 'Metabolism/translation'
+    term_text)] <- 'Metabolism/translation'
 
-  factor(category, levels = names(.gsea_default_term_group_colors()))
+  factor(term_group, levels = names(.gsea_default_term_group_colors))
 }
 
 .gsea_match_term_groups <- function(gsea_results,
-                                    term_groups,
-                                    default_group = 'Other') {
+                                    term_groups) {
   .gsea_validate_term_groups(term_groups)
 
   match_text_seed <- function(seed, descriptions) {
@@ -314,10 +292,7 @@ read_gsea_result_csv <- function(path,
     grepl(paste0('\\b', escaped_seed, '\\b'), descriptions, ignore.case = TRUE, perl = TRUE)
   }
 
-  mapping <- data.frame(
-    go_term_id = gsea_results$go_term_id,
-    term_group = default_group,
-    stringsAsFactors = FALSE)
+  term_group <- rep('Other', nrow(gsea_results))
 
   for (group_name in names(term_groups)) {
     seeds <- as.character(term_groups[[group_name]])
@@ -327,46 +302,27 @@ read_gsea_result_csv <- function(path,
       term_match <- match_text_seed(seed, gsea_results$go_description)
       matched <- matched | id_match | term_match
     }
-    replace_idx <- mapping$term_group == default_group & matched
-    mapping$term_group[replace_idx] <- group_name
+    replace_idx <- term_group == 'Other' & matched
+    term_group[replace_idx] <- group_name
   }
 
-  mapping
+  term_group
 }
 
 .gsea_assign_term_groups <- function(gsea_results,
-                                     term_groups = NULL,
-                                     default_group = 'Other') {
+                                     term_groups = NULL) {
   if (is.null(term_groups)) {
     return(.gsea_classify_terms(gsea_results$go_description))
   }
-  term_mapping <- .gsea_match_term_groups(
+  matched_group <- .gsea_match_term_groups(
     gsea_results = gsea_results,
-    term_groups = term_groups,
-    default_group = default_group)
-  matched_group <- term_mapping$term_group[match(gsea_results$go_term_id, term_mapping$go_term_id)]
-  factor(matched_group, levels = c(names(term_groups), default_group))
-}
-
-.gsea_combine_label_requests <- function(label_terms = NULL,
-                                         label_ranks = NULL) {
-  requests <- list()
-  if (!is.null(label_terms) && length(label_terms) > 0L) {
-    requests <- c(requests, as.list(label_terms))
-  }
-  if (!is.null(label_ranks) && length(label_ranks) > 0L) {
-    requests <- c(requests, as.list(as.integer(label_ranks)))
-  }
-  if (length(requests) == 0L) {
-    return(NULL)
-  }
-  requests
+    term_groups = term_groups)
+  factor(matched_group, levels = c(names(term_groups), 'Other'))
 }
 
 .gsea_select_labels <- function(plot_tbl,
                                 label_terms = NULL,
                                 label_n = 0L,
-                                score_col = 'label_score',
                                 rank_col = NULL) {
   if (nrow(plot_tbl) == 0L) {
     return(plot_tbl[0L, , drop = FALSE])
@@ -409,7 +365,7 @@ read_gsea_result_csv <- function(path,
     return(plot_tbl[0L, , drop = FALSE])
   }
   if (is.null(rank_col) || !rank_col %in% names(plot_tbl)) {
-    plot_tbl <- plot_tbl[order(-plot_tbl[[score_col]], plot_tbl$padj, plot_tbl$go_description), , drop = FALSE]
+    plot_tbl <- plot_tbl[order(-plot_tbl$label_score, plot_tbl$padj, plot_tbl$go_description), , drop = FALSE]
     return(utils::head(plot_tbl, label_n))
   }
 
@@ -420,7 +376,7 @@ read_gsea_result_csv <- function(path,
     labels = FALSE)
   label_tbl <- do.call(rbind, lapply(sort(unique(plot_tbl$label_bin)), function(label_bin) {
     bin_tbl <- plot_tbl[plot_tbl$label_bin == label_bin, , drop = FALSE]
-    bin_tbl <- bin_tbl[order(-bin_tbl[[score_col]], bin_tbl$padj, bin_tbl$go_description), , drop = FALSE]
+    bin_tbl <- bin_tbl[order(-bin_tbl$label_score, bin_tbl$padj, bin_tbl$go_description), , drop = FALSE]
     utils::head(bin_tbl, 1L)
   }))
   label_tbl$label_bin <- NULL
@@ -443,8 +399,8 @@ read_gsea_result_csv <- function(path,
   negative_tbl$label_rank <- seq_len(nrow(negative_tbl))
 
   label_tbl <- rbind(
-    .gsea_select_labels(positive_tbl, label_n = positive_label_n, score_col = 'label_score', rank_col = 'label_rank'),
-    .gsea_select_labels(negative_tbl, label_n = negative_label_n, score_col = 'label_score', rank_col = 'label_rank'))
+    .gsea_select_labels(positive_tbl, label_n = positive_label_n, rank_col = 'label_rank'),
+    .gsea_select_labels(negative_tbl, label_n = negative_label_n, rank_col = 'label_rank'))
   if (nrow(label_tbl) < label_n) {
     remaining_tbl <- plot_tbl[plot_tbl$significant & !plot_tbl$go_term_id %in% label_tbl$go_term_id, , drop = FALSE]
     remaining_tbl <- remaining_tbl[order(-remaining_tbl$label_score, remaining_tbl$padj), , drop = FALSE]
@@ -465,7 +421,6 @@ read_gsea_result_csv <- function(path,
 .gsea_rank_direction_terms <- function(plot_tbl,
                                        direction,
                                        rank_by = 'NES') {
-  rank_by <- .gsea_normalize_rank_by(rank_by)
   if (rank_by == 'NES') {
     if (direction == 'positive') {
       return(plot_tbl[order(-plot_tbl$NES, plot_tbl$padj, plot_tbl$go_description), , drop = FALSE])

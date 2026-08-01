@@ -21,17 +21,19 @@
 #' @param gsea_y Second GSEA result table.
 #' @param x_label X-axis label.
 #' @param y_label Y-axis label.
-#' @param term_col Column containing GO term names in both tables.
+#' @param term_col Column containing term descriptions and the fallback key in
+#'   both tables.
 #' @param nes_col Column containing normalized enrichment scores in both tables.
 #' @param pvalue_col Column containing nominal GSEA p-values in both tables.
 #' @param padj_col Column containing adjusted p-values in both tables.
-#' @param id_col Optional column containing GO IDs in both tables.
+#' @param id_col Optional column containing unique stable term identifiers in
+#'   both tables; overrides existing `go_term_id` columns.
 #' @param color_by Color points by significance or matched GO term group.
 #' @param term_groups Named list used when `color_by = 'term_group'`.
 #' @param term_group_colors Optional named colors for `term_groups`.
 #' @param point_colors Optional named colors for significance groups when
 #'   `color_by = 'significance'`.
-#' @param quadrant Terms to include: all, Q1, or Q3.
+#' @param quadrant Terms to include: `all`, `q1`, or `q3`.
 #' @param x_name Short name used for the first contrast in the legend.
 #' @param y_name Short name used for the second contrast in the legend.
 #' @param label_n_x_only Number of terms to label that are significant only in `gsea_x`.
@@ -44,8 +46,9 @@
 #' @param label_words_per_line Number of GO term words shown on each label line.
 #' @param padj_cutoff Adjusted p-value cutoff for significance coloring.
 #' @param include_nonsignificant Keep terms that are not significant in either contrast.
-#' @param equal_axis_limits Use matching x/y limits. For Q1 and Q3 this zooms
-#'   to the selected quadrant while keeping the x and y ranges equal.
+#' @param equal_axis_limits Use matching x/y limits. For `q1` and `q3` this
+#'   zooms to the selected quadrant while keeping the x and y ranges equal.
+#'   Cannot be combined with explicit axis limits.
 #' @param quadrant_min_abs_nes Inner absolute NES boundary for Q1 and Q3 plots
 #'   when `equal_axis_limits = TRUE`.
 #' @param x_min Optional lower x-axis limit.
@@ -61,7 +64,6 @@
 #' @return A ggplot object built from the exact shared term-key intersection
 #'   without file-system side effects
 #'
-#' @export
 plot_gsea_nes_scatter <- function(gsea_x,
                                   gsea_y,
                                   x_label,
@@ -115,7 +117,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
     label_n_y_only <- .gsea_validate_count(label_n_y_only, 'label_n_y_only')
     label_n_both <- .gsea_validate_count(label_n_both, 'label_n_both')
   }
-  if (isTRUE(equal_axis_limits) && quadrant != 'all') {
+  if (equal_axis_limits && quadrant != 'all') {
     quadrant_min_abs_nes <- .gsea_validate_number(
       quadrant_min_abs_nes,
       'quadrant_min_abs_nes',
@@ -123,7 +125,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
   }
   .gsea_validate_limits(x_min, x_max, 'x_min', 'x_max')
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
-  if (isTRUE(equal_axis_limits) && any(!vapply(
+  if (equal_axis_limits && any(!vapply(
     list(x_min, x_max, y_min, y_max),
     is.null,
     logical(1)))) {
@@ -158,7 +160,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
 
   plot_tbl$significant_x <- plot_tbl$padj_x < padj_cutoff
   plot_tbl$significant_y <- plot_tbl$padj_y < padj_cutoff
-  if (!isTRUE(include_nonsignificant)) {
+  if (!include_nonsignificant) {
     plot_tbl <- plot_tbl[plot_tbl$significant_x | plot_tbl$significant_y, , drop = FALSE]
   }
   plot_tbl$label_score <- pmax(abs(plot_tbl$NES_x), abs(plot_tbl$NES_y)) *
@@ -182,9 +184,6 @@ plot_gsea_nes_scatter <- function(gsea_x,
       paste0('Significant in ', y_name, ' only'),
       'Not significant in either')
     if (is.null(point_colors)) {
-      if (!requireNamespace('RColorBrewer', quietly = TRUE)) {
-        stop('The RColorBrewer package is required for default scatterplot significance colors.', call. = FALSE)
-      }
       brewer_colors <- RColorBrewer::brewer.pal(4L, 'Set1')
       color_values <- stats::setNames(
         c(brewer_colors[[4L]], brewer_colors[[1L]], brewer_colors[[2L]], .gsea_nonsignificant_color),
@@ -199,10 +198,9 @@ plot_gsea_nes_scatter <- function(gsea_x,
     if (is.null(term_groups)) {
       stop("Provide `term_groups` when `color_by = 'term_group'.", call. = FALSE)
     }
-    term_group_mapping <- .gsea_assign_term_groups(
-      x_tbl,
+    plot_tbl$point_group <- .gsea_assign_term_groups(
+      plot_tbl,
       term_groups = term_groups)
-    plot_tbl$point_group <- term_group_mapping[match(plot_tbl$go_term_id, x_tbl$go_term_id)]
     color_values <- .gsea_resolve_term_group_colors(
       term_groups = term_groups,
       term_group_colors = term_group_colors)
@@ -218,7 +216,6 @@ plot_gsea_nes_scatter <- function(gsea_x,
   group_counts <- table(plot_tbl$point_group)
   color_values <- color_values[names(color_values) %in% names(group_counts)]
   count_values <- as.integer(group_counts[names(color_values)])
-  count_values[is.na(count_values)] <- 0L
   legend_labels <- stats::setNames(
     paste0(names(color_values), ' (n=', count_values, ')'),
     names(color_values))
@@ -241,20 +238,18 @@ plot_gsea_nes_scatter <- function(gsea_x,
     utils::head(label_tbl, label_n)
   }
 
-  label_requests <- .gsea_combine_label_requests(label_terms = label_terms)
-  if (!is.null(label_requests) && length(label_requests) > 0L) {
-    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = label_requests)
+  if (length(label_terms) > 0L) {
+    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = as.list(label_terms))
   } else {
     label_x_tbl <- select_scatter_label_rows(
-      plot_tbl[label_n_x_only > 0L & plot_tbl$significant_x & !plot_tbl$significant_y, , drop = FALSE],
+      plot_tbl[plot_tbl$significant_x & !plot_tbl$significant_y, , drop = FALSE],
       label_n_x_only)
     label_y_tbl <- select_scatter_label_rows(
-      plot_tbl[label_n_y_only > 0L & !plot_tbl$significant_x & plot_tbl$significant_y, , drop = FALSE],
+      plot_tbl[!plot_tbl$significant_x & plot_tbl$significant_y, , drop = FALSE],
       label_n_y_only)
 
     label_both_tbl <- plot_tbl[
-      label_n_both > 0L &
-        plot_tbl$significant_x &
+      plot_tbl$significant_x &
         plot_tbl$significant_y,
       ,
       drop = FALSE]
@@ -262,14 +257,13 @@ plot_gsea_nes_scatter <- function(gsea_x,
 
     label_tbl <- rbind(label_x_tbl, label_y_tbl, label_both_tbl)
   }
-  label_tbl <- label_tbl[!duplicated(label_tbl$go_term_id), , drop = FALSE]
   label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
   label_tbl$label_nudge_x <- ifelse(label_tbl$NES_x >= 0, 0.08, -0.08)
   label_tbl$label_nudge_y <- ifelse(label_tbl$NES_y >= 0, 0.08, -0.08)
 
   axis_x_limits <- NULL
   axis_y_limits <- NULL
-  if (isTRUE(equal_axis_limits)) {
+  if (equal_axis_limits) {
     axis_limit <- max(abs(c(plot_tbl$NES_x, plot_tbl$NES_y)), na.rm = TRUE)
     if (!is.finite(axis_limit) || axis_limit <= 0) {
       axis_limit <- 1
@@ -310,13 +304,13 @@ plot_gsea_nes_scatter <- function(gsea_x,
   if (!is.null(y_max)) {
     axis_y_limits[[2L]] <- y_max
   }
-  if (is.null(x_breaks) && !is.null(axis_x_limits)) {
+  if (!is.null(axis_x_limits)) {
     x_breaks <- scales::breaks_pretty(n = 5)(axis_x_limits)
     if (axis_x_limits[[1L]] <= 0 && axis_x_limits[[2L]] >= 0) {
       x_breaks <- sort(unique(c(x_breaks, 0)))
     }
   }
-  if (is.null(y_breaks) && !is.null(axis_y_limits)) {
+  if (!is.null(axis_y_limits)) {
     y_breaks <- scales::breaks_pretty(n = 5)(axis_y_limits)
     if (axis_y_limits[[1L]] <= 0 && axis_y_limits[[2L]] >= 0) {
       y_breaks <- sort(unique(c(y_breaks, 0)))
@@ -335,7 +329,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
     NULL
   }
 
-  coord_layer <- if (isTRUE(equal_axis_limits)) {
+  coord_layer <- if (equal_axis_limits) {
     ggplot2::coord_fixed(ratio = 1, xlim = axis_x_limits, ylim = axis_y_limits, clip = 'off')
   } else {
     ggplot2::coord_cartesian(xlim = axis_x_limits, ylim = axis_y_limits, clip = 'off')

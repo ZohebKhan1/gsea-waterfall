@@ -10,8 +10,6 @@
 
 # local scratch and generated intermediates
 /tmp/
-/tutorial/.quarto/
-/tutorial/_site/
 
 # private analysis inputs and full result tables
 /data/
