@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Comparative ranked GSEA waterfall, volcano, scatter-style plots</title>
+  <title>GSEA waterfall, volcano, and comparative NES plots</title>
   <meta name="description" content="Standalone R functions for plotting precomputed GSEA results." />
   <meta name="generator" content="bookdown 0.47 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Comparative ranked GSEA waterfall, volcano, scatter-style plots" />
+  <meta property="og:title" content="GSEA waterfall, volcano, and comparative NES plots" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="Standalone R functions for plotting precomputed GSEA results." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Comparative ranked GSEA waterfall, volcano, scatter-style plots" />
+  <meta name="twitter:title" content="GSEA waterfall, volcano, and comparative NES plots" />
   
   <meta name="twitter:description" content="Standalone R functions for plotting precomputed GSEA results." />
   
@@ -136,25 +136,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <nav role="navigation">
 
 <ul class="summary">
-<li><a href="./">Comparative ranked GSEA plots</a></li>
+<li><a href="./">GSEA visualization toolkit</a></li>
 
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a></li>
-<li class="chapter" data-level="2" data-path=""><a href="#install-and-source-the-functions"><i class="fa fa-check"></i><b>2</b> Install And Source The Functions</a></li>
-<li class="chapter" data-level="3" data-path=""><a href="#input-contract"><i class="fa fa-check"></i><b>3</b> Input Contract</a></li>
-<li class="chapter" data-level="4" data-path=""><a href="#waterfall-plots"><i class="fa fa-check"></i><b>4</b> Waterfall Plots</a>
+<li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a></li>
+<li class="chapter" data-level="3" data-path=""><a href="#input-contract"><i class="fa fa-check"></i><b>3</b> Input contract</a></li>
+<li class="chapter" data-level="4" data-path=""><a href="#ranked-waterfall-plots"><i class="fa fa-check"></i><b>4</b> Ranked waterfall plots</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path=""><a href="#positive-nes-waterfall"><i class="fa fa-check"></i><b>4.1</b> Positive NES waterfall</a></li>
 <li class="chapter" data-level="4.2" data-path=""><a href="#negative-nes-waterfall"><i class="fa fa-check"></i><b>4.2</b> Negative NES waterfall</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path=""><a href="#volcano-plots"><i class="fa fa-check"></i><b>5</b> Volcano Plots</a>
+<li class="chapter" data-level="5" data-path=""><a href="#volcano-plots"><i class="fa fa-check"></i><b>5</b> Volcano plots</a>
 <ul>
 <li class="chapter" data-level="5.1" data-path=""><a href="#symmetric-volcano"><i class="fa fa-check"></i><b>5.1</b> Symmetric volcano</a></li>
 <li class="chapter" data-level="5.2" data-path=""><a href="#directional-half-volcano-plots"><i class="fa fa-check"></i><b>5.2</b> Directional half-volcano plots</a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path=""><a href="#comparative-nes-scatterplot"><i class="fa fa-check"></i><b>6</b> Comparative NES Scatterplot</a></li>
-<li class="chapter" data-level="7" data-path=""><a href="#function-reference"><i class="fa fa-check"></i><b>7</b> Function Reference</a></li>
-<li class="chapter" data-level="8" data-path=""><a href="#reproduce-the-repository"><i class="fa fa-check"></i><b>8</b> Reproduce The Repository</a></li>
+<li class="chapter" data-level="6" data-path=""><a href="#comparative-nes-scatterplot"><i class="fa fa-check"></i><b>6</b> Comparative NES scatterplot</a></li>
+<li class="chapter" data-level="7" data-path=""><a href="#api-summary"><i class="fa fa-check"></i><b>7</b> API summary</a></li>
+<li class="chapter" data-level="8" data-path=""><a href="#reproduce-the-repository"><i class="fa fa-check"></i><b>8</b> Reproduce the repository</a></li>
 <li class="chapter" data-level="9" data-path=""><a href="#references"><i class="fa fa-check"></i><b>9</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://bookdown.org" target="_blank">Published with bookdown</a></li>
@@ -168,7 +168,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Comparative ranked GSEA waterfall, volcano, scatter-style plots</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">GSEA waterfall, volcano, and comparative NES plots</a>
           </h1>
         </div>
 
@@ -177,14 +177,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="header">
-<h1 class="title">Comparative ranked GSEA waterfall, volcano, scatter-style plots</h1>
+<h1 class="title">GSEA waterfall, volcano, and comparative NES plots</h1>
 </div>
 <div class="tutorial-title-block">
 <h1 class="title">
-Comparative ranked GSEA waterfall, volcano, scatter-style plots
+GSEA waterfall, volcano, and comparative NES plots
 </h1>
 <div class="tutorial-subtitle">
-Standalone R functions for ranked GSEA GO terms, directional volcano plots, and cross-contrast NES comparisons.
+Standalone R functions for visualizing ranked GO biological-process enrichment results.
 </div>
 <div class="tutorial-meta-block">
 <div>
@@ -200,13 +200,12 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <div id="overview" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">1</span> Overview<a href="#overview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><code>gsea-waterfall</code> is a copyable R plotting toolkit for <strong>precomputed</strong> Gene Set Enrichment Analysis (GSEA) results. It provides ranked positive and negative NES waterfall plots, a symmetric volcano plot, directional half-volcano plots, and comparative NES scatterplots.</p>
-<p>The functions do not run GSEA or modify supplied enrichment statistics. They select and display rows according to explicit plotting arguments. The worked example uses GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts.</p>
-<p>Rendered tutorial: <a href="https://zohebkhan1.github.io/gsea-waterfall/" class="uri">https://zohebkhan1.github.io/gsea-waterfall/</a></p>
+<p><code>gsea-waterfall</code> visualizes <strong>precomputed</strong> Gene Set Enrichment Analysis (GSEA) results as ranked NES waterfalls, symmetric or directional volcano plots, and cross-contrast NES scatterplots. The functions return ggplot objects without running GSEA, changing supplied statistics, or writing files.</p>
+<p>The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plotting choices control row selection, labels, grouping, and presentation; they do not redefine enrichment significance.</p>
 <p>The waterfall layout is inspired by pathway-level figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri, <em>Nature</em>, 2024</a>, <a href="https://doi.org/10.1038/s41556-025-01751-5">Xu, <em>Nature Cell Biology</em>, 2025</a>, <a href="https://doi.org/10.1126/science.aea1259">Vuong, <em>Science</em>, 2026</a>, and <a href="https://doi.org/10.1126/science.aea1549">Risgaard, <em>Science</em>, 2026</a>.</p>
 </div>
-<div id="install-and-source-the-functions" class="section level1 hasAnchor" number="2">
-<h1><span class="header-section-number">2</span> Install And Source The Functions<a href="#install-and-source-the-functions" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="install-and-source" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">2</span> Install and source<a href="#install-and-source" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Install the plotting dependencies once:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;RColorBrewer&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
 <p>Download the shared utilities first, then the plot modules you need:</p>
@@ -225,7 +224,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span></code></pre></div>
 </div>
 <div id="input-contract" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">3</span> Input Contract<a href="#input-contract" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<h1><span class="header-section-number">3</span> Input contract<a href="#input-contract" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Each table represents one GSEA contrast with one row per unique term. The default columns are:</p>
 <table>
 <colgroup>
@@ -244,7 +243,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <tr class="odd">
 <td align="left"><code>go_description</code></td>
 <td align="left">yes</td>
-<td align="left">unique GO term name and default matching key</td>
+<td align="left">GO term description and default matching key</td>
 </tr>
 <tr class="even">
 <td align="left"><code>NES</code></td>
@@ -263,7 +262,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </tr>
 </tbody>
 </table>
-<p>All four columns must be complete, and NES values must be finite. If descriptions are not unique, supply a complete unique identifier column through <code>id_col</code>. Comparative scatterplots use the exact shared identifier intersection; they do not impute absent terms.</p>
+<p>All four columns must be complete, and NES values must be finite. Descriptions must be unique unless <code>id_col</code> names a separate complete, unique term key. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.</p>
 <p>Load the bundled examples from the repository root:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
@@ -275,8 +274,8 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>)</span></code></pre></div>
 </div>
-<div id="waterfall-plots" class="section level1 hasAnchor" number="4">
-<h1><span class="header-section-number">4</span> Waterfall Plots<a href="#waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="ranked-waterfall-plots" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Ranked waterfall plots<a href="#ranked-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks terms by <code>NES</code>, <code>padj</code>, or <code>pvalue</code>, and displays the first <code>top_n</code> rows. <code>term_groups</code> controls point colors; <code>label_terms</code> independently controls direct labels. Text seeds are matched case-insensitively against term descriptions, while supplied term IDs are matched exactly after case normalization.</p>
 <div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Positive NES waterfall<a href="#positive-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -297,7 +296,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  <span class="st">&#39;Heart development&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;atrial&#39;</span>, <span class="st">&#39;ventricular&#39;</span>, <span class="st">&#39;heart&#39;</span>, <span class="st">&#39;cardiac&#39;</span>)</span>
 <span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>)</span>
 <span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>positive_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>positive_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
 <span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle contraction&#39;</span>,</span>
 <span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell action potential&#39;</span>,</span>
@@ -315,13 +314,13 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>  <span class="st">&#39;heart trabecula morphogenesis&#39;</span></span>
 <span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>)</span>
 <span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>positive_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a>positive_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
 <span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
 <span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
 <span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
 <span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
-<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_label_terms,</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_waterfall_label_terms,</span>
 <span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups</span>
 <span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>)</span></code></pre></div>
 <div id="fig-positive-waterfall" class="figure-anchor">
@@ -329,7 +328,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="" width="80%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 1.</strong> Positive NES GO biological-process waterfall for Cardiomyocyte vs. Mesoderm. Terms are ranked by NES, colored by manually defined cardiac-relevant groups, and labeled with selected terms.
+<strong>Figure 1.</strong> Positive NES terms ranked by NES, with selected cardiac-relevant groups and labels.
 </div>
 </div>
 <div id="negative-nes-waterfall" class="section level2 hasAnchor" number="4.2">
@@ -349,7 +348,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="st">&#39;#E41A1C&#39;</span></span>
 <span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>)</span>
 <span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>negative_waterfall <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
 <span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
@@ -364,12 +363,12 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="" width="80%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 2.</strong> Negative NES GO biological-process waterfall for the same contrast. The selected groups highlight ribosomal, mitotic, and DNA-replication programs.
+<strong>Figure 2.</strong> Negative NES terms highlighting ribosomal, mitotic, and DNA-replication programs.
 </div>
 </div>
 </div>
 <div id="volcano-plots" class="section level1 hasAnchor" number="5">
-<h1><span class="header-section-number">5</span> Volcano Plots<a href="#volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<h1><span class="header-section-number">5</span> Volcano plots<a href="#volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for a larger directional view. The example retains the established adjusted p-value cutoff of 0.05.</p>
 <div id="symmetric-volcano" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Symmetric volcano<a href="#symmetric-volcano" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -386,7 +385,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="st">&#39;ribosome assembly&#39;</span></span>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
 <span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>symmetric_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>gsea_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
 <span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  <span class="at">label_terms =</span> volcano_label_terms,</span>
@@ -398,7 +397,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg" alt="" width="58%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 3.</strong> Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs. Mesoderm. Point color marks significant positive, significant negative, or non-significant enrichment.
+<strong>Figure 3.</strong> Symmetric NES volcano colored by adjusted-p-value significance and direction.
 </div>
 </div>
 <div id="directional-half-volcano-plots" class="section level2 hasAnchor" number="5.2">
@@ -417,7 +416,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="st">&#39;heart trabecula morphogenesis&#39;</span></span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>)</span>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>positive_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>positive_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
 <span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
 <span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
@@ -432,7 +431,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="" width="72%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 4.</strong> Positive NES half-volcano for Cardiomyocyte vs. Mesoderm. The enlarged view uses the same biological grouping logic as the waterfall plot.
+<strong>Figure 4.</strong> Positive NES half-volcano using the waterfall plot’s term groups.
 </div>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>negative_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
@@ -446,7 +445,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="st">&#39;spindle organization&#39;</span></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>)</span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>negative_half_volcano <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
 <span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
@@ -462,12 +461,12 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="" width="72%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 5.</strong> Negative NES half-volcano for Cardiomyocyte vs. Mesoderm. Selected labels emphasize DNA replication, checkpoint, and ribosome-associated programs.
+<strong>Figure 5.</strong> Negative NES half-volcano emphasizing DNA replication, checkpoint, and ribosome-associated terms.
 </div>
 </div>
 </div>
 <div id="comparative-nes-scatterplot" class="section level1 hasAnchor" number="6">
-<h1><span class="header-section-number">6</span> Comparative NES Scatterplot<a href="#comparative-nes-scatterplot" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<h1><span class="header-section-number">6</span> Comparative NES scatterplot<a href="#comparative-nes-scatterplot" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><code>plot_gsea_nes_scatter()</code> compares the exact shared term-key intersection. The fitted line is descriptive; the helper does not calculate a new enrichment statistic.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>scatter_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="st">&#39;mesenchyme development&#39;</span>,</span>
@@ -479,7 +478,7 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 <span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="st">&#39;regulation of nuclear division&#39;</span></span>
 <span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>)</span>
 <span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>all_quadrants_scatter <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>comparative_nes_scatter_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
 <span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
 <span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
@@ -499,11 +498,11 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </div>
 <p><img src="assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg" alt="" width="100%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 6.</strong> Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day 1. Point color shows significance in one, both, or neither contrast.
+<strong>Figure 6.</strong> Shared terms colored by significance in one, both, or neither contrast.
 </div>
 </div>
-<div id="function-reference" class="section level1 hasAnchor" number="7">
-<h1><span class="header-section-number">7</span> Function Reference<a href="#function-reference" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="api-summary" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">7</span> API summary<a href="#api-summary" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <table>
 <colgroup>
 <col width="50%" />
@@ -538,18 +537,18 @@ Standalone R functions for ranked GSEA GO terms, directional volcano plots, and 
 </tr>
 </tbody>
 </table>
-<p>All plot functions return ggplot objects and do not write files. Their source-level documentation defines the complete argument and return contracts. The common input-column arguments are <code>term_col</code>, <code>nes_col</code>, <code>pvalue_col</code>, <code>padj_col</code>, and optional <code>id_col</code>; visual arguments control labels, colors, dimensions inside the panel, and legends without changing the supplied enrichment values.</p>
+<p>All plot functions return ggplot objects without writing files. Their source documentation defines the complete argument contracts. Common column arguments are <code>term_col</code>, <code>nes_col</code>, <code>pvalue_col</code>, <code>padj_col</code>, and optional <code>id_col</code>.</p>
 </div>
 <div id="reproduce-the-repository" class="section level1 hasAnchor" number="8">
-<h1><span class="header-section-number">8</span> Reproduce The Repository<a href="#reproduce-the-repository" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<h1><span class="header-section-number">8</span> Reproduce the repository<a href="#reproduce-the-repository" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Install the rendering dependencies and run the maintained scripts from the repository root:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>utils<span class="sc">::</span><span class="fu">install.packages</span>(<span class="fu">c</span>(</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="st">&#39;base64enc&#39;</span>, <span class="st">&#39;bookdown&#39;</span>, <span class="st">&#39;knitr&#39;</span>, <span class="st">&#39;rmarkdown&#39;</span>, <span class="st">&#39;svglite&#39;</span>, <span class="st">&#39;systemfonts&#39;</span></span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>))</span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">Rscript</span> R/01_generate_gsea_figs.R</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="ex">Rscript</span> R/02_render_github_pgs.R</span>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">Rscript</span> R/01_generate_gsea_figures.R</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="ex">Rscript</span> R/02_render_github_pages.R</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="ex">Rscript</span> R/03_check_gsea_contracts.R</span></code></pre></div>
-<p>The first script writes the six editable, font-embedded SVGs under <code>tutorial/assets/figures/</code>. The second renders <code>tutorial/tutorial.Rmd</code> into <code>docs/</code> for GitHub Pages. The third verifies the fixed scientific counts, plot contracts, public API, identifier matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands recorded in <code>MAINTENANCE.md</code>.</p>
+<p>The figure script writes six editable, font-embedded SVGs under <code>tutorial/assets/figures/</code>. The site script renders this source into <code>docs/</code>, and the contract script verifies fixed scientific counts, stable-key matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands in <code>MAINTENANCE.md</code>.</p>
 </div>
 <div id="references" class="section level1 hasAnchor" number="9">
 <h1><span class="header-section-number">9</span> References<a href="#references" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -583,53 +582,18 @@ Risgaard RD, et al. Molecular and cellular processes disrupted in the early pos
 </div>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const toc = document.querySelector(".book-summary nav > ul");
-
-    if (toc && !toc.classList.contains("summary")) {
-      toc.classList.add("summary");
-    }
-    if (toc && !toc.querySelector(".toc-title")) {
-      const titleItem = document.createElement("li");
-      titleItem.className = "toc-title";
-
-      const titleLink = document.createElement("a");
-      titleLink.href = "./";
-      titleLink.textContent = "Comparative ranked GSEA plots";
-      titleItem.appendChild(titleLink);
-
-      const dividerItem = document.createElement("li");
-      dividerItem.className = "divider";
-
-      toc.insertBefore(dividerItem, toc.firstChild);
-      toc.insertBefore(titleItem, dividerItem);
-    }
-    if (toc) {
-      toc.querySelectorAll("li").forEach(function (item) {
-        if (!item.classList.contains("toc-title") && !item.classList.contains("divider")) {
-          item.classList.add("chapter");
-        }
-      });
-      toc.querySelectorAll("li.chapter > a").forEach(function (link) {
-        if (!link.querySelector("i.fa-check")) {
-          const icon = document.createElement("i");
-          icon.className = "fa fa-check";
-          icon.setAttribute("aria-hidden", "true");
-          link.insertBefore(icon, link.firstChild);
-        }
-      });
-    }
-
     document.querySelectorAll('.page-inner a[href^="http"]').forEach(function (link) {
       link.setAttribute("target", "_blank");
       link.setAttribute("rel", "noopener noreferrer");
     });
 
     document.querySelectorAll("div.sourceCode, pre.sourceCode").forEach(function (block) {
-      if (block.closest("details.code-fold")) return;
+      if (block.closest("details.code-fold")) {
+        return;
+      }
 
       const details = document.createElement("details");
       details.className = "code-fold";
-      details.open = true;
 
       const summary = document.createElement("summary");
       summary.textContent = "Code";

@@ -5,7 +5,7 @@
 # - Zoheb Khan
 #
 # script path:
-# - R/01_generate_gsea_figs.R
+# - R/01_generate_gsea_figures.R
 #
 # functions:
 # - functions/gsea_plot_utils.R
@@ -35,7 +35,7 @@
 # 0.0 verify project root and source functions -----------------
 
 if (!file.exists('gsea.Rproj')) {
-  stop('Run R/01_generate_gsea_figs.R from the gsea repository root.', call. = FALSE)
+  stop('Run R/01_generate_gsea_figures.R from the gsea repository root.', call. = FALSE)
 }
 
 # source GSEA plotting functions
@@ -47,34 +47,33 @@ source('functions/gsea_nes_scatter_plot.R')
 
 # 1.0 define figure parameters and paths -----------------
 
-gsea_figure_dir <- 'tutorial/assets/figures'
+gsea_figure_dir = 'tutorial/assets/figures'
 
-gsea_figure_font_family <- 'GSEA Nimbus Sans'
-gsea_svg_font_family <- 'Nimbus Sans'
-gsea_figure_font_dir <- 'tutorial/assets/fonts'
+gsea_figure_font_family = 'GSEA Nimbus Sans'
+gsea_svg_font_family = 'Nimbus Sans'
 gsea_figure_font_paths <- c(
-  plain = file.path(gsea_figure_font_dir, 'NimbusSans-Regular.otf'),
-  bold = file.path(gsea_figure_font_dir, 'NimbusSans-Bold.otf'),
-  italic = file.path(gsea_figure_font_dir, 'NimbusSans-Italic.otf'),
-  bolditalic = file.path(gsea_figure_font_dir, 'NimbusSans-BoldItalic.otf'))
+  plain = 'tutorial/assets/fonts/NimbusSans-Regular.otf',
+  bold = 'tutorial/assets/fonts/NimbusSans-Bold.otf',
+  italic = 'tutorial/assets/fonts/NimbusSans-Italic.otf',
+  bold_italic = 'tutorial/assets/fonts/NimbusSans-BoldItalic.otf')
 
-waterfall_figure_width <- 7.40
-waterfall_figure_height <- 4.30
-volcano_figure_width <- 4.80
-volcano_figure_height <- 4.90
-half_volcano_figure_width <- 7.40
-half_volcano_figure_height <- 4.30
-scatter_figure_width <- 9.00
-scatter_figure_height <- 6.38
+waterfall_figure_width = 7.40
+waterfall_figure_height = 4.30
+volcano_figure_width = 4.80
+volcano_figure_height = 4.90
+half_volcano_figure_width = 7.40
+half_volcano_figure_height = 4.30
+nes_scatter_figure_width = 9.00
+nes_scatter_figure_height = 6.38
 
-gsea_padj_cutoff <- 0.05
-waterfall_top_n <- 100L
-half_volcano_inner_nes_limit <- 1
-scatter_include_nonsignificant <- TRUE
-scatter_equal_axis_limits <- TRUE
-scatter_show_fit_line <- TRUE
+gsea_padj_cutoff = 0.05
+waterfall_top_n = 100L
+half_volcano_inner_nes_limit = 1
+nes_scatter_include_nonsignificant = TRUE
+nes_scatter_equal_axis_limits = TRUE
+nes_scatter_show_fit_line = TRUE
 
-display_contrast_label <- 'Cardiomyocyte vs. Mesoderm'
+gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
 positive_term_groups <- list(
   'Ion channel' = c(
@@ -154,7 +153,7 @@ negative_half_volcano_label_terms <- c(
   'cell cycle DNA replication',
   'spindle organization')
 
-scatter_label_terms <- c(
+nes_scatter_label_terms <- c(
   'mesenchyme development',
   'mesoderm development',
   'mesodermal cell differentiation',
@@ -174,10 +173,9 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 
 # 1.2 define SVG writer -----------------
 
-# create valid inline web-font CSS before opening the device; SVG output is
-# never read back or rewritten
-make_embedded_font_face <- function(path, weight, style) {
-  font_uri <- base64enc::dataURI(file = path, mime = 'font/otf')
+# create inline web-font CSS before opening the SVG device
+make_embedded_font_face <- function(font_path, weight, style) {
+  font_uri <- base64enc::dataURI(file = font_path, mime = 'font/otf')
   css <- paste0(
     '    @font-face {\n',
     '      font-family: "', gsea_svg_font_family, '";\n',
@@ -193,30 +191,30 @@ systemfonts::register_font(
   plain = gsea_figure_font_paths[['plain']],
   bold = gsea_figure_font_paths[['bold']],
   italic = gsea_figure_font_paths[['italic']],
-  bolditalic = gsea_figure_font_paths[['bolditalic']])
+  bolditalic = gsea_figure_font_paths[['bold_italic']])
 
-gsea_svg_web_fonts <- list(
+gsea_svg_font_faces <- list(
   make_embedded_font_face(
-    path = gsea_figure_font_paths[['plain']],
+    font_path = gsea_figure_font_paths[['plain']],
     weight = '400',
     style = 'normal'),
   make_embedded_font_face(
-    path = gsea_figure_font_paths[['bold']],
+    font_path = gsea_figure_font_paths[['bold']],
     weight = '700',
     style = 'normal'),
   make_embedded_font_face(
-    path = gsea_figure_font_paths[['italic']],
+    font_path = gsea_figure_font_paths[['italic']],
     weight = '400',
     style = 'italic'),
   make_embedded_font_face(
-    path = gsea_figure_font_paths[['bolditalic']],
+    font_path = gsea_figure_font_paths[['bold_italic']],
     weight = '700',
     style = 'italic'))
 
-save_gsea_figure <- function(plot, path, width, height) {
-  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+save_gsea_figure <- function(plot, figure_path, figure_width, figure_height) {
+  dir.create(dirname(figure_path), recursive = TRUE, showWarnings = FALSE)
   ggplot2::ggsave(
-    filename = path,
+    filename = figure_path,
     plot = plot,
     device = function(filename, width, height, bg, ...) {
       svglite::svglite(
@@ -224,15 +222,15 @@ save_gsea_figure <- function(plot, path, width, height) {
         width = width,
         height = height,
         bg = bg,
-        web_fonts = gsea_svg_web_fonts,
+        web_fonts = gsea_svg_font_faces,
         fix_text_size = FALSE,
         ...)
     },
-    width = width,
-    height = height,
+    width = figure_width,
+    height = figure_height,
     units = 'in',
     bg = 'white')
-  invisible(path)
+  invisible(figure_path)
 }
 
 # 2.0 create and save tutorial figures -----------------
@@ -247,11 +245,11 @@ save_gsea_figure(
     label_terms = positive_waterfall_label_terms,
     term_groups = positive_term_groups,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg'),
-  width = waterfall_figure_width,
-  height = waterfall_figure_height)
+  figure_width = waterfall_figure_width,
+  figure_height = waterfall_figure_height)
 
 save_gsea_figure(
   plot = plot_gsea_waterfall(
@@ -264,25 +262,25 @@ save_gsea_figure(
     term_groups = negative_term_groups,
     term_group_colors = negative_term_group_colors,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg'),
-  width = waterfall_figure_width,
-  height = waterfall_figure_height)
+  figure_width = waterfall_figure_width,
+  figure_height = waterfall_figure_height)
 
 save_gsea_figure(
   plot = plot_gsea_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
     padj_cutoff = gsea_padj_cutoff,
     label_terms = volcano_label_terms,
-    contrast_label = display_contrast_label,
+    contrast_label = gsea_contrast_label,
     label_words_per_line = 3L,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg'),
-  width = volcano_figure_width,
-  height = volcano_figure_height)
+  figure_width = volcano_figure_width,
+  figure_height = volcano_figure_height)
 
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
@@ -293,13 +291,13 @@ save_gsea_figure(
     label_terms = positive_half_volcano_label_terms,
     term_groups = positive_term_groups,
     inner_nes_limit = half_volcano_inner_nes_limit,
-    contrast_label = display_contrast_label,
+    contrast_label = gsea_contrast_label,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg'),
-  width = half_volcano_figure_width,
-  height = half_volcano_figure_height)
+  figure_width = half_volcano_figure_width,
+  figure_height = half_volcano_figure_height)
 
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
@@ -311,13 +309,13 @@ save_gsea_figure(
     term_groups = negative_term_groups,
     term_group_colors = negative_term_group_colors,
     inner_nes_limit = half_volcano_inner_nes_limit,
-    contrast_label = display_contrast_label,
+    contrast_label = gsea_contrast_label,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg'),
-  width = half_volcano_figure_width,
-  height = half_volcano_figure_height)
+  figure_width = half_volcano_figure_width,
+  figure_height = half_volcano_figure_height)
 
 save_gsea_figure(
   plot = plot_gsea_nes_scatter(
@@ -329,14 +327,14 @@ save_gsea_figure(
     quadrant = 'all',
     x_name = 'Day 9 vs. Day 6',
     y_name = 'Day 3 vs. Day 1',
-    label_terms = scatter_label_terms,
+    label_terms = nes_scatter_label_terms,
     padj_cutoff = gsea_padj_cutoff,
-    include_nonsignificant = scatter_include_nonsignificant,
-    equal_axis_limits = scatter_equal_axis_limits,
-    show_fit_line = scatter_show_fit_line,
+    include_nonsignificant = nes_scatter_include_nonsignificant,
+    equal_axis_limits = nes_scatter_equal_axis_limits,
+    show_fit_line = nes_scatter_show_fit_line,
     font_family = gsea_figure_font_family),
-  path = file.path(
+  figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg'),
-  width = scatter_figure_width,
-  height = scatter_figure_height)
+  figure_width = nes_scatter_figure_width,
+  figure_height = nes_scatter_figure_height)

@@ -1,52 +1,17 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const toc = document.querySelector(".book-summary nav > ul");
-
-    if (toc && !toc.classList.contains("summary")) {
-      toc.classList.add("summary");
-    }
-    if (toc && !toc.querySelector(".toc-title")) {
-      const titleItem = document.createElement("li");
-      titleItem.className = "toc-title";
-
-      const titleLink = document.createElement("a");
-      titleLink.href = "./";
-      titleLink.textContent = "Comparative ranked GSEA plots";
-      titleItem.appendChild(titleLink);
-
-      const dividerItem = document.createElement("li");
-      dividerItem.className = "divider";
-
-      toc.insertBefore(dividerItem, toc.firstChild);
-      toc.insertBefore(titleItem, dividerItem);
-    }
-    if (toc) {
-      toc.querySelectorAll("li").forEach(function (item) {
-        if (!item.classList.contains("toc-title") && !item.classList.contains("divider")) {
-          item.classList.add("chapter");
-        }
-      });
-      toc.querySelectorAll("li.chapter > a").forEach(function (link) {
-        if (!link.querySelector("i.fa-check")) {
-          const icon = document.createElement("i");
-          icon.className = "fa fa-check";
-          icon.setAttribute("aria-hidden", "true");
-          link.insertBefore(icon, link.firstChild);
-        }
-      });
-    }
-
     document.querySelectorAll('.page-inner a[href^="http"]').forEach(function (link) {
       link.setAttribute("target", "_blank");
       link.setAttribute("rel", "noopener noreferrer");
     });
 
     document.querySelectorAll("div.sourceCode, pre.sourceCode").forEach(function (block) {
-      if (block.closest("details.code-fold")) return;
+      if (block.closest("details.code-fold")) {
+        return;
+      }
 
       const details = document.createElement("details");
       details.className = "code-fold";
-      details.open = true;
 
       const summary = document.createElement("summary");
       summary.textContent = "Code";

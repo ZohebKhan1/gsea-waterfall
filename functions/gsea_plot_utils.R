@@ -113,47 +113,33 @@ read_gsea_result_csv <- function(path,
   -log10(pmax(x, .Machine$double.xmin))
 }
 
-.gsea_neutral_gray <- function() {
-  '#9E9E9E'
-}
+.gsea_neutral_color <- '#9E9E9E'
+.gsea_nonsignificant_color <- '#D9D9D9'
 
-.gsea_light_gray <- function() {
-  '#D9D9D9'
-}
-
-.gsea_default_colors <- function() {
+.gsea_direction_colors <- function() {
   c(
     'Significantly up' = '#CC79A7',
     'Significantly down' = '#0072B2',
-    'Not significant' = .gsea_light_gray(),
-    'Significant in both' = '#2A9D8F',
-    'Significant in x only' = '#CC79A7',
-    'Significant in y only' = '#0072B2',
-    'Not significant in either' = .gsea_light_gray(),
-    'Other' = .gsea_neutral_gray())
+    'Not significant' = .gsea_nonsignificant_color)
 }
 
-.gsea_category_colors <- function() {
+.gsea_default_term_group_colors <- function() {
   c(
     'Development/morphogenesis' = '#1B9E77',
     'Neuronal/signaling' = '#4F61BD',
     'Cell cycle/genome' = '#D73027',
     'Metabolism/translation' = '#7A5195',
-    'Other' = .gsea_neutral_gray())
+    'Other' = .gsea_neutral_color)
 }
 
 .gsea_validate_number <- function(value,
                                   parameter_name,
                                   minimum = -Inf,
-                                  maximum = Inf,
-                                  minimum_inclusive = TRUE,
-                                  maximum_inclusive = TRUE) {
+                                  maximum = Inf) {
   if (length(value) != 1L || !is.numeric(value) || is.na(value) || !is.finite(value)) {
     stop('`', parameter_name, '` has an invalid numeric value.', call. = FALSE)
   }
-  valid_minimum <- if (minimum_inclusive) value >= minimum else value > minimum
-  valid_maximum <- if (maximum_inclusive) value <= maximum else value < maximum
-  if (!valid_minimum || !valid_maximum) {
+  if (value < minimum || value > maximum) {
     stop('`', parameter_name, '` has an invalid numeric value.', call. = FALSE)
   }
   as.numeric(value)
@@ -166,6 +152,13 @@ read_gsea_result_csv <- function(path,
     stop('`', parameter_name, '` must be an integer of at least ', minimum, '.', call. = FALSE)
   }
   as.integer(value)
+}
+
+.gsea_validate_flag <- function(value, parameter_name) {
+  if (length(value) != 1L || !is.logical(value) || is.na(value)) {
+    stop('`', parameter_name, '` must be `TRUE` or `FALSE`.', call. = FALSE)
+  }
+  value
 }
 
 .gsea_validate_limits <- function(lower, upper, lower_name, upper_name) {
@@ -204,9 +197,13 @@ read_gsea_result_csv <- function(path,
   valid_names <- !is.null(names(term_groups)) &&
     !anyNA(names(term_groups)) &&
     all(nzchar(trimws(names(term_groups)))) &&
-    !anyDuplicated(names(term_groups))
+    !anyDuplicated(names(term_groups)) &&
+    !'Other' %in% names(term_groups)
   if (!valid_values || !valid_names) {
-    stop('`term_groups` must be a non-empty uniquely named list of non-empty seeds.', call. = FALSE)
+    stop(
+      '`term_groups` must be a non-empty uniquely named list of non-empty seeds; ',
+      '`Other` is reserved for unmatched terms.',
+      call. = FALSE)
   }
   invisible(NULL)
 }
@@ -236,16 +233,20 @@ read_gsea_result_csv <- function(path,
                                             term_group_colors = NULL,
                                             default_group = 'Other') {
   if (is.null(term_groups)) {
-    return(.gsea_category_colors())
+    return(.gsea_default_term_group_colors())
   }
   group_names <- names(term_groups)
   if (is.null(term_group_colors)) {
     if (!requireNamespace('RColorBrewer', quietly = TRUE)) {
       stop('The RColorBrewer package is required for default term-group colors.', call. = FALSE)
     }
-    brewer_n <- max(3L, length(group_names))
+    brewer_n <- min(9L, max(3L, length(group_names)))
+    palette_colors <- RColorBrewer::brewer.pal(brewer_n, 'Set1')
+    if (length(group_names) > brewer_n) {
+      palette_colors <- grDevices::colorRampPalette(palette_colors)(length(group_names))
+    }
     term_group_colors <- stats::setNames(
-      RColorBrewer::brewer.pal(brewer_n, 'Set1')[seq_along(group_names)],
+      palette_colors[seq_along(group_names)],
       group_names)
   }
 
@@ -253,7 +254,7 @@ read_gsea_result_csv <- function(path,
     color_values = term_group_colors,
     required_names = group_names,
     parameter_name = 'term_group_colors')
-  c(term_group_colors[group_names], stats::setNames(.gsea_neutral_gray(), default_group))
+  c(term_group_colors[group_names], stats::setNames(.gsea_neutral_color, default_group))
 }
 
 .gsea_wrap_label <- function(labels,
@@ -282,7 +283,7 @@ read_gsea_result_csv <- function(path,
     foreground = plot_tbl[!background_rows, , drop = FALSE])
 }
 
-# fallback categories keep ungrouped scatterplots interpretable
+# define default biological groups when callers do not supply category seeds
 .gsea_classify_terms <- function(go_description) {
   term <- tolower(as.character(go_description))
   category <- rep('Other', length(term))
@@ -300,7 +301,7 @@ read_gsea_result_csv <- function(path,
     'ribosom|translation|rrna|metabolic|biosynthetic|mitochond|oxidative|protein folding|rna processing',
     term)] <- 'Metabolism/translation'
 
-  factor(category, levels = names(.gsea_category_colors()))
+  factor(category, levels = names(.gsea_default_term_group_colors()))
 }
 
 .gsea_match_term_groups <- function(gsea_results,
@@ -382,9 +383,16 @@ read_gsea_result_csv <- function(path,
         matched_row <- which(plot_tbl[[rank_col]] == requested_label)
       } else {
         requested_label <- as.character(requested_label)
-        matched_row <- which(tolower(plot_tbl$go_description) == tolower(requested_label))
+        matched_row <- which(tolower(plot_tbl$go_term_id) == tolower(requested_label))
         if (length(matched_row) == 0L) {
-          matched_row <- which(tolower(plot_tbl$go_term_id) == tolower(requested_label))
+          matched_row <- which(tolower(plot_tbl$go_description) == tolower(requested_label))
+        }
+        if (length(matched_row) > 1L) {
+          stop(
+            'Requested GO description matches multiple term keys: ',
+            requested_label,
+            '. Supply a unique term ID instead.',
+            call. = FALSE)
         }
       }
       if (length(matched_row) == 0L) {
@@ -425,7 +433,8 @@ read_gsea_result_csv <- function(path,
     return(plot_tbl[0L, , drop = FALSE])
   }
 
-  per_direction <- max(1L, floor(label_n / 2L))
+  positive_label_n <- ceiling(label_n / 2L)
+  negative_label_n <- floor(label_n / 2L)
   positive_tbl <- plot_tbl[plot_tbl$significant & plot_tbl$NES > 0, , drop = FALSE]
   negative_tbl <- plot_tbl[plot_tbl$significant & plot_tbl$NES < 0, , drop = FALSE]
   positive_tbl <- positive_tbl[order(positive_tbl$NES, positive_tbl$padj), , drop = FALSE]
@@ -434,8 +443,8 @@ read_gsea_result_csv <- function(path,
   negative_tbl$label_rank <- seq_len(nrow(negative_tbl))
 
   label_tbl <- rbind(
-    .gsea_select_labels(positive_tbl, label_n = per_direction, score_col = 'label_score', rank_col = 'label_rank'),
-    .gsea_select_labels(negative_tbl, label_n = per_direction, score_col = 'label_score', rank_col = 'label_rank'))
+    .gsea_select_labels(positive_tbl, label_n = positive_label_n, score_col = 'label_score', rank_col = 'label_rank'),
+    .gsea_select_labels(negative_tbl, label_n = negative_label_n, score_col = 'label_score', rank_col = 'label_rank'))
   if (nrow(label_tbl) < label_n) {
     remaining_tbl <- plot_tbl[plot_tbl$significant & !plot_tbl$go_term_id %in% label_tbl$go_term_id, , drop = FALSE]
     remaining_tbl <- remaining_tbl[order(-remaining_tbl$label_score, remaining_tbl$padj), , drop = FALSE]
@@ -471,11 +480,6 @@ read_gsea_result_csv <- function(path,
 
 .gsea_axis_limits <- function(values,
                               buffer_fraction = 0.045) {
-  values <- values[is.finite(values)]
-  if (length(values) == 0L) {
-    return(c(NA_real_, NA_real_))
-  }
-
   value_range <- range(values)
   value_span <- diff(value_range)
   if (value_span == 0) {
@@ -484,18 +488,18 @@ read_gsea_result_csv <- function(path,
   value_range + c(-1, 1) * value_span * buffer_fraction
 }
 
-.gsea_waterfall_y_limits <- function(values,
-                                     y_min = NULL,
-                                     y_max = NULL,
-                                     buffer_fraction = 0.18) {
-  y_limits <- .gsea_axis_limits(values, buffer_fraction = buffer_fraction)
-  if (!is.null(y_min)) {
-    y_limits[[1L]] <- y_min
+.gsea_resolve_axis_limits <- function(values,
+                                      lower = NULL,
+                                      upper = NULL,
+                                      buffer_fraction = 0.18) {
+  axis_limits <- .gsea_axis_limits(values, buffer_fraction = buffer_fraction)
+  if (!is.null(lower)) {
+    axis_limits[[1L]] <- lower
   }
-  if (!is.null(y_max)) {
-    y_limits[[2L]] <- y_max
+  if (!is.null(upper)) {
+    axis_limits[[2L]] <- upper
   }
-  y_limits
+  axis_limits
 }
 
 .gsea_theme <- function(font_family) {

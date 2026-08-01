@@ -13,6 +13,10 @@
 
 #' Make a directional half-volcano plot for GSEA results
 #'
+#' The selected direction and inclusive `inner_nes_limit` are applied before
+#' plotting. Significance is always defined as `padj < padj_cutoff`. A threshold
+#' line is drawn only when adjusted p-values are shown on the y-axis.
+#'
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing GO term names.
 #' @param nes_col Column containing normalized enrichment scores.
@@ -39,7 +43,7 @@
 #' @param legend_position Legend position passed to `ggplot2::theme()`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object without file-system side effects.
+#' @return A ggplot object without file-system side effects
 #'
 #' @export
 plot_gsea_half_volcano <- function(gsea_results,
@@ -72,23 +76,14 @@ plot_gsea_half_volcano <- function(gsea_results,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
-  label_n <- .gsea_validate_count(label_n, 'label_n')
+  if (length(label_terms) == 0L) {
+    label_n <- .gsea_validate_count(label_n, 'label_n')
+  }
   inner_nes_limit <- .gsea_validate_number(
     inner_nes_limit,
     'inner_nes_limit',
     minimum = 0)
-  point_size <- .gsea_validate_number(
-    point_size,
-    'point_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  label_size <- .gsea_validate_number(
-    label_size,
-    'label_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
-  .gsea_validate_term_groups(term_groups)
   plot_tbl <- .gsea_standardize_results(
     gsea_results = gsea_results,
     term_col = term_col,
@@ -108,13 +103,12 @@ plot_gsea_half_volcano <- function(gsea_results,
     stop('No GSEA terms remain after applying the half-volcano NES boundary.', call. = FALSE)
   }
   plot_tbl$neg_log10_p <- .gsea_neg_log10(plot_tbl[[p_col]])
-  plot_tbl$significant <- !is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
+  plot_tbl$significant <- plot_tbl$padj < padj_cutoff
   if (is.null(term_groups)) {
     direction_label <- if (direction == 'positive') 'Significantly up' else 'Significantly down'
-    direction_color <- if (direction == 'positive') '#CC79A7' else '#0072B2'
     plot_tbl$point_group <- ifelse(plot_tbl$significant, direction_label, 'Not significant')
     plot_tbl$point_group <- factor(plot_tbl$point_group, levels = c(direction_label, 'Not significant'))
-    color_values <- c(stats::setNames(direction_color, direction_label), 'Not significant' = .gsea_light_gray())
+    color_values <- .gsea_direction_colors()[levels(plot_tbl$point_group)]
     custom_colors <- .gsea_resolve_named_colors(
       color_values = point_colors,
       required_names = levels(plot_tbl$point_group),
@@ -136,7 +130,7 @@ plot_gsea_half_volcano <- function(gsea_results,
     color_values <- .gsea_resolve_term_group_colors(
       term_groups = term_groups,
       term_group_colors = term_group_colors)
-    color_values <- c(color_values, 'Not significant' = .gsea_light_gray())
+    color_values <- c(color_values, 'Not significant' = .gsea_nonsignificant_color)
     legend_title <- 'GO:BP category'
     background_groups <- c('Other', 'Not significant')
   }
@@ -159,7 +153,11 @@ plot_gsea_half_volcano <- function(gsea_results,
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   label_direction <- if (direction == 'positive') 1 else -1
   repel_tbl$label_nudge_x[label_match] <- label_direction * 0.12
-  y_limits <- .gsea_waterfall_y_limits(plot_tbl$neg_log10_p, y_min = y_min, y_max = y_max, buffer_fraction = 0.035)
+  y_limits <- .gsea_resolve_axis_limits(
+    plot_tbl$neg_log10_p,
+    lower = y_min,
+    upper = y_max,
+    buffer_fraction = 0.035)
   x_limits <- .gsea_axis_limits(plot_tbl$NES, buffer_fraction = 0.035)
   if (direction == 'positive') {
     x_limits[[1L]] <- inner_nes_limit
@@ -186,6 +184,15 @@ plot_gsea_half_volcano <- function(gsea_results,
     plot_tbl = plot_tbl,
     group_col = 'point_group',
     background_groups = background_groups)
+  significance_line <- if (p_col == 'padj' && padj_cutoff > 0) {
+    ggplot2::geom_hline(
+      yintercept = -log10(padj_cutoff),
+      color = 'black',
+      linewidth = 0.22,
+      linetype = 'dashed')
+  } else {
+    NULL
+  }
 
   half_plot <- ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$NES, y = .data$neg_log10_p)) +
     ggplot2::geom_point(
@@ -200,11 +207,7 @@ plot_gsea_half_volcano <- function(gsea_results,
       size = point_size,
       alpha = 1,
       stroke = 0) +
-    ggplot2::geom_hline(
-      yintercept = -log10(padj_cutoff),
-      color = 'black',
-      linewidth = 0.22,
-      linetype = 'dashed') +
+    significance_line +
     ggrepel::geom_text_repel(
       data = repel_tbl,
       ggplot2::aes(label = .data$label_text),

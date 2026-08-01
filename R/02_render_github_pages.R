@@ -5,7 +5,7 @@
 # - Zoheb Khan
 #
 # script path:
-# - R/02_render_github_pgs.R
+# - R/02_render_github_pages.R
 #
 # input data:
 # - tutorial/tutorial.Rmd
@@ -28,7 +28,7 @@
 # 0.0 verify project root -----------------
 
 if (!file.exists('gsea.Rproj')) {
-  stop('Run R/02_render_github_pgs.R from the gsea repository root.', call. = FALSE)
+  stop('Run R/02_render_github_pages.R from the gsea repository root.', call. = FALSE)
 }
 
 # 1.0 replace the generated GitHub Pages site -----------------
@@ -44,11 +44,10 @@ bookdown::render_book(
   clean = TRUE)
 
 unlink(c('docs/tutorial.md', 'docs/reference-keys.txt', 'tutorial/index.rds'))
-docs_machine_metadata <- list.files(
+unlink(list.files(
   'docs',
   pattern = '^\\.DS_Store$',
   all.files = TRUE,
   full.names = TRUE,
-  recursive = TRUE)
-unlink(docs_machine_metadata)
+  recursive = TRUE))
 file.create('docs/.nojekyll')

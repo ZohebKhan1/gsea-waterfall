@@ -13,6 +13,10 @@
 
 #' Make a comparative GSEA NES scatterplot
 #'
+#' Both inputs must contain complete, unique term keys. The plot uses their
+#' exact inner intersection, retains descriptions from `gsea_x`, and does not
+#' impute unmatched terms. Significance is defined as `padj < padj_cutoff`.
+#'
 #' @param gsea_x First GSEA result table.
 #' @param gsea_y Second GSEA result table.
 #' @param x_label X-axis label.
@@ -55,7 +59,7 @@
 #' @param font_family Figure font family.
 #'
 #' @return A ggplot object built from the exact shared term-key intersection
-#'   without file-system side effects.
+#'   without file-system side effects
 #'
 #' @export
 plot_gsea_nes_scatter <- function(gsea_x,
@@ -96,31 +100,35 @@ plot_gsea_nes_scatter <- function(gsea_x,
                                   font_family = 'Nimbus Sans') {
   color_by <- match.arg(color_by)
   quadrant <- match.arg(quadrant)
+  include_nonsignificant <- .gsea_validate_flag(
+    include_nonsignificant,
+    'include_nonsignificant')
+  equal_axis_limits <- .gsea_validate_flag(equal_axis_limits, 'equal_axis_limits')
+  show_fit_line <- .gsea_validate_flag(show_fit_line, 'show_fit_line')
   padj_cutoff <- .gsea_validate_number(
     padj_cutoff,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
-  label_n_x_only <- .gsea_validate_count(label_n_x_only, 'label_n_x_only')
-  label_n_y_only <- .gsea_validate_count(label_n_y_only, 'label_n_y_only')
-  label_n_both <- .gsea_validate_count(label_n_both, 'label_n_both')
-  point_size <- .gsea_validate_number(
-    point_size,
-    'point_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  label_size <- .gsea_validate_number(
-    label_size,
-    'label_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  quadrant_min_abs_nes <- .gsea_validate_number(
-    quadrant_min_abs_nes,
-    'quadrant_min_abs_nes',
-    minimum = 0)
+  if (length(label_terms) == 0L) {
+    label_n_x_only <- .gsea_validate_count(label_n_x_only, 'label_n_x_only')
+    label_n_y_only <- .gsea_validate_count(label_n_y_only, 'label_n_y_only')
+    label_n_both <- .gsea_validate_count(label_n_both, 'label_n_both')
+  }
+  if (isTRUE(equal_axis_limits) && quadrant != 'all') {
+    quadrant_min_abs_nes <- .gsea_validate_number(
+      quadrant_min_abs_nes,
+      'quadrant_min_abs_nes',
+      minimum = 0)
+  }
   .gsea_validate_limits(x_min, x_max, 'x_min', 'x_max')
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
-  .gsea_validate_term_groups(term_groups)
+  if (isTRUE(equal_axis_limits) && any(!vapply(
+    list(x_min, x_max, y_min, y_max),
+    is.null,
+    logical(1)))) {
+    stop('`equal_axis_limits` cannot be combined with explicit axis limits.', call. = FALSE)
+  }
   if (is.null(legend_nrow)) {
     legend_nrow <- if (color_by == 'significance') 2L else 1L
   } else {
@@ -148,10 +156,8 @@ plot_gsea_nes_scatter <- function(gsea_x,
   plot_tbl$go_description_x <- NULL
   plot_tbl$go_description_y <- NULL
 
-  sig_x <- !is.na(plot_tbl$padj_x) & plot_tbl$padj_x < padj_cutoff
-  sig_y <- !is.na(plot_tbl$padj_y) & plot_tbl$padj_y < padj_cutoff
-  plot_tbl$significant_x <- sig_x
-  plot_tbl$significant_y <- sig_y
+  plot_tbl$significant_x <- plot_tbl$padj_x < padj_cutoff
+  plot_tbl$significant_y <- plot_tbl$padj_y < padj_cutoff
   if (!isTRUE(include_nonsignificant)) {
     plot_tbl <- plot_tbl[plot_tbl$significant_x | plot_tbl$significant_y, , drop = FALSE]
   }
@@ -170,21 +176,24 @@ plot_gsea_nes_scatter <- function(gsea_x,
         plot_tbl$significant_x & !plot_tbl$significant_y,
         paste0('Significant in ', x_name, ' only'),
         ifelse(!plot_tbl$significant_x & plot_tbl$significant_y, paste0('Significant in ', y_name, ' only'), 'Not significant in either')))
-    if (!requireNamespace('RColorBrewer', quietly = TRUE)) {
-      stop('The RColorBrewer package is required for default scatterplot significance colors.', call. = FALSE)
-    }
-    brewer_colors <- RColorBrewer::brewer.pal(4L, 'Set1')
-    color_values <- c(
-      'Significant in both' = brewer_colors[[4L]],
-      stats::setNames(brewer_colors[[1L]], paste0('Significant in ', x_name, ' only')),
-      stats::setNames(brewer_colors[[2L]], paste0('Significant in ', y_name, ' only')),
-      'Not significant in either' = .gsea_light_gray())
-    custom_colors <- .gsea_resolve_named_colors(
-      color_values = point_colors,
-      required_names = names(color_values),
-      parameter_name = 'point_colors')
-    if (!is.null(custom_colors)) {
-      color_values <- custom_colors
+    group_names <- c(
+      'Significant in both',
+      paste0('Significant in ', x_name, ' only'),
+      paste0('Significant in ', y_name, ' only'),
+      'Not significant in either')
+    if (is.null(point_colors)) {
+      if (!requireNamespace('RColorBrewer', quietly = TRUE)) {
+        stop('The RColorBrewer package is required for default scatterplot significance colors.', call. = FALSE)
+      }
+      brewer_colors <- RColorBrewer::brewer.pal(4L, 'Set1')
+      color_values <- stats::setNames(
+        c(brewer_colors[[4L]], brewer_colors[[1L]], brewer_colors[[2L]], .gsea_nonsignificant_color),
+        group_names)
+    } else {
+      color_values <- .gsea_resolve_named_colors(
+        color_values = point_colors,
+        required_names = group_names,
+        parameter_name = 'point_colors')
     }
   } else {
     if (is.null(term_groups)) {
@@ -260,7 +269,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
 
   axis_x_limits <- NULL
   axis_y_limits <- NULL
-  if (equal_axis_limits) {
+  if (isTRUE(equal_axis_limits)) {
     axis_limit <- max(abs(c(plot_tbl$NES_x, plot_tbl$NES_y)), na.rm = TRUE)
     if (!is.finite(axis_limit) || axis_limit <= 0) {
       axis_limit <- 1
@@ -281,13 +290,8 @@ plot_gsea_nes_scatter <- function(gsea_x,
       axis_y_limits <- c(-axis_limit, axis_limit)
     }
   }
-  axis_breaks <- NULL
-  if (!is.null(axis_x_limits)) {
-    axis_breaks <- scales::breaks_pretty(n = 5)(axis_x_limits)
-    if (axis_x_limits[[1L]] <= 0 && axis_x_limits[[2L]] >= 0) {
-      axis_breaks <- sort(unique(c(axis_breaks, 0)))
-    }
-  }
+  x_breaks <- NULL
+  y_breaks <- NULL
   if (is.null(axis_x_limits) && (!is.null(x_min) || !is.null(x_max))) {
     axis_x_limits <- .gsea_axis_limits(plot_tbl$NES_x, buffer_fraction = 0.06)
   }
@@ -306,8 +310,17 @@ plot_gsea_nes_scatter <- function(gsea_x,
   if (!is.null(y_max)) {
     axis_y_limits[[2L]] <- y_max
   }
-  if (is.null(axis_breaks) && !is.null(axis_x_limits)) {
-    axis_breaks <- scales::breaks_pretty(n = 5)(axis_x_limits)
+  if (is.null(x_breaks) && !is.null(axis_x_limits)) {
+    x_breaks <- scales::breaks_pretty(n = 5)(axis_x_limits)
+    if (axis_x_limits[[1L]] <= 0 && axis_x_limits[[2L]] >= 0) {
+      x_breaks <- sort(unique(c(x_breaks, 0)))
+    }
+  }
+  if (is.null(y_breaks) && !is.null(axis_y_limits)) {
+    y_breaks <- scales::breaks_pretty(n = 5)(axis_y_limits)
+    if (axis_y_limits[[1L]] <= 0 && axis_y_limits[[2L]] >= 0) {
+      y_breaks <- sort(unique(c(y_breaks, 0)))
+    }
   }
 
   fit_line_layer <- if (show_fit_line && nrow(plot_tbl) > 1L) {
@@ -322,15 +335,15 @@ plot_gsea_nes_scatter <- function(gsea_x,
     NULL
   }
 
-  coord_layer <- if (equal_axis_limits) {
+  coord_layer <- if (isTRUE(equal_axis_limits)) {
     ggplot2::coord_fixed(ratio = 1, xlim = axis_x_limits, ylim = axis_y_limits, clip = 'off')
   } else {
     ggplot2::coord_cartesian(xlim = axis_x_limits, ylim = axis_y_limits, clip = 'off')
   }
-  background_groups <- c('Not significant in either', 'Not significant', 'Other')
-  background_rows <- is.na(plot_tbl$point_group) | plot_tbl$point_group %in% background_groups
-  background_tbl <- plot_tbl[background_rows, , drop = FALSE]
-  foreground_tbl <- plot_tbl[!background_rows, , drop = FALSE]
+  point_layers <- .gsea_split_point_layers(
+    plot_tbl = plot_tbl,
+    group_col = 'point_group',
+    background_groups = c('Not significant in either', 'Not significant', 'Other'))
   label_layer <- ggrepel::geom_text_repel(
     data = label_tbl,
     ggplot2::aes(label = .data$label_text),
@@ -359,13 +372,13 @@ plot_gsea_nes_scatter <- function(gsea_x,
     ggplot2::geom_hline(yintercept = 0, color = 'black', linewidth = 0.22, linetype = 'dashed') +
     ggplot2::geom_vline(xintercept = 0, color = 'black', linewidth = 0.22, linetype = 'dashed') +
     ggplot2::geom_point(
-      data = background_tbl,
+      data = point_layers$background,
       ggplot2::aes(color = .data$point_group),
       size = point_size,
       alpha = 1,
       stroke = 0) +
     ggplot2::geom_point(
-      data = foreground_tbl,
+      data = point_layers$foreground,
       ggplot2::aes(color = .data$point_group),
       size = point_size,
       alpha = 1,
@@ -373,15 +386,15 @@ plot_gsea_nes_scatter <- function(gsea_x,
     label_layer +
     ggplot2::scale_color_manual(values = color_values, labels = legend_labels, drop = FALSE) +
     ggplot2::scale_x_continuous(
-      breaks = axis_breaks,
+      breaks = x_breaks,
       position = if (quadrant == 'q3') 'top' else 'bottom',
       expand = if (is.null(axis_x_limits)) ggplot2::expansion(mult = 0.06) else ggplot2::expansion(mult = 0)) +
     ggplot2::scale_y_continuous(
-      breaks = axis_breaks,
+      breaks = y_breaks,
       position = if (quadrant == 'q3') 'right' else 'left',
       expand = if (is.null(axis_y_limits)) ggplot2::expansion(mult = 0.06) else ggplot2::expansion(mult = 0)) +
     coord_layer +
-    ggplot2::labs(x = x_label, y = y_label, color = if (color_by == 'significance') 'GSEA enrichment' else 'GO term category') +
+    ggplot2::labs(x = x_label, y = y_label, color = if (color_by == 'significance') 'GSEA enrichment' else 'GO:BP category') +
     ggplot2::guides(color = ggplot2::guide_legend(
       nrow = legend_nrow,
       byrow = TRUE,

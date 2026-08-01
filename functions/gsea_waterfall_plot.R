@@ -13,6 +13,10 @@
 
 #' Make a GSEA waterfall plot
 #'
+#' Positive and negative plots exclude zero NES values. Terms are ranked before
+#' `top_n` is applied. Term descriptions act as unique keys unless `id_col`
+#' supplies a separate complete, unique identifier.
+#'
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing GO term names.
 #' @param nes_col Column containing normalized enrichment scores.
@@ -46,7 +50,7 @@
 #'   coordinates such as `c(0.98, 0.98)`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object without file-system side effects.
+#' @return A ggplot object without file-system side effects
 #'
 #' @export
 plot_gsea_waterfall <- function(gsea_results,
@@ -77,18 +81,8 @@ plot_gsea_waterfall <- function(gsea_results,
   direction <- match.arg(direction)
   rank_by <- .gsea_normalize_rank_by(rank_by)
   top_n <- .gsea_validate_count(top_n, 'top_n', minimum = 1L)
-  label_n <- .gsea_validate_count(label_n, 'label_n')
-  label_size <- .gsea_validate_number(
-    label_size,
-    'label_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  label_y_nudge_fraction <- .gsea_validate_number(
-    label_y_nudge_fraction,
-    'label_y_nudge_fraction',
-    minimum = 0)
-  if (!is.null(label_x_nudge)) {
-    label_x_nudge <- .gsea_validate_number(label_x_nudge, 'label_x_nudge')
+  if (length(label_terms) == 0L && length(label_ranks) == 0L) {
+    label_n <- .gsea_validate_count(label_n, 'label_n')
   }
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
   .gsea_validate_positive_integer_vector(label_ranks, 'label_ranks')
@@ -99,7 +93,6 @@ plot_gsea_waterfall <- function(gsea_results,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
-  .gsea_validate_term_groups(term_groups)
 
   if (direction == 'positive') {
     plot_tbl <- gsea_results[gsea_results$NES > 0, , drop = FALSE]
@@ -115,7 +108,7 @@ plot_gsea_waterfall <- function(gsea_results,
   plot_tbl <- utils::head(plot_tbl, top_n)
   plot_tbl$waterfall_rank <- seq_len(nrow(plot_tbl))
   plot_tbl$label_score <- abs(plot_tbl$NES) * .gsea_neg_log10(plot_tbl$padj)
-  plot_tbl$term_category <- .gsea_assign_term_groups(
+  plot_tbl$term_group <- .gsea_assign_term_groups(
     gsea_results = plot_tbl,
     term_groups = term_groups)
   color_values <- .gsea_resolve_term_group_colors(
@@ -131,7 +124,7 @@ plot_gsea_waterfall <- function(gsea_results,
     score_col = 'label_score',
     rank_col = 'waterfall_rank')
   label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
-  y_limits <- .gsea_waterfall_y_limits(plot_tbl$NES, y_min = y_min, y_max = y_max)
+  y_limits <- .gsea_resolve_axis_limits(plot_tbl$NES, lower = y_min, upper = y_max)
   y_breaks <- scales::breaks_pretty(n = 4)(y_limits)
   label_tbl$label_nudge_x <- numeric(nrow(label_tbl))
   label_tbl$label_nudge_y <- numeric(nrow(label_tbl))
@@ -158,25 +151,25 @@ plot_gsea_waterfall <- function(gsea_results,
   legend_anchor <- if (direction == 'positive') c(1, 1) else c(0, 1)
   point_layers <- .gsea_split_point_layers(
     plot_tbl = plot_tbl,
-    group_col = 'term_category',
+    group_col = 'term_group',
     background_groups = 'Other')
 
   ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$waterfall_rank, y = .data$NES)) +
     ggplot2::geom_point(
       data = point_layers$background,
-      ggplot2::aes(color = .data$term_category),
+      ggplot2::aes(color = .data$term_group),
       size = 0.95,
       alpha = 1,
       stroke = 0) +
     ggplot2::geom_point(
       data = point_layers$foreground,
-      ggplot2::aes(color = .data$term_category),
+      ggplot2::aes(color = .data$term_group),
       size = 0.95,
       alpha = 1,
       stroke = 0) +
     ggrepel::geom_text_repel(
       data = label_tbl,
-      ggplot2::aes(label = .data$label_text, color = .data$term_category),
+      ggplot2::aes(label = .data$label_text, color = .data$term_group),
       family = font_family,
       fontface = label_fontface,
       size = label_size / ggplot2::.pt,

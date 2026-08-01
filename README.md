@@ -52,14 +52,15 @@ Each input table represents one GSEA contrast with one row per unique term:
 
 | Column | Required | Meaning |
 | :-- | :-- | :-- |
-| `go_description` | yes | unique term description and default matching key |
+| `go_description` | yes | term description and default matching key |
 | `NES` | yes | normalized enrichment score |
 | `pval` | yes | nominal GSEA p-value in `[0, 1]` |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-The columns must be complete, and NES values must be finite. Supply `id_col`
-when a separate unique stable term identifier should be used. Comparative plots
-use the exact shared identifier intersection and do not impute absent terms.
+The columns must be complete, and NES values must be finite. Descriptions must
+be unique unless `id_col` names a separate complete, unique term key.
+Comparative plots use the exact shared-key intersection and do not impute absent
+terms.
 
 ## Plot functions
 
@@ -124,17 +125,16 @@ utils::install.packages(c(
 ```
 
 ```sh
-Rscript R/01_generate_gsea_figs.R
-Rscript R/02_render_github_pgs.R
+Rscript R/01_generate_gsea_figures.R
+Rscript R/02_render_github_pages.R
 Rscript R/03_check_gsea_contracts.R
 ```
 
-The first script writes six editable, font-embedded SVGs under
-`tutorial/assets/figures/`. The second renders `tutorial/tutorial.Rmd` directly
-to `docs/` for GitHub Pages. `tutorial/tutorial.Rmd` is the public site source
-of truth; generated files under `docs/` should not be edited by hand.
-The third script verifies fixed scientific counts, plot return contracts, the
-public API, identifier matching, and invalid-input boundaries.
+The figure script writes six editable, font-embedded SVGs under
+`tutorial/assets/figures/`. The site script renders `tutorial/tutorial.Rmd`
+directly to `docs/`; generated files under `docs/` should not be edited by
+hand. The contract script verifies fixed scientific counts, stable-key matching,
+and invalid-input boundaries.
 
 Maintainer contracts, output ownership, and canonical validation commands are
 recorded in [`MAINTENANCE.md`](MAINTENANCE.md).

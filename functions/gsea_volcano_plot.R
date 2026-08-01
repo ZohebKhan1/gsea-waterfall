@@ -11,7 +11,14 @@
 
 # 1.0 create symmetric volcano plot -----------------
 
+# retain the established SVG panel footprint with the portable plain-text y-axis label
+.gsea_volcano_y_title_margin_pt <- 5.42
+
 #' Make a symmetric GSEA volcano plot
+#'
+#' Significance is defined as `padj < padj_cutoff`. Zero adjusted p-values are
+#' displayed at the finite cap controlled by `y_max`; supplied values are not
+#' modified in the input table.
 #'
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing GO term names.
@@ -37,7 +44,7 @@
 #' @param legend_position Legend position passed to `ggplot2::theme()`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object without file-system side effects.
+#' @return A ggplot object without file-system side effects
 #'
 #' @export
 plot_gsea_volcano <- function(gsea_results,
@@ -67,24 +74,9 @@ plot_gsea_volcano <- function(gsea_results,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
-  label_n <- .gsea_validate_count(label_n, 'label_n')
-  point_size <- .gsea_validate_number(
-    point_size,
-    'point_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  label_size <- .gsea_validate_number(
-    label_size,
-    'label_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  count_label_size <- .gsea_validate_number(
-    count_label_size,
-    'count_label_size',
-    minimum = 0,
-    minimum_inclusive = FALSE)
-  label_nudge_x <- .gsea_validate_number(label_nudge_x, 'label_nudge_x')
-  label_nudge_y <- .gsea_validate_number(label_nudge_y, 'label_nudge_y')
+  if (length(label_terms) == 0L) {
+    label_n <- .gsea_validate_count(label_n, 'label_n')
+  }
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
   plot_tbl <- .gsea_standardize_results(
     gsea_results = gsea_results,
@@ -95,7 +87,7 @@ plot_gsea_volcano <- function(gsea_results,
     id_col = id_col)
   plot_tbl$neg_log10_padj <- .gsea_neg_log10(plot_tbl$padj)
   plot_tbl$plot_neg_log10_padj <- pmin(plot_tbl$neg_log10_padj, y_max)
-  plot_tbl$significant <- !is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
+  plot_tbl$significant <- plot_tbl$padj < padj_cutoff
   plot_tbl$point_group <- ifelse(
     plot_tbl$significant & plot_tbl$NES >= 0,
     'Significantly up',
@@ -103,8 +95,7 @@ plot_gsea_volcano <- function(gsea_results,
   plot_tbl$point_group <- factor(
     plot_tbl$point_group,
     levels = c('Significantly up', 'Significantly down', 'Not significant'))
-  color_values <- .gsea_default_colors()[levels(plot_tbl$point_group)]
-  color_values[['Not significant']] <- .gsea_light_gray()
+  color_values <- .gsea_direction_colors()[levels(plot_tbl$point_group)]
   custom_colors <- .gsea_resolve_named_colors(
     color_values = point_colors,
     required_names = levels(plot_tbl$point_group),
@@ -130,14 +121,12 @@ plot_gsea_volcano <- function(gsea_results,
   label_match <- match(label_tbl$go_term_id, repel_tbl$go_term_id)
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   repel_tbl$plot_neg_log10_padj[label_match] <- label_tbl$plot_neg_log10_padj
-  # inward nudges use central open space and avoid clipped edge labels
   label_nudge_x_values <- ifelse(label_tbl$NES < 0, label_nudge_x, -label_nudge_x)
   repel_tbl$label_nudge_x[label_match] <- label_nudge_x_values
   repel_tbl$label_nudge_y[label_match] <- label_nudge_y +
     rep(c(0.18, -0.12, 0.08, -0.18), length.out = length(label_match))
   negative_count <- sum(plot_tbl$significant & plot_tbl$NES < 0, na.rm = TRUE)
   positive_count <- sum(plot_tbl$significant & plot_tbl$NES > 0, na.rm = TRUE)
-  # place count boxes away from upper GO labels
   count_y <- y_min + 0.35
   x_axis_label <- if (is.null(contrast_label)) {
     'Normalized enrichment score (NES)'
@@ -237,7 +226,7 @@ plot_gsea_volcano <- function(gsea_results,
       override.aes = list(size = point_size + 0.8))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
-      axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 5.42)),
+      axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = .gsea_volcano_y_title_margin_pt)),
       legend.position = legend_position,
       legend.direction = 'horizontal',
       legend.box = 'horizontal',

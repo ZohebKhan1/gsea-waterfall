@@ -1,5 +1,5 @@
 ---
-title: "Comparative ranked GSEA waterfall, volcano, scatter-style plots"
+title: "GSEA waterfall, volcano, and comparative NES plots"
 description: "Standalone R functions for plotting precomputed GSEA results."
 site: bookdown::bookdown_site
 documentclass: book
@@ -15,8 +15,8 @@ knitr::opts_chunk$set(
 ```
 
 <div class="tutorial-title-block">
-<h1 class="title">Comparative ranked GSEA waterfall, volcano, scatter-style plots</h1>
-<div class="tutorial-subtitle">Standalone R functions for ranked GSEA GO terms, directional volcano plots, and cross-contrast NES comparisons.</div>
+<h1 class="title">GSEA waterfall, volcano, and comparative NES plots</h1>
+<div class="tutorial-subtitle">Standalone R functions for visualizing ranked GO biological-process enrichment results.</div>
 
 <div class="tutorial-meta-block">
 <div><span>Author:</span> Zoheb Khan</div>
@@ -27,15 +27,13 @@ knitr::opts_chunk$set(
 
 # Overview
 
-`gsea-waterfall` is a copyable R plotting toolkit for **precomputed** Gene Set Enrichment Analysis (GSEA) results. It provides ranked positive and negative NES waterfall plots, a symmetric volcano plot, directional half-volcano plots, and comparative NES scatterplots.
+`gsea-waterfall` visualizes **precomputed** Gene Set Enrichment Analysis (GSEA) results as ranked NES waterfalls, symmetric or directional volcano plots, and cross-contrast NES scatterplots. The functions return ggplot objects without running GSEA, changing supplied statistics, or writing files.
 
-The functions do not run GSEA or modify supplied enrichment statistics. They select and display rows according to explicit plotting arguments. The worked example uses GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts.
-
-Rendered tutorial: <https://zohebkhan1.github.io/gsea-waterfall/>
+The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plotting choices control row selection, labels, grouping, and presentation; they do not redefine enrichment significance.
 
 The waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8), [Xu, *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5), [Vuong, *Science*, 2026](https://doi.org/10.1126/science.aea1259), and [Risgaard, *Science*, 2026](https://doi.org/10.1126/science.aea1549).
 
-# Install And Source The Functions
+# Install and source
 
 Install the plotting dependencies once:
 
@@ -61,18 +59,18 @@ source('gsea_half_volcano_plot.R')
 source('gsea_nes_scatter_plot.R')
 ```
 
-# Input Contract
+# Input contract
 
 Each table represents one GSEA contrast with one row per unique term. The default columns are:
 
 | Column | Required | Meaning |
 |:---|:---|:---|
-| `go_description` | yes | unique GO term name and default matching key |
+| `go_description` | yes | GO term description and default matching key |
 | `NES` | yes | normalized enrichment score |
 | `pval` | yes | nominal GSEA p-value in `[0, 1]` |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-All four columns must be complete, and NES values must be finite. If descriptions are not unique, supply a complete unique identifier column through `id_col`. Comparative scatterplots use the exact shared identifier intersection; they do not impute absent terms.
+All four columns must be complete, and NES values must be finite. Descriptions must be unique unless `id_col` names a separate complete, unique term key. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
 
 Load the bundled examples from the repository root:
 
@@ -88,7 +86,7 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 )
 ```
 
-# Waterfall Plots
+# Ranked waterfall plots
 
 `plot_gsea_waterfall()` selects one NES direction, ranks terms by `NES`, `padj`, or `pvalue`, and displays the first `top_n` rows. `term_groups` controls point colors; `label_terms` independently controls direct labels. Text seeds are matched case-insensitively against term descriptions, while supplied term IDs are matched exactly after case normalization.
 
@@ -112,7 +110,7 @@ positive_term_groups <- list(
   'Heart development' = c('atrial', 'ventricular', 'heart', 'cardiac')
 )
 
-positive_label_terms <- c(
+positive_waterfall_label_terms <- c(
   'myofibril assembly',
   'cardiac muscle contraction',
   'cardiac muscle cell action potential',
@@ -130,13 +128,13 @@ positive_label_terms <- c(
   'heart trabecula morphogenesis'
 )
 
-positive_waterfall <- plot_gsea_waterfall(
+positive_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'positive',
   top_n = 100L,
   rank_by = 'NES',
   x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
-  label_terms = positive_label_terms,
+  label_terms = positive_waterfall_label_terms,
   term_groups = positive_term_groups
 )
 ```
@@ -146,7 +144,7 @@ cat('<div id="fig-positive-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 1.</strong> Positive NES GO biological-process waterfall for Cardiomyocyte vs. Mesoderm. Terms are ranked by NES, colored by manually defined cardiac-relevant groups, and labeled with selected terms.</div>
+<div class="tutorial-figure-caption"><strong>Figure 1.</strong> Positive NES terms ranked by NES, with selected cardiac-relevant groups and labels.</div>
 
 ## Negative NES waterfall
 
@@ -166,7 +164,7 @@ negative_term_group_colors <- c(
   'DNA replication' = '#E41A1C'
 )
 
-negative_waterfall <- plot_gsea_waterfall(
+negative_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
   top_n = 100L,
@@ -183,9 +181,9 @@ cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES GO biological-process waterfall for the same contrast. The selected groups highlight ribosomal, mitotic, and DNA-replication programs.</div>
+<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES terms highlighting ribosomal, mitotic, and DNA-replication programs.</div>
 
-# Volcano Plots
+# Volcano plots
 
 Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_half_volcano()` for a larger directional view. The example retains the established adjusted p-value cutoff of 0.05.
 
@@ -205,7 +203,7 @@ volcano_label_terms <- c(
   'ribosome assembly'
 )
 
-symmetric_volcano <- plot_gsea_volcano(
+gsea_volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   padj_cutoff = 0.05,
   label_terms = volcano_label_terms,
@@ -219,7 +217,7 @@ cat('<div id="fig-symmetric-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 3.</strong> Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs. Mesoderm. Point color marks significant positive, significant negative, or non-significant enrichment.</div>
+<div class="tutorial-figure-caption"><strong>Figure 3.</strong> Symmetric NES volcano colored by adjusted-p-value significance and direction.</div>
 
 ## Directional half-volcano plots
 
@@ -238,7 +236,7 @@ positive_half_volcano_label_terms <- c(
   'heart trabecula morphogenesis'
 )
 
-positive_half_volcano <- plot_gsea_half_volcano(
+positive_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'positive',
   p_col = 'padj',
@@ -255,7 +253,7 @@ cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Positive NES half-volcano for Cardiomyocyte vs. Mesoderm. The enlarged view uses the same biological grouping logic as the waterfall plot.</div>
+<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Positive NES half-volcano using the waterfall plot's term groups.</div>
 
 ```r
 negative_half_volcano_label_terms <- c(
@@ -270,7 +268,7 @@ negative_half_volcano_label_terms <- c(
   'spindle organization'
 )
 
-negative_half_volcano <- plot_gsea_half_volcano(
+negative_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
   p_col = 'padj',
@@ -288,9 +286,9 @@ cat('<div id="fig-negative-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Negative NES half-volcano for Cardiomyocyte vs. Mesoderm. Selected labels emphasize DNA replication, checkpoint, and ribosome-associated programs.</div>
+<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Negative NES half-volcano emphasizing DNA replication, checkpoint, and ribosome-associated terms.</div>
 
-# Comparative NES Scatterplot
+# Comparative NES scatterplot
 
 `plot_gsea_nes_scatter()` compares the exact shared term-key intersection. The fitted line is descriptive; the helper does not calculate a new enrichment statistic.
 
@@ -305,7 +303,7 @@ scatter_label_terms <- c(
   'regulation of nuclear division'
 )
 
-all_quadrants_scatter <- plot_gsea_nes_scatter(
+comparative_nes_scatter_plot <- plot_gsea_nes_scatter(
   gsea_x = gsea_day9_vs_day6,
   gsea_y = gsea_day3_vs_day1,
   x_label = 'Day 9 vs. Day 6 NES',
@@ -327,9 +325,9 @@ cat('<div id="fig-all-quadrants-scatter" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 6.</strong> Comparative GO biological-process NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day 1. Point color shows significance in one, both, or neither contrast.</div>
+<div class="tutorial-figure-caption"><strong>Figure 6.</strong> Shared terms colored by significance in one, both, or neither contrast.</div>
 
-# Function Reference
+# API summary
 
 | Function | Contract |
 |:---|:---|
@@ -339,9 +337,9 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 | `plot_gsea_half_volcano()` | returns a directional ggplot after the explicit NES boundary |
 | `plot_gsea_nes_scatter()` | returns a ggplot from the exact shared term-key intersection |
 
-All plot functions return ggplot objects and do not write files. Their source-level documentation defines the complete argument and return contracts. The common input-column arguments are `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col`; visual arguments control labels, colors, dimensions inside the panel, and legends without changing the supplied enrichment values.
+All plot functions return ggplot objects without writing files. Their source documentation defines the complete argument contracts. Common column arguments are `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col`.
 
-# Reproduce The Repository
+# Reproduce the repository
 
 Install the rendering dependencies and run the maintained scripts from the repository root:
 
@@ -352,12 +350,12 @@ utils::install.packages(c(
 ```
 
 ```sh
-Rscript R/01_generate_gsea_figs.R
-Rscript R/02_render_github_pgs.R
+Rscript R/01_generate_gsea_figures.R
+Rscript R/02_render_github_pages.R
 Rscript R/03_check_gsea_contracts.R
 ```
 
-The first script writes the six editable, font-embedded SVGs under `tutorial/assets/figures/`. The second renders `tutorial/tutorial.Rmd` into `docs/` for GitHub Pages. The third verifies the fixed scientific counts, plot contracts, public API, identifier matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands recorded in `MAINTENANCE.md`.
+The figure script writes six editable, font-embedded SVGs under `tutorial/assets/figures/`. The site script renders this source into `docs/`, and the contract script verifies fixed scientific counts, stable-key matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands in `MAINTENANCE.md`.
 
 # References
 

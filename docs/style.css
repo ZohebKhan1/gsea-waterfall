@@ -31,12 +31,10 @@
 }
 
 :root {
-  --tutorial-text-width: 770px;
-  --tutorial-heading-width: 770px;
-  --tutorial-code-width: 770px;
+  --tutorial-content-width: 770px;
   --tutorial-figure-width: 900px;
   --tutorial-figure-offset: calc(
-    (var(--tutorial-text-width) - var(--tutorial-figure-width)) / 2
+    (var(--tutorial-content-width) - var(--tutorial-figure-width)) / 2
   );
   --tutorial-sidebar-width: 300px;
   --tutorial-code-font:
@@ -94,7 +92,7 @@ body > #header,
   margin: 0;
 }
 
-.book .book-summary nav li.toc-title a {
+.book .book-summary nav ul.summary > li:first-child > a {
   color: #2d3748;
   font-size: 0.98rem;
   padding: 0.82rem 0.95rem;
@@ -155,13 +153,13 @@ body > #header,
 .book .book-body .page-wrapper .page-inner section.normal {
   color: #000000;
   font-size: 17.5px;
-  font-weight: 475;
+  font-weight: 400;
   line-height: 1.7;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .tutorial-title-block {
   margin: 3.8rem 0;
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .tutorial-title-block h1.title {
@@ -177,17 +175,17 @@ body > #header,
 .book .book-body .page-wrapper .page-inner section.normal .tutorial-subtitle {
   color: #000000;
   font-size: 1.18em;
-  font-weight: 475;
+  font-weight: 400;
   line-height: 1.42;
   margin: 0 0 0.85rem;
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .tutorial-meta-block {
   color: #000000;
   font-size: 1em;
   line-height: 1.7;
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .tutorial-meta-block div {
@@ -204,7 +202,7 @@ body > #header,
 .book .book-body .page-wrapper .page-inner section.normal ol,
 .book .book-body .page-wrapper .page-inner section.normal blockquote,
 .book .book-body .page-wrapper .page-inner section.normal table {
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal p:not(:has(img)),
@@ -236,7 +234,7 @@ body > #header,
   font-weight: 700;
   margin-bottom: 0.85em;
   margin-top: 1.275em;
-  max-width: var(--tutorial-heading-width);
+  max-width: var(--tutorial-content-width);
   padding-bottom: 0;
 }
 
@@ -281,14 +279,14 @@ body > #header,
   font-size: 0.91em;
   line-height: 1.45;
   margin: 0.45rem auto 2.75rem 0;
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
   text-align: left;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .reference-list {
   font-size: 0.96em;
   line-height: 1.55;
-  max-width: var(--tutorial-text-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal .reference-list li {
@@ -344,7 +342,7 @@ body > #header,
   font-size: 0.86em;
   line-height: 1.45;
   margin: 1.65rem 0 2.1rem;
-  max-width: var(--tutorial-code-width);
+  max-width: var(--tutorial-content-width);
   overflow-x: auto;
 }
 
@@ -408,7 +406,7 @@ body > #header,
   border: 1px solid #2f2f2f;
   border-radius: 4px;
   margin: 1.65rem 0 2.1rem;
-  max-width: var(--tutorial-code-width);
+  max-width: var(--tutorial-content-width);
 }
 
 .book .book-body .page-wrapper .page-inner section.normal details.code-fold summary {
@@ -428,12 +426,6 @@ body > #header,
 .book .book-body .page-wrapper .page-inner section.normal details.code-fold .sourceCode,
 .book .book-body .page-wrapper .page-inner section.normal details.code-fold pre {
   margin: 0;
-}
-
-.book .book-body .page-wrapper .page-inner section.normal #session-info pre,
-.book .book-body .page-wrapper .page-inner section.normal #session-info pre code,
-.book .book-body .page-wrapper .page-inner section.normal #session-info pre code span {
-  color: #ffffff !important;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal table {
