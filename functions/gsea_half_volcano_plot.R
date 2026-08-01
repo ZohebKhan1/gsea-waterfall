@@ -1,6 +1,15 @@
-if (!base::exists('standardize_gsea_results', mode = 'function')) {
-  base::stop('Source gsea_plot_utils.R before this plotting function file.', call. = FALSE)
-}
+# ----
+# author:
+# - Zoheb Khan
+#
+# script path:
+# - functions/gsea_half_volcano_plot.R
+#
+# functions:
+# - functions/gsea_plot_utils.R
+# ----
+
+# 1.0 create directional volcano plot -----------------
 
 #' Make a directional half-volcano plot for GSEA results
 #'
@@ -16,8 +25,6 @@ if (!base::exists('standardize_gsea_results', mode = 'function')) {
 #' @param label_n Number of significant terms to label.
 #' @param label_terms Optional exact term descriptions or GO IDs to label.
 #' @param term_groups Optional named GO category seeds for coloring.
-#' @param category_n Optional expected number of categories in `term_groups`.
-#' @param max_categories Maximum allowed number of custom categories.
 #' @param term_group_colors Optional named colors for `term_groups`.
 #' @param inner_nes_limit Inner absolute NES cutoff shown on the x-axis.
 #' @param point_size Point size.
@@ -32,21 +39,21 @@ if (!base::exists('standardize_gsea_results', mode = 'function')) {
 #' @param legend_position Legend position passed to `ggplot2::theme()`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object.
-make_gsea_half_volcano <- function(gsea_results,
+#' @return A ggplot object without file-system side effects.
+#'
+#' @export
+plot_gsea_half_volcano <- function(gsea_results,
                                    term_col = 'go_description',
                                    nes_col = 'NES',
                                    pvalue_col = 'pval',
                                    padj_col = 'padj',
                                    id_col = NULL,
-                                   direction = base::c('positive', 'negative'),
+                                   direction = c('positive', 'negative'),
                                    p_col = 'padj',
                                    padj_cutoff = 0.05,
                                    label_n = 12L,
                                    label_terms = NULL,
                                    term_groups = NULL,
-                                   category_n = NULL,
-                                   max_categories = 6L,
                                    term_group_colors = NULL,
                                    inner_nes_limit = 1,
                                    point_size = 1.35,
@@ -59,85 +66,101 @@ make_gsea_half_volcano <- function(gsea_results,
                                    y_max = NULL,
                                    legend_position = NULL,
                                    font_family = 'Nimbus Sans') {
-  direction <- base::match.arg(direction)
-  validate_term_groups(term_groups = term_groups, category_n = category_n)
-  validate_max_categories(term_groups = term_groups, max_categories = max_categories)
-  plot_tbl <- standardize_gsea_results(
+  direction <- match.arg(direction)
+  padj_cutoff <- .gsea_validate_number(
+    padj_cutoff,
+    'padj_cutoff',
+    minimum = 0,
+    maximum = 1)
+  label_n <- .gsea_validate_count(label_n, 'label_n')
+  inner_nes_limit <- .gsea_validate_number(
+    inner_nes_limit,
+    'inner_nes_limit',
+    minimum = 0)
+  point_size <- .gsea_validate_number(
+    point_size,
+    'point_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  label_size <- .gsea_validate_number(
+    label_size,
+    'label_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
+  .gsea_validate_term_groups(term_groups)
+  plot_tbl <- .gsea_standardize_results(
     gsea_results = gsea_results,
     term_col = term_col,
     nes_col = nes_col,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
-  if (!p_col %in% base::c('pvalue', 'padj')) {
-    base::stop("`p_col` must be either 'pvalue' or 'padj'.", call. = FALSE)
+  if (!p_col %in% c('pvalue', 'padj')) {
+    stop("`p_col` must be either 'pvalue' or 'padj'.", call. = FALSE)
   }
 
   plot_tbl <- plot_tbl[if (direction == 'positive') plot_tbl$NES > 0 else plot_tbl$NES < 0, , drop = FALSE]
-  inner_nes_limit <- base::as.numeric(inner_nes_limit)
-  if (base::is.na(inner_nes_limit) || inner_nes_limit < 0) {
-    base::stop('`inner_nes_limit` must be a non-negative number.', call. = FALSE)
-  }
   if (inner_nes_limit > 0) {
     plot_tbl <- plot_tbl[if (direction == 'positive') plot_tbl$NES >= inner_nes_limit else plot_tbl$NES <= -inner_nes_limit, , drop = FALSE]
   }
-  if (base::nrow(plot_tbl) == 0L) {
-    base::stop('No GSEA terms remain after applying the half-volcano NES boundary.', call. = FALSE)
+  if (nrow(plot_tbl) == 0L) {
+    stop('No GSEA terms remain after applying the half-volcano NES boundary.', call. = FALSE)
   }
-  plot_tbl$neg_log10_p <- safe_neg_log10(plot_tbl[[p_col]])
-  plot_tbl$significant <- !base::is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
-  if (base::is.null(term_groups)) {
+  plot_tbl$neg_log10_p <- .gsea_neg_log10(plot_tbl[[p_col]])
+  plot_tbl$significant <- !is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
+  if (is.null(term_groups)) {
     direction_label <- if (direction == 'positive') 'Significantly up' else 'Significantly down'
     direction_color <- if (direction == 'positive') '#CC79A7' else '#0072B2'
-    plot_tbl$point_group <- base::ifelse(plot_tbl$significant, direction_label, 'Not significant')
-    plot_tbl$point_group <- base::factor(plot_tbl$point_group, levels = base::c(direction_label, 'Not significant'))
-    color_values <- base::c(stats::setNames(direction_color, direction_label), 'Not significant' = gsea_light_gray())
-    custom_colors <- resolve_named_colors(
+    plot_tbl$point_group <- ifelse(plot_tbl$significant, direction_label, 'Not significant')
+    plot_tbl$point_group <- factor(plot_tbl$point_group, levels = c(direction_label, 'Not significant'))
+    color_values <- c(stats::setNames(direction_color, direction_label), 'Not significant' = .gsea_light_gray())
+    custom_colors <- .gsea_resolve_named_colors(
       color_values = point_colors,
-      required_names = base::levels(plot_tbl$point_group),
+      required_names = levels(plot_tbl$point_group),
       parameter_name = 'point_colors')
-    if (!base::is.null(custom_colors)) {
+    if (!is.null(custom_colors)) {
       color_values <- custom_colors
     }
     legend_title <- 'GSEA direction'
     background_groups <- 'Not significant'
   } else {
-    plot_tbl$point_group <- assign_plot_term_groups(
+    plot_tbl$point_group <- .gsea_assign_term_groups(
       gsea_results = plot_tbl,
       term_groups = term_groups)
-    plot_tbl$point_group <- base::as.character(plot_tbl$point_group)
+    plot_tbl$point_group <- as.character(plot_tbl$point_group)
     plot_tbl$point_group[!plot_tbl$significant] <- 'Not significant'
-    plot_tbl$point_group <- base::factor(
+    plot_tbl$point_group <- factor(
       plot_tbl$point_group,
-      levels = base::c(base::names(term_groups), 'Other', 'Not significant'))
-    color_values <- resolve_term_group_colors(
+      levels = c(names(term_groups), 'Other', 'Not significant'))
+    color_values <- .gsea_resolve_term_group_colors(
       term_groups = term_groups,
       term_group_colors = term_group_colors)
-    color_values <- base::c(color_values, 'Not significant' = gsea_light_gray())
+    color_values <- c(color_values, 'Not significant' = .gsea_light_gray())
     legend_title <- 'GO:BP category'
-    background_groups <- base::c('Other', 'Not significant')
+    background_groups <- c('Other', 'Not significant')
   }
-  plot_tbl$label_score <- base::abs(plot_tbl$NES) * plot_tbl$neg_log10_p
+  plot_tbl$label_score <- abs(plot_tbl$NES) * plot_tbl$neg_log10_p
   significant_tbl <- plot_tbl[plot_tbl$significant, , drop = FALSE]
-  significant_tbl <- significant_tbl[base::order(base::abs(significant_tbl$NES), significant_tbl$padj), , drop = FALSE]
-  significant_tbl$label_rank <- base::seq_len(base::nrow(significant_tbl))
-  label_requests <- combine_label_requests(label_terms = label_terms)
-  if (!base::is.null(label_requests) && base::length(label_requests) > 0L) {
-    label_tbl <- select_gsea_labels(plot_tbl, label_terms = label_requests)
+  significant_tbl <- significant_tbl[order(abs(significant_tbl$NES), significant_tbl$padj), , drop = FALSE]
+  significant_tbl$label_rank <- seq_len(nrow(significant_tbl))
+  label_requests <- .gsea_combine_label_requests(label_terms = label_terms)
+  if (!is.null(label_requests) && length(label_requests) > 0L) {
+    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = label_requests)
   } else {
-    label_tbl <- select_gsea_labels(significant_tbl, label_n = label_n, score_col = 'label_score', rank_col = 'label_rank')
+    label_tbl <- .gsea_select_labels(significant_tbl, label_n = label_n, score_col = 'label_score', rank_col = 'label_rank')
   }
-  label_tbl$label_text <- wrap_gsea_label(label_tbl$go_description, words_per_line = label_words_per_line)
+  label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
   repel_tbl <- plot_tbl
   repel_tbl$label_text <- ''
   repel_tbl$label_nudge_x <- 0
   repel_tbl$label_nudge_y <- 0
-  label_match <- base::match(label_tbl$go_term_id, repel_tbl$go_term_id)
+  label_match <- match(label_tbl$go_term_id, repel_tbl$go_term_id)
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   label_direction <- if (direction == 'positive') 1 else -1
   repel_tbl$label_nudge_x[label_match] <- label_direction * 0.12
-  y_limits <- calculate_waterfall_y_limits(plot_tbl$neg_log10_p, y_min = y_min, y_max = y_max, buffer_fraction = 0.035)
-  x_limits <- calculate_axis_limits(plot_tbl$NES, buffer_fraction = 0.035)
+  y_limits <- .gsea_waterfall_y_limits(plot_tbl$neg_log10_p, y_min = y_min, y_max = y_max, buffer_fraction = 0.035)
+  x_limits <- .gsea_axis_limits(plot_tbl$NES, buffer_fraction = 0.035)
   if (direction == 'positive') {
     x_limits[[1L]] <- inner_nes_limit
   } else {
@@ -145,21 +168,21 @@ make_gsea_half_volcano <- function(gsea_results,
   }
   x_breaks <- scales::breaks_pretty(n = 4)(x_limits)
   x_breaks <- x_breaks[x_breaks >= x_limits[[1L]] & x_breaks <= x_limits[[2L]]]
-  use_default_legend <- base::is.null(legend_position)
+  use_default_legend <- is.null(legend_position)
   if (use_default_legend) {
-    legend_position <- if (direction == 'negative') base::c(0.97, 0.97) else base::c(0.03, 0.97)
+    legend_position <- if (direction == 'negative') c(0.97, 0.97) else c(0.03, 0.97)
   }
   legend_anchor <- if (use_default_legend && direction == 'negative') {
-    base::c(1, 1)
+    c(1, 1)
   } else {
-    base::c(0, 1)
+    c(0, 1)
   }
-  x_axis_label <- if (base::is.null(contrast_label)) {
+  x_axis_label <- if (is.null(contrast_label)) {
     'Normalized enrichment score (NES)'
   } else {
-    base::paste0(contrast_label, ' NES')
+    paste0(contrast_label, ' NES')
   }
-  point_layers <- split_point_layers(
+  point_layers <- .gsea_split_point_layers(
     plot_tbl = plot_tbl,
     group_col = 'point_group',
     background_groups = background_groups)
@@ -178,7 +201,7 @@ make_gsea_half_volcano <- function(gsea_results,
       alpha = 1,
       stroke = 0) +
     ggplot2::geom_hline(
-      yintercept = -base::log10(padj_cutoff),
+      yintercept = -log10(padj_cutoff),
       color = 'black',
       linewidth = 0.22,
       linetype = 'dashed') +
@@ -206,27 +229,16 @@ make_gsea_half_volcano <- function(gsea_results,
       show.legend = FALSE) +
     ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = 0.015)) +
-    ggplot2::scale_y_continuous(expand = base::c(0, 0), position = if (direction == 'negative') 'right' else 'left') +
+    ggplot2::scale_y_continuous(expand = c(0, 0), position = if (direction == 'negative') 'right' else 'left') +
     ggplot2::coord_cartesian(xlim = x_limits, ylim = y_limits, clip = 'off') +
-    ggplot2::labs(x = x_axis_label, y = base::paste0('-log10(', p_col, ')'), color = legend_title) +
-    ggplot2::guides(color = ggplot2::guide_legend(override.aes = base::list(size = point_size + 0.5))) +
-    ggplot2::theme_classic(base_family = font_family, base_size = 9) +
+    ggplot2::labs(x = x_axis_label, y = paste0('-log10(', p_col, ')'), color = legend_title) +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size + 0.5))) +
+    .gsea_theme(font_family) +
     ggplot2::theme(
-      axis.title = ggplot2::element_text(size = 9, color = 'black'),
-      axis.text = ggplot2::element_text(size = 8, color = 'black'),
-      axis.line = ggplot2::element_line(color = 'black', linewidth = 0.24),
-      axis.ticks = ggplot2::element_line(color = 'black', linewidth = 0.20),
-      panel.grid.major = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank(),
       legend.position = legend_position,
       legend.justification = legend_anchor,
       legend.background = ggplot2::element_rect(fill = 'white', color = NA),
-      legend.title = ggplot2::element_text(size = 8, color = 'black', face = 'bold'),
-      legend.text = ggplot2::element_text(size = 7.5, color = 'black'),
-      legend.key.size = grid::unit(0.25, 'cm'),
       plot.margin = ggplot2::margin(8, 10, 8, 10))
 
   half_plot
 }
-
-plot_gsea_half_volcano <- make_gsea_half_volcano

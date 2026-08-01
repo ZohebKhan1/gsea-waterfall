@@ -1,6 +1,15 @@
-if (!base::exists('standardize_gsea_results', mode = 'function')) {
-  base::stop('Source gsea_plot_utils.R before this plotting function file.', call. = FALSE)
-}
+# ----
+# author:
+# - Zoheb Khan
+#
+# script path:
+# - functions/gsea_volcano_plot.R
+#
+# functions:
+# - functions/gsea_plot_utils.R
+# ----
+
+# 1.0 create symmetric volcano plot -----------------
 
 #' Make a symmetric GSEA volcano plot
 #'
@@ -28,8 +37,10 @@ if (!base::exists('standardize_gsea_results', mode = 'function')) {
 #' @param legend_position Legend position passed to `ggplot2::theme()`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object.
-make_gsea_volcano <- function(gsea_results,
+#' @return A ggplot object without file-system side effects.
+#'
+#' @export
+plot_gsea_volcano <- function(gsea_results,
                               term_col = 'go_description',
                               nes_col = 'NES',
                               pvalue_col = 'pval',
@@ -51,65 +62,89 @@ make_gsea_volcano <- function(gsea_results,
                               label_words_per_line = 3L,
                               legend_position = 'top',
                               font_family = 'Nimbus Sans') {
-  plot_tbl <- standardize_gsea_results(
+  padj_cutoff <- .gsea_validate_number(
+    padj_cutoff,
+    'padj_cutoff',
+    minimum = 0,
+    maximum = 1)
+  label_n <- .gsea_validate_count(label_n, 'label_n')
+  point_size <- .gsea_validate_number(
+    point_size,
+    'point_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  label_size <- .gsea_validate_number(
+    label_size,
+    'label_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  count_label_size <- .gsea_validate_number(
+    count_label_size,
+    'count_label_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  label_nudge_x <- .gsea_validate_number(label_nudge_x, 'label_nudge_x')
+  label_nudge_y <- .gsea_validate_number(label_nudge_y, 'label_nudge_y')
+  .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
+  plot_tbl <- .gsea_standardize_results(
     gsea_results = gsea_results,
     term_col = term_col,
     nes_col = nes_col,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
-  plot_tbl$neg_log10_padj <- safe_neg_log10(plot_tbl$padj)
-  plot_tbl$plot_neg_log10_padj <- base::pmin(plot_tbl$neg_log10_padj, y_max)
-  plot_tbl$significant <- !base::is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
-  plot_tbl$point_group <- base::ifelse(
+  plot_tbl$neg_log10_padj <- .gsea_neg_log10(plot_tbl$padj)
+  plot_tbl$plot_neg_log10_padj <- pmin(plot_tbl$neg_log10_padj, y_max)
+  plot_tbl$significant <- !is.na(plot_tbl$padj) & plot_tbl$padj < padj_cutoff
+  plot_tbl$point_group <- ifelse(
     plot_tbl$significant & plot_tbl$NES >= 0,
     'Significantly up',
-    base::ifelse(plot_tbl$significant & plot_tbl$NES < 0, 'Significantly down', 'Not significant'))
-  plot_tbl$point_group <- base::factor(
+    ifelse(plot_tbl$significant & plot_tbl$NES < 0, 'Significantly down', 'Not significant'))
+  plot_tbl$point_group <- factor(
     plot_tbl$point_group,
-    levels = base::c('Significantly up', 'Significantly down', 'Not significant'))
-  color_values <- gsea_default_colors()[base::levels(plot_tbl$point_group)]
-  color_values[['Not significant']] <- gsea_light_gray()
-  custom_colors <- resolve_named_colors(
+    levels = c('Significantly up', 'Significantly down', 'Not significant'))
+  color_values <- .gsea_default_colors()[levels(plot_tbl$point_group)]
+  color_values[['Not significant']] <- .gsea_light_gray()
+  custom_colors <- .gsea_resolve_named_colors(
     color_values = point_colors,
-    required_names = base::levels(plot_tbl$point_group),
+    required_names = levels(plot_tbl$point_group),
     parameter_name = 'point_colors')
-  if (!base::is.null(custom_colors)) {
+  if (!is.null(custom_colors)) {
     color_values <- custom_colors
   }
-  plot_tbl$label_score <- base::abs(plot_tbl$NES) * plot_tbl$plot_neg_log10_padj
-  label_requests <- combine_label_requests(label_terms = label_terms)
-  if (!base::is.null(label_requests) && base::length(label_requests) > 0L) {
-    label_tbl <- select_gsea_labels(plot_tbl, label_terms = label_requests)
+  plot_tbl$label_score <- abs(plot_tbl$NES) * plot_tbl$plot_neg_log10_padj
+  label_requests <- .gsea_combine_label_requests(label_terms = label_terms)
+  if (!is.null(label_requests) && length(label_requests) > 0L) {
+    label_tbl <- .gsea_select_labels(plot_tbl, label_terms = label_requests)
   } else {
-    label_tbl <- select_volcano_labels(plot_tbl, label_n = label_n)
+    label_tbl <- .gsea_select_volcano_labels(plot_tbl, label_n = label_n)
   }
-  x_limits <- base::c(-3.5, 3.5)
-  y_limits <- base::c(y_min, y_max + 3.5)
-  label_tbl$plot_neg_log10_padj <- base::pmin(label_tbl$plot_neg_log10_padj, y_max - 2.0)
-  label_tbl$label_text <- wrap_gsea_label(label_tbl$go_description, words_per_line = label_words_per_line)
+  x_limits <- c(-3.5, 3.5)
+  y_limits <- c(y_min, y_max + 3.5)
+  label_tbl$plot_neg_log10_padj <- pmin(label_tbl$plot_neg_log10_padj, y_max - 2.0)
+  label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
   repel_tbl <- plot_tbl
   repel_tbl$label_text <- ''
   repel_tbl$label_nudge_x <- 0
   repel_tbl$label_nudge_y <- 0
-  label_match <- base::match(label_tbl$go_term_id, repel_tbl$go_term_id)
+  label_match <- match(label_tbl$go_term_id, repel_tbl$go_term_id)
   repel_tbl$label_text[label_match] <- label_tbl$label_text
   repel_tbl$plot_neg_log10_padj[label_match] <- label_tbl$plot_neg_log10_padj
   # inward nudges use central open space and avoid clipped edge labels
-  label_nudge_x_values <- base::ifelse(label_tbl$NES < 0, label_nudge_x, -label_nudge_x)
+  label_nudge_x_values <- ifelse(label_tbl$NES < 0, label_nudge_x, -label_nudge_x)
   repel_tbl$label_nudge_x[label_match] <- label_nudge_x_values
   repel_tbl$label_nudge_y[label_match] <- label_nudge_y +
-    base::rep(base::c(0.18, -0.12, 0.08, -0.18), length.out = base::length(label_match))
-  negative_count <- base::sum(plot_tbl$significant & plot_tbl$NES < 0, na.rm = TRUE)
-  positive_count <- base::sum(plot_tbl$significant & plot_tbl$NES > 0, na.rm = TRUE)
-  # place count boxes away from upper go labels
+    rep(c(0.18, -0.12, 0.08, -0.18), length.out = length(label_match))
+  negative_count <- sum(plot_tbl$significant & plot_tbl$NES < 0, na.rm = TRUE)
+  positive_count <- sum(plot_tbl$significant & plot_tbl$NES > 0, na.rm = TRUE)
+  # place count boxes away from upper GO labels
   count_y <- y_min + 0.35
-  x_axis_label <- if (base::is.null(contrast_label)) {
+  x_axis_label <- if (is.null(contrast_label)) {
     'Normalized enrichment score (NES)'
   } else {
-    base::paste0(contrast_label, ' NES')
+    paste0(contrast_label, ' NES')
   }
-  point_layers <- split_point_layers(
+  point_layers <- .gsea_split_point_layers(
     plot_tbl = plot_tbl,
     group_col = 'point_group',
     background_groups = 'Not significant')
@@ -142,8 +177,8 @@ make_gsea_volcano <- function(gsea_results,
       segment.size = 0.13,
       box.padding = 0.45,
       point.padding = 0.16,
-      xlim = base::c(x_limits[[1L]] + 0.18, x_limits[[2L]] - 0.18),
-      ylim = base::c(y_min, y_max),
+      xlim = c(x_limits[[1L]] + 0.18, x_limits[[2L]] - 0.18),
+      ylim = c(y_min, y_max),
       direction = 'both',
       force = 1.8,
       force_pull = 3.4,
@@ -156,7 +191,7 @@ make_gsea_volcano <- function(gsea_results,
       'label',
       x = x_limits[[1L]],
       y = count_y,
-      label = base::paste0('Significantly down: ', negative_count),
+      label = paste0('Significantly down: ', negative_count),
       hjust = 0,
       vjust = 0,
       family = font_family,
@@ -171,7 +206,7 @@ make_gsea_volcano <- function(gsea_results,
       'label',
       x = x_limits[[2L]],
       y = count_y,
-      label = base::paste0('Significantly up: ', positive_count),
+      label = paste0('Significantly up: ', positive_count),
       hjust = 1,
       vjust = 0,
       family = font_family,
@@ -185,39 +220,29 @@ make_gsea_volcano <- function(gsea_results,
     ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
     ggplot2::scale_x_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
-      breaks = base::c(-3, -2, -1, 0, 1, 2, 3),
+      breaks = c(-3, -2, -1, 0, 1, 2, 3),
       expand = ggplot2::expansion(mult = 0.02)) +
     ggplot2::scale_y_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
-      breaks = base::c(0, 1, 2, 5, 10, 25),
-      expand = base::c(0, 0)) +
+      breaks = c(0, 1, 2, 5, 10, 25),
+      expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = x_limits, ylim = y_limits, clip = 'off') +
-    ggplot2::labs(x = x_axis_label, y = base::quote(-log[10]('Adjusted p-value'))) +
+    ggplot2::labs(x = x_axis_label, y = '\u2212log10(Adjusted p-value)') +
     ggplot2::guides(color = ggplot2::guide_legend(
       title = 'GSEA direction',
       nrow = 1,
       byrow = TRUE,
       title.position = 'top',
       title.hjust = 0.5,
-      override.aes = base::list(size = point_size + 0.8))) +
-    ggplot2::theme_classic(base_family = font_family, base_size = 9) +
+      override.aes = list(size = point_size + 0.8))) +
+    .gsea_theme(font_family) +
     ggplot2::theme(
-      axis.title = ggplot2::element_text(size = 9, color = 'black'),
-      axis.text = ggplot2::element_text(size = 8, color = 'black'),
-      axis.line = ggplot2::element_line(color = 'black', linewidth = 0.24),
-      axis.ticks = ggplot2::element_line(color = 'black', linewidth = 0.20),
-      panel.grid.major = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank(),
+      axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 5.42)),
       legend.position = legend_position,
       legend.direction = 'horizontal',
       legend.box = 'horizontal',
       legend.justification = 'center',
-      legend.title = ggplot2::element_text(size = 8, color = 'black', face = 'bold'),
-      legend.text = ggplot2::element_text(size = 7.5, color = 'black'),
-      legend.key.size = grid::unit(0.25, 'cm'),
       plot.margin = ggplot2::margin(10, 18, 8, 12))
 
   volcano_plot
 }
-
-plot_gsea_volcano <- make_gsea_volcano

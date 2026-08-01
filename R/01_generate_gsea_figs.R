@@ -1,157 +1,107 @@
 #!/usr/bin/env Rscript
 
-# load standalone plotting functions
-base::source('functions/gsea_plot_utils.R')
-base::source('functions/gsea_waterfall_plot.R')
-base::source('functions/gsea_volcano_plot.R')
-base::source('functions/gsea_half_volcano_plot.R')
-base::source('functions/gsea_nes_scatter_plot.R')
+# ----
+# author:
+# - Zoheb Khan
+#
+# script path:
+# - R/01_generate_gsea_figs.R
+#
+# functions:
+# - functions/gsea_plot_utils.R
+# - functions/gsea_waterfall_plot.R
+# - functions/gsea_volcano_plot.R
+# - functions/gsea_half_volcano_plot.R
+# - functions/gsea_nes_scatter_plot.R
+#
+# input data:
+# - tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv
+# - tutorial/data/GSE122380_gsea_day9_vs_day6.csv
+# - tutorial/data/GSE122380_gsea_day3_vs_day1.csv
+# - tutorial/assets/fonts/NimbusSans-Regular.otf
+# - tutorial/assets/fonts/NimbusSans-Bold.otf
+# - tutorial/assets/fonts/NimbusSans-Italic.otf
+# - tutorial/assets/fonts/NimbusSans-BoldItalic.otf
+#
+# outputs:
+# - tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg
+# - tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg
+# - tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg
+# - tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg
+# - tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg
+# - tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg
+# ----
 
-# load minimal precomputed gsea examples
-gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csvs(
-  'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv')
-gsea_day9_vs_day6 <- read_gsea_result_csvs(
-  'tutorial/data/GSE122380_gsea_day9_vs_day6.csv')
-gsea_day3_vs_day1 <- read_gsea_result_csvs(
-  'tutorial/data/GSE122380_gsea_day3_vs_day1.csv')
+# 0.0 verify project root and source functions -----------------
 
-# keep dimensions synchronized across tutorial figures
-figure_family = 'Nimbus Sans'
-display_contrast_label = 'Cardiomyocyte vs. Mesoderm'
-figure_width = 9
-figure_width_waterfall = 7.4
-figure_width_volcano = 4.8
-figure_width_directional = 7.4
-figure_height_volcano = 4.9
-figure_height_waterfall = 4.3
-figure_height_directional = 4.3
-figure_height_scatter = 6.375
-
-# keep nimbus font embedding local to tutorial svg export
-resolve_font_path <- function(candidates) {
-  found <- candidates[base::file.exists(candidates)]
-  if (base::length(found) == 0L) {
-    return(NA_character_)
-  }
-  found[[1L]]
+if (!file.exists('gsea.Rproj')) {
+  stop('Run R/01_generate_gsea_figs.R from the gsea repository root.', call. = FALSE)
 }
 
-plot_user_fonts <- function(font_family = 'Nimbus Sans') {
-  font_dir <- 'tutorial/assets/fonts'
-  regular <- resolve_font_path(base::c(
-    base::file.path(font_dir, 'NimbusSans-Regular.otf'),
-    '/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf'))
-  if (base::is.na(regular)) {
-    return(base::list())
-  }
-  stats::setNames(base::list(regular), font_family)
-}
+# source GSEA plotting functions
+source('functions/gsea_plot_utils.R')
+source('functions/gsea_waterfall_plot.R')
+source('functions/gsea_volcano_plot.R')
+source('functions/gsea_half_volcano_plot.R')
+source('functions/gsea_nes_scatter_plot.R')
 
-nimbus_svg_web_fonts <- function() {
-  base::list(
-    svglite::font_face(
-      family = 'Nimbus Sans',
-      otf = '../fonts/NimbusSans-Regular.otf',
-      weight = 400,
-      style = 'normal'),
-    svglite::font_face(
-      family = 'Nimbus Sans',
-      otf = '../fonts/NimbusSans-Bold.otf',
-      weight = 700,
-      style = 'normal'),
-    svglite::font_face(
-      family = 'Nimbus Sans',
-      otf = '../fonts/NimbusSans-Italic.otf',
-      weight = 400,
-      style = 'italic'),
-    svglite::font_face(
-      family = 'Nimbus Sans',
-      otf = '../fonts/NimbusSans-BoldItalic.otf',
-      weight = 700,
-      style = 'italic'))
-}
+# 1.0 define figure parameters and paths -----------------
 
-font_data_uri <- function(path) {
-  if (!base::requireNamespace('base64enc', quietly = TRUE)) {
-    base::stop('The base64enc package is required to embed SVG fonts.', call. = FALSE)
-  }
-  if (!base::file.exists(path)) {
-    base::stop('Font file not found: ', path, call. = FALSE)
-  }
-  base::paste0('data:font/otf;base64,', base64enc::base64encode(path))
-}
+gsea_figure_dir <- 'tutorial/assets/figures'
 
-embed_svg_font <- function(path, svg_font_url, font_file) {
-  svg_text <- base::readLines(path, warn = FALSE)
-  svg_text <- base::gsub(
-    pattern = base::paste0('url\\("', svg_font_url, '"\\) format\\("opentype"\\)'),
-    replacement = base::paste0('url("', font_data_uri(font_file), '") format("opentype")'),
-    x = svg_text)
-  base::writeLines(svg_text, path, useBytes = TRUE)
-}
+gsea_figure_font_family <- 'GSEA Nimbus Sans'
+gsea_svg_font_family <- 'Nimbus Sans'
+gsea_figure_font_dir <- 'tutorial/assets/fonts'
+gsea_figure_font_paths <- c(
+  plain = file.path(gsea_figure_font_dir, 'NimbusSans-Regular.otf'),
+  bold = file.path(gsea_figure_font_dir, 'NimbusSans-Bold.otf'),
+  italic = file.path(gsea_figure_font_dir, 'NimbusSans-Italic.otf'),
+  bolditalic = file.path(gsea_figure_font_dir, 'NimbusSans-BoldItalic.otf'))
 
-embed_nimbus_svg_fonts <- function(path) {
-  font_dir <- base::file.path(base::dirname(base::dirname(path)), 'fonts')
-  for (font_file in base::c(
-    'NimbusSans-Regular.otf',
-    'NimbusSans-Bold.otf',
-    'NimbusSans-Italic.otf',
-    'NimbusSans-BoldItalic.otf')) {
-    embed_svg_font(
-      path = path,
-      svg_font_url = base::paste0('../fonts/', font_file),
-      font_file = base::file.path(font_dir, font_file))
-  }
-  base::invisible(path)
-}
+waterfall_figure_width <- 7.40
+waterfall_figure_height <- 4.30
+volcano_figure_width <- 4.80
+volcano_figure_height <- 4.90
+half_volcano_figure_width <- 7.40
+half_volcano_figure_height <- 4.30
+scatter_figure_width <- 9.00
+scatter_figure_height <- 6.38
 
-save_svg <- function(plot, path, width, height) {
-  ggplot2::ggsave(
-    filename = path,
-    plot = plot,
-    width = width,
-    height = height,
-    device = function(filename, width, height, ...) {
-      svglite::svglite(
-        filename = filename,
-        width = width,
-        height = height,
-        web_fonts = nimbus_svg_web_fonts(),
-        user_fonts = plot_user_fonts(font_family = figure_family),
-        ...)
-    },
-    fix_text_size = FALSE,
-    bg = 'white',
-    limitsize = FALSE)
-  # embed nimbus sans for portable svg rendering
-  embed_nimbus_svg_fonts(path)
-}
+gsea_padj_cutoff <- 0.05
+waterfall_top_n <- 100L
+half_volcano_inner_nes_limit <- 1
+scatter_include_nonsignificant <- TRUE
+scatter_equal_axis_limits <- TRUE
+scatter_show_fit_line <- TRUE
 
-save_figure_svg <- function(plot, path_stub, width, height) {
-  save_svg(
-    plot = plot,
-    path = base::paste0(path_stub, '.svg'),
-    width = width,
-    height = height)
-}
+display_contrast_label <- 'Cardiomyocyte vs. Mesoderm'
 
-base::dir.create('tutorial/assets/figures', recursive = TRUE, showWarnings = FALSE)
-
-# group positive terms by cardiac-relevant biology
-positive_term_groups <- base::list(
-  'Ion channel' = base::c(
+positive_term_groups <- list(
+  'Ion channel' = c(
     'Calcium', 'Sodium', 'Potassium', 'Ion', 'Voltage', 'Channel',
     'electrical', 'Action potential', 'transmembrane', 'conduction'),
-  'Metabolism' = base::c(
+  'Metabolism' = c(
     'Metabolic', 'Metabolism', 'Electron transport chain', 'Mitochondria',
     'Mitochondrial', 'Oxidative', 'Phosphorylation', 'ATP', 'lipid',
     'biosynthetic', 'respiration'),
-  'Muscle contraction' = base::c(
+  'Muscle contraction' = c(
     'Muscle contraction', 'Muscle cell differentiation', 'Striated',
     'Sarcomere', 'Myofibril', 'Actin', 'Muscle'),
-  'Heart development' = base::c(
-    'atrial', 'ventricular', 'heart', 'cardiac'))
-positive_label_terms <- base::c(
+  'Heart development' = c('atrial', 'ventricular', 'heart', 'cardiac'))
+
+negative_term_groups <- list(
+  'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
+  'Mitosis' = c(
+    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
+    'spindle', 'Mitotic', 'Meiotic'),
+  'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
+
+negative_term_group_colors <- c(
+  'Ribosomal' = '#377EB8',
+  'Mitosis' = '#984EA3',
+  'DNA replication' = '#E41A1C')
+
+positive_waterfall_label_terms <- c(
   'myofibril assembly',
   'cardiac muscle contraction',
   'cardiac muscle cell action potential',
@@ -167,33 +117,20 @@ positive_label_terms <- base::c(
   'heart growth',
   'cardiac atrium development',
   'heart trabecula morphogenesis')
-negative_term_groups <- base::list(
-  'Ribosomal' = base::c(
-    'ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
-  'Mitosis' = base::c(
-    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
-    'spindle', 'Mitotic', 'Meiotic'),
-  'DNA replication' = base::c(
-    'chromosome', 'DNA', 'base', 'repair', 'DNA-'))
-negative_term_group_colors <- base::c(
-  'Ribosomal' = '#377EB8',
-  'Mitosis' = '#984EA3',
-  'DNA replication' = '#E41A1C')
 
-# label spread across high and moderate volcano significance
-positive_volcano_label_terms <- base::c(
+volcano_label_terms <- c(
   'cardiac muscle contraction',
   'muscle cell differentiation',
   'cardiac chamber morphogenesis',
   'heart growth',
-  'heart valve development')
-negative_volcano_label_terms <- base::c(
+  'heart valve development',
   'mitotic nuclear division',
   'DNA replication initiation',
   'mitotic G2/M transition checkpoint',
   'centriole assembly',
   'ribosome assembly')
-positive_half_volcano_label_terms <- base::c(
+
+positive_half_volcano_label_terms <- c(
   'myofibril assembly',
   'cardiac muscle contraction',
   'cardiac muscle cell action potential',
@@ -205,7 +142,8 @@ positive_half_volcano_label_terms <- base::c(
   'cardiac conduction',
   'heart growth',
   'heart trabecula morphogenesis')
-negative_label_terms <- base::c(
+
+negative_half_volcano_label_terms <- c(
   'DNA-templated DNA replication',
   'DNA replication',
   'cell cycle checkpoint signaling',
@@ -215,7 +153,8 @@ negative_label_terms <- base::c(
   'DNA replication initiation',
   'cell cycle DNA replication',
   'spindle organization')
-all_quadrants_scatter_label_terms <- base::c(
+
+scatter_label_terms <- c(
   'mesenchyme development',
   'mesoderm development',
   'mesodermal cell differentiation',
@@ -224,74 +163,164 @@ all_quadrants_scatter_label_terms <- base::c(
   'oxidative phosphorylation',
   'regulation of nuclear division')
 
-save_figure_svg(
-  plot_gsea_waterfall(
+# 1.1 read GSEA inputs -----------------
+
+gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
+  'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv')
+gsea_day9_vs_day6 <- read_gsea_result_csv(
+  'tutorial/data/GSE122380_gsea_day9_vs_day6.csv')
+gsea_day3_vs_day1 <- read_gsea_result_csv(
+  'tutorial/data/GSE122380_gsea_day3_vs_day1.csv')
+
+# 1.2 define SVG writer -----------------
+
+# create valid inline web-font CSS before opening the device; SVG output is
+# never read back or rewritten
+make_embedded_font_face <- function(path, weight, style) {
+  font_uri <- base64enc::dataURI(file = path, mime = 'font/otf')
+  css <- paste0(
+    '    @font-face {\n',
+    '      font-family: "', gsea_svg_font_family, '";\n',
+    '      src: url("', font_uri, '") format("opentype");\n',
+    '      font-weight: ', weight, ';\n',
+    '      font-style: ', style, ';\n',
+    '    }')
+  structure(css, class = c('font_face', 'character'))
+}
+
+systemfonts::register_font(
+  name = gsea_figure_font_family,
+  plain = gsea_figure_font_paths[['plain']],
+  bold = gsea_figure_font_paths[['bold']],
+  italic = gsea_figure_font_paths[['italic']],
+  bolditalic = gsea_figure_font_paths[['bolditalic']])
+
+gsea_svg_web_fonts <- list(
+  make_embedded_font_face(
+    path = gsea_figure_font_paths[['plain']],
+    weight = '400',
+    style = 'normal'),
+  make_embedded_font_face(
+    path = gsea_figure_font_paths[['bold']],
+    weight = '700',
+    style = 'normal'),
+  make_embedded_font_face(
+    path = gsea_figure_font_paths[['italic']],
+    weight = '400',
+    style = 'italic'),
+  make_embedded_font_face(
+    path = gsea_figure_font_paths[['bolditalic']],
+    weight = '700',
+    style = 'italic'))
+
+save_gsea_figure <- function(plot, path, width, height) {
+  dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
+  ggplot2::ggsave(
+    filename = path,
+    plot = plot,
+    device = function(filename, width, height, bg, ...) {
+      svglite::svglite(
+        filename = filename,
+        width = width,
+        height = height,
+        bg = bg,
+        web_fonts = gsea_svg_web_fonts,
+        fix_text_size = FALSE,
+        ...)
+    },
+    width = width,
+    height = height,
+    units = 'in',
+    bg = 'white')
+  invisible(path)
+}
+
+# 2.0 create and save tutorial figures -----------------
+
+save_gsea_figure(
+  plot = plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
     direction = 'positive',
-    top_n = 100L,
+    top_n = waterfall_top_n,
+    rank_by = 'NES',
+    x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
+    label_terms = positive_waterfall_label_terms,
+    term_groups = positive_term_groups,
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg'),
+  width = waterfall_figure_width,
+  height = waterfall_figure_height)
+
+save_gsea_figure(
+  plot = plot_gsea_waterfall(
+    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    direction = 'negative',
+    top_n = waterfall_top_n,
     rank_by = 'NES',
     x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
     label_n = 10L,
-    label_terms = positive_label_terms,
-    term_groups = positive_term_groups,
-    category_n = 4L),
-  'tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive',
-  width = figure_width_waterfall,
-  height = figure_height_waterfall)
-
-save_figure_svg(
-  plot_gsea_waterfall(
-    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    direction = 'negative',
-    top_n = 100L,
-    rank_by = 'NES',
-    x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
-    label_n = 10L,
-    term_groups = negative_term_groups,
-    term_group_colors = negative_term_group_colors),
-  'tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative',
-  width = figure_width_waterfall,
-  height = figure_height_waterfall)
-
-save_figure_svg(
-  plot_gsea_volcano(
-    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    label_n = 10L,
-    label_terms = base::c(positive_volcano_label_terms, negative_volcano_label_terms),
-    contrast_label = display_contrast_label,
-    label_words_per_line = 3L),
-  'tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm',
-  width = figure_width_volcano,
-  height = figure_height_volcano)
-
-save_figure_svg(
-  plot_gsea_half_volcano(
-    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    direction = 'positive',
-    label_n = 10L,
-    label_terms = positive_half_volcano_label_terms,
-    term_groups = positive_term_groups,
-    category_n = 4L,
-    contrast_label = display_contrast_label),
-  'tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive',
-  width = figure_width_directional,
-  height = figure_height_directional)
-
-save_figure_svg(
-  plot_gsea_half_volcano(
-    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    direction = 'negative',
-    label_n = 10L,
-    label_terms = negative_label_terms,
     term_groups = negative_term_groups,
     term_group_colors = negative_term_group_colors,
-    contrast_label = display_contrast_label),
-  'tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative',
-  width = figure_width_directional,
-  height = figure_height_directional)
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg'),
+  width = waterfall_figure_width,
+  height = waterfall_figure_height)
 
-save_figure_svg(
-  plot_gsea_nes_scatter(
+save_gsea_figure(
+  plot = plot_gsea_volcano(
+    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_cutoff = gsea_padj_cutoff,
+    label_terms = volcano_label_terms,
+    contrast_label = display_contrast_label,
+    label_words_per_line = 3L,
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg'),
+  width = volcano_figure_width,
+  height = volcano_figure_height)
+
+save_gsea_figure(
+  plot = plot_gsea_half_volcano(
+    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    direction = 'positive',
+    p_col = 'padj',
+    padj_cutoff = gsea_padj_cutoff,
+    label_terms = positive_half_volcano_label_terms,
+    term_groups = positive_term_groups,
+    inner_nes_limit = half_volcano_inner_nes_limit,
+    contrast_label = display_contrast_label,
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg'),
+  width = half_volcano_figure_width,
+  height = half_volcano_figure_height)
+
+save_gsea_figure(
+  plot = plot_gsea_half_volcano(
+    gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    direction = 'negative',
+    p_col = 'padj',
+    padj_cutoff = gsea_padj_cutoff,
+    label_terms = negative_half_volcano_label_terms,
+    term_groups = negative_term_groups,
+    term_group_colors = negative_term_group_colors,
+    inner_nes_limit = half_volcano_inner_nes_limit,
+    contrast_label = display_contrast_label,
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg'),
+  width = half_volcano_figure_width,
+  height = half_volcano_figure_height)
+
+save_gsea_figure(
+  plot = plot_gsea_nes_scatter(
     gsea_x = gsea_day9_vs_day6,
     gsea_y = gsea_day3_vs_day1,
     x_label = 'Day 9 vs. Day 6 NES',
@@ -300,43 +329,14 @@ save_figure_svg(
     quadrant = 'all',
     x_name = 'Day 9 vs. Day 6',
     y_name = 'Day 3 vs. Day 1',
-    label_terms = all_quadrants_scatter_label_terms,
-    include_nonsignificant = TRUE,
-    equal_axis_limits = TRUE),
-  'tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants',
-  width = figure_width,
-  height = figure_height_scatter)
-
-base::rm(
-  list = base::c(
-    'gsea_cardiomyocyte_vs_mesoderm',
-    'gsea_day9_vs_day6',
-    'gsea_day3_vs_day1',
-    'figure_family',
-    'display_contrast_label',
-    'figure_width',
-    'figure_width_waterfall',
-    'figure_width_volcano',
-    'figure_width_directional',
-    'figure_height_volcano',
-    'figure_height_waterfall',
-    'figure_height_directional',
-    'figure_height_scatter',
-    'resolve_font_path',
-    'plot_user_fonts',
-    'nimbus_svg_web_fonts',
-    'font_data_uri',
-    'embed_svg_font',
-    'embed_nimbus_svg_fonts',
-    'save_svg',
-    'save_figure_svg',
-    'positive_term_groups',
-    'positive_label_terms',
-    'negative_term_groups',
-    'negative_term_group_colors',
-    'positive_volcano_label_terms',
-    'negative_volcano_label_terms',
-    'positive_half_volcano_label_terms',
-    'negative_label_terms',
-    'all_quadrants_scatter_label_terms'),
-  envir = base::.GlobalEnv)
+    label_terms = scatter_label_terms,
+    padj_cutoff = gsea_padj_cutoff,
+    include_nonsignificant = scatter_include_nonsignificant,
+    equal_axis_limits = scatter_equal_axis_limits,
+    show_fit_line = scatter_show_fit_line,
+    font_family = gsea_figure_font_family),
+  path = file.path(
+    gsea_figure_dir,
+    'GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg'),
+  width = scatter_figure_width,
+  height = scatter_figure_height)

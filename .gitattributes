@@ -1,0 +1,6 @@
+# generated artifacts are rebuilt from maintained sources
+docs/** linguist-generated=true whitespace=-blank-at-eol,-blank-at-eof
+tutorial/assets/figures/*.svg linguist-generated=true
+
+# bundled fonts are binary inputs
+*.otf binary

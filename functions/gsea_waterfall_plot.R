@@ -1,6 +1,15 @@
-if (!base::exists('standardize_gsea_results', mode = 'function')) {
-  base::stop('Source gsea_plot_utils.R before this plotting function file.', call. = FALSE)
-}
+# ----
+# author:
+# - Zoheb Khan
+#
+# script path:
+# - functions/gsea_waterfall_plot.R
+#
+# functions:
+# - functions/gsea_plot_utils.R
+# ----
+
+# 1.0 create waterfall plot -----------------
 
 #' Make a GSEA waterfall plot
 #'
@@ -21,9 +30,6 @@ if (!base::exists('standardize_gsea_results', mode = 'function')) {
 #' @param label_n Number of labels to automatically select across the ranked
 #'   terms when `label_terms` is not supplied.
 #' @param term_groups Optional named GO category seeds for coloring.
-#' @param category_n Optional expected number of categories in `term_groups`;
-#'   automatic term-group colors are generated for this category count.
-#' @param max_categories Maximum allowed number of custom categories.
 #' @param term_group_colors Optional named colors for `term_groups`.
 #' @param label_size Label font size in points.
 #' @param label_fontface Label font face.
@@ -40,23 +46,23 @@ if (!base::exists('standardize_gsea_results', mode = 'function')) {
 #'   coordinates such as `c(0.98, 0.98)`.
 #' @param font_family Figure font family.
 #'
-#' @return A ggplot object.
-make_gsea_waterfall <- function(gsea_results,
+#' @return A ggplot object without file-system side effects.
+#'
+#' @export
+plot_gsea_waterfall <- function(gsea_results,
                                 term_col = 'go_description',
                                 nes_col = 'NES',
                                 pvalue_col = 'pval',
                                 padj_col = 'padj',
                                 id_col = NULL,
-                                direction = base::c('positive', 'negative'),
+                                direction = c('positive', 'negative'),
                                 top_n = 100L,
-                                rank_by = base::c('NES', 'padj', 'pvalue', 'pval'),
+                                rank_by = c('NES', 'padj', 'pvalue', 'pval'),
                                 x_label = NULL,
                                 label_terms = NULL,
                                 label_ranks = NULL,
                                 label_n = 12L,
                                 term_groups = NULL,
-                                category_n = NULL,
-                                max_categories = 6L,
                                 term_group_colors = NULL,
                                 label_size = 7.5,
                                 label_fontface = 'plain',
@@ -68,17 +74,32 @@ make_gsea_waterfall <- function(gsea_results,
                                 y_max = NULL,
                                 legend_position = NULL,
                                 font_family = 'Nimbus Sans') {
-  direction <- base::match.arg(direction)
-  rank_by <- normalize_rank_by(rank_by)
-  gsea_results <- standardize_gsea_results(
+  direction <- match.arg(direction)
+  rank_by <- .gsea_normalize_rank_by(rank_by)
+  top_n <- .gsea_validate_count(top_n, 'top_n', minimum = 1L)
+  label_n <- .gsea_validate_count(label_n, 'label_n')
+  label_size <- .gsea_validate_number(
+    label_size,
+    'label_size',
+    minimum = 0,
+    minimum_inclusive = FALSE)
+  label_y_nudge_fraction <- .gsea_validate_number(
+    label_y_nudge_fraction,
+    'label_y_nudge_fraction',
+    minimum = 0)
+  if (!is.null(label_x_nudge)) {
+    label_x_nudge <- .gsea_validate_number(label_x_nudge, 'label_x_nudge')
+  }
+  .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
+  .gsea_validate_positive_integer_vector(label_ranks, 'label_ranks')
+  gsea_results <- .gsea_standardize_results(
     gsea_results = gsea_results,
     term_col = term_col,
     nes_col = nes_col,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
-  validate_term_groups(term_groups = term_groups, category_n = category_n)
-  validate_max_categories(term_groups = term_groups, max_categories = max_categories)
+  .gsea_validate_term_groups(term_groups)
 
   if (direction == 'positive') {
     plot_tbl <- gsea_results[gsea_results$NES > 0, , drop = FALSE]
@@ -86,56 +107,56 @@ make_gsea_waterfall <- function(gsea_results,
     plot_tbl <- gsea_results[gsea_results$NES < 0, , drop = FALSE]
   }
 
-  if (base::nrow(plot_tbl) == 0L) {
-    base::stop('No GSEA terms remain for the requested direction.', call. = FALSE)
+  if (nrow(plot_tbl) == 0L) {
+    stop('No GSEA terms remain for the requested direction.', call. = FALSE)
   }
 
-  plot_tbl <- rank_gsea_direction_terms(plot_tbl, direction = direction, rank_by = rank_by)
+  plot_tbl <- .gsea_rank_direction_terms(plot_tbl, direction = direction, rank_by = rank_by)
   plot_tbl <- utils::head(plot_tbl, top_n)
-  plot_tbl$waterfall_rank <- base::seq_len(base::nrow(plot_tbl))
-  plot_tbl$label_score <- base::abs(plot_tbl$NES) * safe_neg_log10(plot_tbl$padj)
-  plot_tbl$term_category <- assign_plot_term_groups(
+  plot_tbl$waterfall_rank <- seq_len(nrow(plot_tbl))
+  plot_tbl$label_score <- abs(plot_tbl$NES) * .gsea_neg_log10(plot_tbl$padj)
+  plot_tbl$term_category <- .gsea_assign_term_groups(
     gsea_results = plot_tbl,
     term_groups = term_groups)
-  color_values <- resolve_term_group_colors(
+  color_values <- .gsea_resolve_term_group_colors(
     term_groups = term_groups,
     term_group_colors = term_group_colors)
-  label_requests <- combine_label_requests(
+  label_requests <- .gsea_combine_label_requests(
     label_terms = label_terms,
     label_ranks = label_ranks)
-  label_tbl <- select_gsea_labels(
+  label_tbl <- .gsea_select_labels(
     plot_tbl = plot_tbl,
     label_terms = label_requests,
     label_n = label_n,
     score_col = 'label_score',
     rank_col = 'waterfall_rank')
-  label_tbl$label_text <- wrap_gsea_label(label_tbl$go_description, words_per_line = label_words_per_line)
-  y_limits <- calculate_waterfall_y_limits(plot_tbl$NES, y_min = y_min, y_max = y_max)
+  label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
+  y_limits <- .gsea_waterfall_y_limits(plot_tbl$NES, y_min = y_min, y_max = y_max)
   y_breaks <- scales::breaks_pretty(n = 4)(y_limits)
-  label_tbl$label_nudge_x <- numeric(base::nrow(label_tbl))
-  label_tbl$label_nudge_y <- numeric(base::nrow(label_tbl))
-  if (base::nrow(label_tbl) > 0L) {
-    label_tbl <- label_tbl[base::order(label_tbl$waterfall_rank), , drop = FALSE]
-    nudge_step <- base::max(base::diff(base::range(plot_tbl$NES, na.rm = TRUE)) * label_y_nudge_fraction, 0.08)
-    if (base::is.null(label_x_nudge)) {
-      label_tbl$label_nudge_x <- base::rep(base::c(-0.65, 0.35, 0, 0.6, -0.3), length.out = base::nrow(label_tbl))
+  label_tbl$label_nudge_x <- numeric(nrow(label_tbl))
+  label_tbl$label_nudge_y <- numeric(nrow(label_tbl))
+  if (nrow(label_tbl) > 0L) {
+    label_tbl <- label_tbl[order(label_tbl$waterfall_rank), , drop = FALSE]
+    nudge_step <- max(diff(range(plot_tbl$NES, na.rm = TRUE)) * label_y_nudge_fraction, 0.08)
+    if (is.null(label_x_nudge)) {
+      label_tbl$label_nudge_x <- rep(c(-0.65, 0.35, 0, 0.6, -0.3), length.out = nrow(label_tbl))
     } else {
-      label_tbl$label_nudge_x <- base::rep(label_x_nudge, length.out = base::nrow(label_tbl))
+      label_tbl$label_nudge_x <- rep(label_x_nudge, length.out = nrow(label_tbl))
     }
-    label_tbl$label_nudge_y <- base::rep(base::c(nudge_step, -nudge_step), length.out = base::nrow(label_tbl))
+    label_tbl$label_nudge_y <- rep(c(nudge_step, -nudge_step), length.out = nrow(label_tbl))
     if (direction == 'negative') {
       label_tbl$label_nudge_y <- -label_tbl$label_nudge_y
     }
   }
-  x_breaks <- base::unique(base::c(0, scales::breaks_pretty(n = 4)(base::c(1, base::nrow(plot_tbl)))))
-  if (base::is.null(x_label)) {
-    x_label <- base::paste0('Ranked GO terms (by ', rank_by, ')')
+  x_breaks <- unique(c(0, scales::breaks_pretty(n = 4)(c(1, nrow(plot_tbl)))))
+  if (is.null(x_label)) {
+    x_label <- paste0('Ranked GO terms (by ', rank_by, ')')
   }
-  if (base::is.null(legend_position)) {
-    legend_position <- if (direction == 'positive') base::c(0.98, 0.98) else base::c(0.03, 0.98)
+  if (is.null(legend_position)) {
+    legend_position <- if (direction == 'positive') c(0.98, 0.98) else c(0.03, 0.98)
   }
-  legend_anchor <- if (direction == 'positive') base::c(1, 1) else base::c(0, 1)
-  point_layers <- split_point_layers(
+  legend_anchor <- if (direction == 'positive') c(1, 1) else c(0, 1)
+  point_layers <- .gsea_split_point_layers(
     plot_tbl = plot_tbl,
     group_col = 'term_category',
     background_groups = 'Other')
@@ -177,29 +198,19 @@ make_gsea_waterfall <- function(gsea_results,
       seed = 42,
       show.legend = FALSE) +
     ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
-    ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = base::c(0, 0.02))) +
-    ggplot2::scale_y_continuous(breaks = y_breaks, expand = base::c(0, 0)) +
-    ggplot2::coord_cartesian(xlim = base::c(0, base::nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
+    ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = c(0, 0.02))) +
+    ggplot2::scale_y_continuous(breaks = y_breaks, expand = c(0, 0)) +
+    ggplot2::coord_cartesian(xlim = c(0, nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
     ggplot2::labs(x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
-    ggplot2::guides(color = ggplot2::guide_legend(override.aes = base::list(size = 1.5))) +
-    ggplot2::theme_classic(base_family = font_family, base_size = 9) +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = 1.5))) +
+    .gsea_theme(font_family) +
     ggplot2::theme(
-      axis.title = ggplot2::element_text(size = 9, color = 'black'),
-      axis.text = ggplot2::element_text(size = 8, color = 'black'),
-      axis.line = ggplot2::element_line(color = 'black', linewidth = 0.24),
-      axis.ticks = ggplot2::element_line(color = 'black', linewidth = 0.20),
       axis.ticks.length = grid::unit(1.4, 'pt'),
-      panel.grid.major = ggplot2::element_blank(),
-      panel.grid.minor = ggplot2::element_blank(),
       legend.position = legend_position,
       legend.justification = legend_anchor,
       legend.background = ggplot2::element_blank(),
       legend.box.background = ggplot2::element_blank(),
-      legend.title = ggplot2::element_text(size = 8, color = 'black', face = 'bold', hjust = 0),
+      legend.title = ggplot2::element_text(hjust = 0),
       legend.box.just = 'left',
-      legend.text = ggplot2::element_text(size = 7.5, color = 'black'),
-      legend.key.size = grid::unit(0.25, 'cm'),
       plot.margin = ggplot2::margin(8, 10, 8, 8))
 }
-
-plot_gsea_waterfall <- make_gsea_waterfall

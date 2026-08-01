@@ -1,9 +1,12 @@
 # r session files
 .Rproj.user/
-*.Rproj
 .Rhistory
 .RData
 .Ruserdata
+.r_codex_utils/
+
+# operating system and editor metadata
+.DS_Store
 
 # local scratch and generated intermediates
 /tmp/
@@ -24,7 +27,7 @@
 /.aider*
 /.roo/
 /tools/
-/coding_guidelines.md
+/coding_guidelines*.md
 /AGENTS.md
 
 # windows metadata
