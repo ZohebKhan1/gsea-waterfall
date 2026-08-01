@@ -15,11 +15,13 @@ Download the plotting functions and source them in R:
 # set the raw github function path
 base_url <- "https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions"
 
+download.file(paste0(base_url, "/gsea_plot_utils.R"), "gsea_plot_utils.R")
 download.file(paste0(base_url, "/gsea_waterfall_plot.R"), "gsea_waterfall_plot.R")
 download.file(paste0(base_url, "/gsea_volcano_plot.R"), "gsea_volcano_plot.R")
 download.file(paste0(base_url, "/gsea_half_volcano_plot.R"), "gsea_half_volcano_plot.R")
 download.file(paste0(base_url, "/gsea_nes_scatter_plot.R"), "gsea_nes_scatter_plot.R")
 
+source("gsea_plot_utils.R")
 source("gsea_waterfall_plot.R")
 source("gsea_volcano_plot.R")
 source("gsea_half_volcano_plot.R")
@@ -115,6 +117,11 @@ waterfall plots used in recent developmental and stem-cell genomics studies.
 This project turns that visual style into a parameterizable, reusable R function
 for precomputed GSEA results.
 
+Examples include [Ciceri, _Nature_, 2024](https://doi.org/10.1038/s41586-023-06984-8),
+[Xu, _Nature Cell Biology_, 2025](https://doi.org/10.1038/s41556-025-01751-5),
+[Vuong, _Science_, 2026](https://doi.org/10.1126/science.aea1259), and
+[Risgaard, _Science_, 2026](https://doi.org/10.1126/science.aea1549).
+
 The advantage of these plots is breadth. Instead of showing only a small subset
 of enriched terms, such as the top 10 GO terms, the waterfall view can rank up
 to 200 GO terms by NES and color them by biological class. This gives a broader
@@ -136,66 +143,85 @@ The rendered site is written to `docs/index.html` for GitHub Pages.
 
 Ranks GO terms in one NES direction and colors selected biological categories.
 
-| Parameter | Meaning |
-| :--- | :--- |
-| `gsea_results` | GSEA result table. |
-| `direction` | `"positive"` or `"negative"`. |
-| `top_n` | Number of ranked terms to plot. |
-| `rank_by` | Column used for ordering terms, usually `"NES"`. |
-| `x_label` | X-axis title. |
-| `label_n` | Number of automatic labels when `label_terms` is not supplied. |
-| `label_terms` | Exact GO descriptions or GO IDs to label. |
-| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
-| `category_n` | Expected number of groups in `term_groups`. |
-| `term_group_colors` | Optional named colors for biological groups. |
-| `include_descendants` | Include GO offspring for GO-ID group seeds. |
+| Parameter           | Meaning                                                            |
+| :------------------ | :----------------------------------------------------------------- |
+| `gsea_results`      | GSEA result table.                                                 |
+| `term_col`          | Column containing GO term names.                                   |
+| `nes_col`           | Column containing NES values.                                      |
+| `pvalue_col`        | Column containing nominal GSEA p-values.                           |
+| `padj_col`          | Column containing adjusted p-values.                               |
+| `id_col`            | Optional column containing GO IDs.                                 |
+| `direction`         | `"positive"` or `"negative"`.                                      |
+| `top_n`             | Number of ranked terms to plot.                                    |
+| `rank_by`           | Column used for ordering terms, usually `"NES"`.                   |
+| `x_label`           | X-axis title.                                                      |
+| `label_n`           | Number of automatic labels when `label_terms` is not supplied.     |
+| `label_terms`       | Exact GO descriptions or GO IDs to label.                          |
+| `term_groups`       | Named list of biological groups and matching text seeds or GO IDs. |
+| `category_n`        | Expected number of groups in `term_groups`.                        |
+| `term_group_colors` | Optional named colors for biological groups.                       |
 
 ### `plot_gsea_volcano()`
 
 Plots positive, negative, and non-significant GSEA terms in one symmetric NES
 volcano.
 
-| Parameter | Meaning |
-| :--- | :--- |
-| `gsea_results` | GSEA result table. |
-| `padj_cutoff` | Adjusted p-value cutoff for significance. |
-| `label_n` | Number of significant terms to label automatically. |
-| `label_terms` | Exact GO descriptions or GO IDs to label. |
-| `contrast_label` | Short contrast name used in the x-axis title. |
-| `label_words_per_line` | Number of words per line in wrapped GO labels. |
-| `point_size` | Point size. |
-| `label_size` | GO label text size. |
+| Parameter              | Meaning                                             |
+| :--------------------- | :-------------------------------------------------- |
+| `gsea_results`         | GSEA result table.                                  |
+| `term_col`             | Column containing GO term names.                    |
+| `nes_col`              | Column containing NES values.                       |
+| `pvalue_col`           | Column containing nominal GSEA p-values.            |
+| `padj_col`             | Column containing adjusted p-values.                |
+| `id_col`               | Optional column containing GO IDs.                  |
+| `padj_cutoff`          | Adjusted p-value cutoff for significance.           |
+| `label_n`              | Number of significant terms to label automatically. |
+| `label_terms`          | Exact GO descriptions or GO IDs to label.           |
+| `contrast_label`       | Short contrast name used in the x-axis title.       |
+| `label_words_per_line` | Number of words per line in wrapped GO labels.      |
+| `point_size`           | Point size.                                         |
+| `label_size`           | GO label text size.                                 |
 
 ### `plot_gsea_half_volcano()`
 
 Expands one NES direction into a directional volcano panel.
 
-| Parameter | Meaning |
-| :--- | :--- |
-| `gsea_results` | GSEA result table. |
-| `direction` | `"positive"` or `"negative"`. |
-| `p_col` | P-value column shown on the y-axis, usually `"padj"`. |
-| `padj_cutoff` | Adjusted p-value cutoff for significance. |
-| `label_terms` | Exact GO descriptions or GO IDs to label. |
-| `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
-| `term_group_colors` | Optional named colors for biological groups. |
-| `inner_nes_limit` | Inner NES boundary shown on the x-axis. |
-| `contrast_label` | Short contrast name used in the x-axis title. |
+| Parameter           | Meaning                                                            |
+| :------------------ | :----------------------------------------------------------------- |
+| `gsea_results`      | GSEA result table.                                                 |
+| `term_col`          | Column containing GO term names.                                   |
+| `nes_col`           | Column containing NES values.                                      |
+| `pvalue_col`        | Column containing nominal GSEA p-values.                           |
+| `padj_col`          | Column containing adjusted p-values.                               |
+| `id_col`            | Optional column containing GO IDs.                                 |
+| `direction`         | `"positive"` or `"negative"`.                                      |
+| `p_col`             | P-value column shown on the y-axis, usually `"padj"`.              |
+| `padj_cutoff`       | Adjusted p-value cutoff for significance.                          |
+| `label_terms`       | Exact GO descriptions or GO IDs to label.                          |
+| `term_groups`       | Named list of biological groups and matching text seeds or GO IDs. |
+| `term_group_colors` | Optional named colors for biological groups.                       |
+| `inner_nes_limit`   | Inner NES boundary shown on the x-axis.                            |
+| `contrast_label`    | Short contrast name used in the x-axis title.                      |
 
 ### `plot_gsea_nes_scatter()`
 
 Compares NES values for matched GO terms across two GSEA contrasts.
 
-| Parameter | Meaning |
-| :--- | :--- |
-| `gsea_x`, `gsea_y` | GSEA result tables for the x- and y-axis contrasts. |
-| `x_label`, `y_label` | Axis titles. |
-| `color_by` | `"significance"` or `"term_group"`. |
-| `x_name`, `y_name` | Short contrast names used in legend labels. |
-| `label_terms` | Exact GO descriptions or GO IDs to label. |
-| `include_nonsignificant` | Keep terms not significant in either contrast. |
-| `equal_axis_limits` | Use matched x/y limits. |
-| `show_fit_line` | Draw a linear best-fit line. |
+| Parameter                | Meaning                                                 |
+| :----------------------- | :------------------------------------------------------ |
+| `gsea_x`, `gsea_y`       | GSEA result tables for the x- and y-axis contrasts.     |
+| `x_label`, `y_label`     | Axis titles.                                            |
+| `term_col`               | Column containing GO term names in both tables.         |
+| `nes_col`                | Column containing NES values in both tables.            |
+| `pvalue_col`             | Column containing nominal GSEA p-values in both tables. |
+| `padj_col`               | Column containing adjusted p-values in both tables.     |
+| `id_col`                 | Optional column containing GO IDs in both tables.       |
+| `color_by`               | `"significance"` or `"term_group"`.                     |
+| `x_name`, `y_name`       | Short contrast names used in legend labels.             |
+| `label_terms`            | Exact GO descriptions or GO IDs to label.               |
+| `include_nonsignificant` | Keep terms not significant in either contrast.          |
+| `equal_axis_limits`      | Use matched x/y limits.                                 |
+| `show_fit_line`          | Draw a linear best-fit line.                            |
 
 ## Notes On GSEA And fgsea
 

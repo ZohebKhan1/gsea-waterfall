@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
 # load standalone plotting functions
+base::source('functions/gsea_plot_utils.R')
 base::source('functions/gsea_waterfall_plot.R')
 base::source('functions/gsea_volcano_plot.R')
 base::source('functions/gsea_half_volcano_plot.R')
@@ -25,6 +26,84 @@ figure_height_volcano = 4.9
 figure_height_waterfall = 4.3
 figure_height_directional = 4.3
 figure_height_scatter = 6.375
+
+# keep nimbus font embedding local to tutorial svg export
+resolve_font_path <- function(candidates) {
+  found <- candidates[base::file.exists(candidates)]
+  if (base::length(found) == 0L) {
+    return(NA_character_)
+  }
+  found[[1L]]
+}
+
+plot_user_fonts <- function(font_family = 'Nimbus Sans') {
+  font_dir <- 'tutorial/assets/fonts'
+  regular <- resolve_font_path(base::c(
+    base::file.path(font_dir, 'NimbusSans-Regular.otf'),
+    '/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf'))
+  if (base::is.na(regular)) {
+    return(base::list())
+  }
+  stats::setNames(base::list(regular), font_family)
+}
+
+nimbus_svg_web_fonts <- function() {
+  base::list(
+    svglite::font_face(
+      family = 'Nimbus Sans',
+      otf = '../fonts/NimbusSans-Regular.otf',
+      weight = 400,
+      style = 'normal'),
+    svglite::font_face(
+      family = 'Nimbus Sans',
+      otf = '../fonts/NimbusSans-Bold.otf',
+      weight = 700,
+      style = 'normal'),
+    svglite::font_face(
+      family = 'Nimbus Sans',
+      otf = '../fonts/NimbusSans-Italic.otf',
+      weight = 400,
+      style = 'italic'),
+    svglite::font_face(
+      family = 'Nimbus Sans',
+      otf = '../fonts/NimbusSans-BoldItalic.otf',
+      weight = 700,
+      style = 'italic'))
+}
+
+font_data_uri <- function(path) {
+  if (!base::requireNamespace('base64enc', quietly = TRUE)) {
+    base::stop('The base64enc package is required to embed SVG fonts.', call. = FALSE)
+  }
+  if (!base::file.exists(path)) {
+    base::stop('Font file not found: ', path, call. = FALSE)
+  }
+  base::paste0('data:font/otf;base64,', base64enc::base64encode(path))
+}
+
+embed_svg_font <- function(path, svg_font_url, font_file) {
+  svg_text <- base::readLines(path, warn = FALSE)
+  svg_text <- base::gsub(
+    pattern = base::paste0('url\\("', svg_font_url, '"\\) format\\("opentype"\\)'),
+    replacement = base::paste0('url("', font_data_uri(font_file), '") format("opentype")'),
+    x = svg_text)
+  base::writeLines(svg_text, path, useBytes = TRUE)
+}
+
+embed_nimbus_svg_fonts <- function(path) {
+  font_dir <- base::file.path(base::dirname(base::dirname(path)), 'fonts')
+  for (font_file in base::c(
+    'NimbusSans-Regular.otf',
+    'NimbusSans-Bold.otf',
+    'NimbusSans-Italic.otf',
+    'NimbusSans-BoldItalic.otf')) {
+    embed_svg_font(
+      path = path,
+      svg_font_url = base::paste0('../fonts/', font_file),
+      font_file = base::file.path(font_dir, font_file))
+  }
+  base::invisible(path)
+}
 
 save_svg <- function(plot, path, width, height) {
   ggplot2::ggsave(
@@ -243,6 +322,12 @@ base::rm(
     'figure_height_waterfall',
     'figure_height_directional',
     'figure_height_scatter',
+    'resolve_font_path',
+    'plot_user_fonts',
+    'nimbus_svg_web_fonts',
+    'font_data_uri',
+    'embed_svg_font',
+    'embed_nimbus_svg_fonts',
     'save_svg',
     'save_figure_svg',
     'positive_term_groups',

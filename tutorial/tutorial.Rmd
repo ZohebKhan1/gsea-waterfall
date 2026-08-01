@@ -19,7 +19,6 @@ tutorial_dependency_packages <- c(
   "bookdown",
   "ggplot2",
   "ggrepel",
-  "GO.db",
   "jsonlite",
   "RColorBrewer",
   "scales",
@@ -57,7 +56,7 @@ tutorial_bioc_version <- if (requireNamespace("BiocManager", quietly = TRUE)) {
 <div><span>Compiled:</span> May 9, 2026</div>
 <div><span>Environment:</span> `r R.version.string`; Bioconductor `r tutorial_bioc_version`</div>
 <div><span>Dependencies:</span> `r tutorial_dependency_text`</div>
-<div><span>Source:</span> repository root (`.`)</div>
+<div><span>Source:</span> ZohebKhan1/gsea-waterfall</div>
 </div>
 </div>
 
@@ -76,6 +75,8 @@ The plotting functions generate four figure types:
 
 The worked example uses GO biological-process GSEA results from GSE122380 cardiomyocyte differentiation contrasts. The example input CSVs are deliberately small and contain only the columns needed for plotting.
 
+The ranked waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8), [Xu, *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5), [Vuong, *Science*, 2026](https://doi.org/10.1126/science.aea1259), and [Risgaard, *Science*, 2026](https://doi.org/10.1126/science.aea1549).
+
 # Download The Functions
 
 Download the plotting functions and source them in R:
@@ -84,11 +85,13 @@ Download the plotting functions and source them in R:
 # set the raw github function path
 base_url <- "https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions"
 
+download.file(paste0(base_url, "/gsea_plot_utils.R"), "gsea_plot_utils.R")
 download.file(paste0(base_url, "/gsea_waterfall_plot.R"), "gsea_waterfall_plot.R")
 download.file(paste0(base_url, "/gsea_volcano_plot.R"), "gsea_volcano_plot.R")
 download.file(paste0(base_url, "/gsea_half_volcano_plot.R"), "gsea_half_volcano_plot.R")
 download.file(paste0(base_url, "/gsea_nes_scatter_plot.R"), "gsea_nes_scatter_plot.R")
 
+source("gsea_plot_utils.R")
 source("gsea_waterfall_plot.R")
 source("gsea_volcano_plot.R")
 source("gsea_half_volcano_plot.R")
@@ -118,7 +121,7 @@ The advantage of these plots is breadth. Instead of showing only a small subset 
 
 Use `plot_gsea_waterfall()` for a ranked view of enriched GO terms in one NES direction. Terms can be ranked by `NES`, `padj`, or `pvalue`. Labels can be selected by exact term name, GO ID when available, plotted rank, or automatic rank-based selection.
 
-`term_groups` and `label_terms` are intentionally separate. `term_groups` defines broad biological categories for point colors; `label_terms` defines the smaller set of GO terms that should receive text labels. By default, category matching uses exact GO IDs and text seeds. Set `include_descendants = TRUE` only when category seeds include GO IDs and GO offspring should be included through `GO.db`.
+`term_groups` and `label_terms` are intentionally separate. `term_groups` defines broad biological categories for point colors; `label_terms` defines the smaller set of GO terms that should receive text labels. Category matching uses exact GO IDs when provided through `id_col`, plus text seeds matched against GO term names.
 
 ## Positive NES waterfall
 
@@ -385,6 +388,11 @@ Ranks GO terms in one NES direction and colors selected biological categories.
 | Parameter | Meaning |
 |:---|:---|
 | `gsea_results` | GSEA result table. |
+| `term_col` | Column containing GO term names. |
+| `nes_col` | Column containing NES values. |
+| `pvalue_col` | Column containing nominal GSEA p-values. |
+| `padj_col` | Column containing adjusted p-values. |
+| `id_col` | Optional column containing GO IDs. |
 | `direction` | `"positive"` or `"negative"`. |
 | `top_n` | Number of ranked terms to plot. |
 | `rank_by` | Column used for ordering terms, usually `"NES"`. |
@@ -394,7 +402,6 @@ Ranks GO terms in one NES direction and colors selected biological categories.
 | `term_groups` | Named list of biological groups and matching text seeds or GO IDs. |
 | `category_n` | Expected number of groups in `term_groups`. |
 | `term_group_colors` | Optional named colors for biological groups. |
-| `include_descendants` | Include GO offspring for GO-ID group seeds. |
 
 ## `plot_gsea_volcano()`
 
@@ -403,6 +410,11 @@ Plots positive, negative, and non-significant GSEA terms in one symmetric NES vo
 | Parameter | Meaning |
 |:---|:---|
 | `gsea_results` | GSEA result table. |
+| `term_col` | Column containing GO term names. |
+| `nes_col` | Column containing NES values. |
+| `pvalue_col` | Column containing nominal GSEA p-values. |
+| `padj_col` | Column containing adjusted p-values. |
+| `id_col` | Optional column containing GO IDs. |
 | `padj_cutoff` | Adjusted p-value cutoff for significance. |
 | `label_n` | Number of significant terms to label automatically. |
 | `label_terms` | Exact GO descriptions or GO IDs to label. |
@@ -418,6 +430,11 @@ Expands one NES direction into a directional volcano panel.
 | Parameter | Meaning |
 |:---|:---|
 | `gsea_results` | GSEA result table. |
+| `term_col` | Column containing GO term names. |
+| `nes_col` | Column containing NES values. |
+| `pvalue_col` | Column containing nominal GSEA p-values. |
+| `padj_col` | Column containing adjusted p-values. |
+| `id_col` | Optional column containing GO IDs. |
 | `direction` | `"positive"` or `"negative"`. |
 | `p_col` | P-value column shown on the y-axis, usually `"padj"`. |
 | `padj_cutoff` | Adjusted p-value cutoff for significance. |
@@ -435,6 +452,11 @@ Compares NES values for matched GO terms across two GSEA contrasts.
 |:---|:---|
 | `gsea_x`, `gsea_y` | GSEA result tables for the x- and y-axis contrasts. |
 | `x_label`, `y_label` | Axis titles. |
+| `term_col` | Column containing GO term names in both tables. |
+| `nes_col` | Column containing NES values in both tables. |
+| `pvalue_col` | Column containing nominal GSEA p-values in both tables. |
+| `padj_col` | Column containing adjusted p-values in both tables. |
+| `id_col` | Optional column containing GO IDs in both tables. |
 | `color_by` | `"significance"` or `"term_group"`. |
 | `x_name`, `y_name` | Short contrast names used in legend labels. |
 | `label_terms` | Exact GO descriptions or GO IDs to label. |

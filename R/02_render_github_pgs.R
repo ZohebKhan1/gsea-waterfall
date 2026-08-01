@@ -50,6 +50,7 @@ bookdown_lib_dir <- if (base::dir.exists('tutorial/_site/libs')) 'tutorial/_site
 
 base::file.copy(rendered_html, 'docs/index.html', overwrite = TRUE)
 base::file.copy('tutorial/style.css', 'docs/style.css', overwrite = TRUE)
+base::file.create('docs/.nojekyll')
 strip_trailing_whitespace('docs/index.html')
 
 # keep github pages assets aligned with the tutorial source
