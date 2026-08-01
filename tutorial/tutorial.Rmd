@@ -356,7 +356,11 @@ Rscript R/02_render_github_pages.R
 Rscript R/03_check_gsea_contracts.R
 ```
 
-The figure script writes six editable, font-embedded SVGs under `tutorial/assets/figures/`. The site script renders this source into `docs/`, and the contract script verifies fixed scientific counts, stable-key matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands in `MAINTENANCE.md`.
+The figure script writes six editable, font-embedded SVGs under
+`tutorial/assets/figures/`. The site script renders this source into `docs/`,
+and the regression script verifies fixed scientific counts, stable-key
+matching, and invalid-input boundaries. Local and continuous-integration checks
+are documented in `MAINTENANCE.md`.
 
 # References
 

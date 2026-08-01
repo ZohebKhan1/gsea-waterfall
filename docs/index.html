@@ -553,7 +553,11 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 <div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="ex">Rscript</span> R/01_generate_gsea_figures.R</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="ex">Rscript</span> R/02_render_github_pages.R</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="ex">Rscript</span> R/03_check_gsea_contracts.R</span></code></pre></div>
-<p>The figure script writes six editable, font-embedded SVGs under <code>tutorial/assets/figures/</code>. The site script renders this source into <code>docs/</code>, and the contract script verifies fixed scientific counts, stable-key matching, and invalid-input boundaries. Maintainers use the canonical R Codex Utils commands in <code>MAINTENANCE.md</code>.</p>
+<p>The figure script writes six editable, font-embedded SVGs under
+<code>tutorial/assets/figures/</code>. The site script renders this source into <code>docs/</code>,
+and the regression script verifies fixed scientific counts, stable-key
+matching, and invalid-input boundaries. Local and continuous-integration checks
+are documented in <code>MAINTENANCE.md</code>.</p>
 </div>
 <div id="references" class="section level1 hasAnchor" number="9">
 <h1><span class="header-section-number">9</span> References<a href="#references" class="anchor-section" aria-label="Anchor link to header"></a></h1>

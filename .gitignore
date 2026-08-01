@@ -1,32 +1,20 @@
-# r session files
+# R session files
 .Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
-.r_codex_utils/
 
-# operating system and editor metadata
+# Operating system metadata
 .DS_Store
 
-# local scratch and generated intermediates
+# Local scratch and generated intermediates
 /tmp/
 
-# private analysis inputs and full result tables
+# Private analysis inputs and full result tables
 /data/
 /results/
 /ref/
 /scripts/internal/
 
-# local agent and runner state
-/.agents/
-/.codex/
-/.claude/
-/.cursor/
-/.aider*
-/.roo/
-/tools/
-/coding_guidelines*.md
-/AGENTS.md
-
-# windows metadata
+# Windows metadata
 *:Zone.Identifier
