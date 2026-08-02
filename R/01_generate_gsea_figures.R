@@ -69,6 +69,10 @@ nes_scatter_figure_height = 6.38
 gsea_padj_cutoff = 0.05
 waterfall_top_n = 100L
 half_volcano_inner_nes_limit = 1
+waterfall_point_size = 1.30
+volcano_point_size = 1.30
+half_volcano_point_size = 1.60
+nes_scatter_point_size = 1.30
 
 gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
@@ -242,6 +246,7 @@ save_gsea_figure(
     x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
     label_terms = positive_waterfall_label_terms,
     term_groups = positive_term_groups,
+    point_size = waterfall_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -259,6 +264,7 @@ save_gsea_figure(
     label_n = 10L,
     term_groups = negative_term_groups,
     term_group_colors = negative_term_group_colors,
+    point_size = waterfall_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -273,6 +279,7 @@ save_gsea_figure(
     label_terms = volcano_label_terms,
     contrast_label = gsea_contrast_label,
     label_words_per_line = 3L,
+    point_size = volcano_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -290,6 +297,7 @@ save_gsea_figure(
     term_groups = positive_term_groups,
     inner_nes_limit = half_volcano_inner_nes_limit,
     contrast_label = gsea_contrast_label,
+    point_size = half_volcano_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -308,6 +316,7 @@ save_gsea_figure(
     term_group_colors = negative_term_group_colors,
     inner_nes_limit = half_volcano_inner_nes_limit,
     contrast_label = gsea_contrast_label,
+    point_size = half_volcano_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -330,6 +339,7 @@ save_gsea_figure(
     include_nonsignificant = TRUE,
     equal_axis_limits = TRUE,
     show_fit_line = TRUE,
+    point_size = nes_scatter_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,

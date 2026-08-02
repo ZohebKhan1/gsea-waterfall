@@ -59,7 +59,7 @@ plot_gsea_volcano <- function(gsea_results,
                               label_terms = NULL,
                               y_max = 25,
                               y_min = 0,
-                              point_size = 1.0,
+                              point_size = 1.3,
                               point_colors = NULL,
                               label_size = 7.5,
                               label_color = 'black',
@@ -75,6 +75,7 @@ plot_gsea_volcano <- function(gsea_results,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
+  point_size <- .gsea_validate_number(point_size, 'point_size', minimum = 0)
   if (length(label_terms) == 0L) {
     label_n <- .gsea_validate_count(label_n, 'label_n')
   }

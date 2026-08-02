@@ -84,7 +84,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
                                   label_n_y_only = 0L,
                                   label_n_both = 0L,
                                   label_terms = NULL,
-                                  point_size = 0.95,
+                                  point_size = 1.3,
                                   label_size = 7.5,
                                   label_color = 'black',
                                   label_words_per_line = 2L,
@@ -112,6 +112,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
+  point_size <- .gsea_validate_number(point_size, 'point_size', minimum = 0)
   if (length(label_terms) == 0L) {
     label_n_x_only <- .gsea_validate_count(label_n_x_only, 'label_n_x_only')
     label_n_y_only <- .gsea_validate_count(label_n_y_only, 'label_n_y_only')

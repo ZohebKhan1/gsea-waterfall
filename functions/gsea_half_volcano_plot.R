@@ -60,7 +60,7 @@ plot_gsea_half_volcano <- function(gsea_results,
                                    term_groups = NULL,
                                    term_group_colors = NULL,
                                    inner_nes_limit = 1,
-                                   point_size = 1.35,
+                                   point_size = 1.6,
                                    point_colors = NULL,
                                    label_size = 7.5,
                                    label_color = 'black',
@@ -76,6 +76,7 @@ plot_gsea_half_volcano <- function(gsea_results,
     'padj_cutoff',
     minimum = 0,
     maximum = 1)
+  point_size <- .gsea_validate_number(point_size, 'point_size', minimum = 0)
   if (length(label_terms) == 0L) {
     label_n <- .gsea_validate_count(label_n, 'label_n')
   }

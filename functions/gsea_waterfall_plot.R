@@ -37,6 +37,7 @@
 #' @param term_groups Optional named GO category seeds for coloring. When
 #'   omitted, built-in description-based categories are used.
 #' @param term_group_colors Optional named colors for `term_groups`.
+#' @param point_size Point size.
 #' @param label_size Label font size in points.
 #' @param label_fontface Label font face.
 #' @param label_words_per_line Number of GO term words shown on each label line.
@@ -69,6 +70,7 @@ plot_gsea_waterfall <- function(gsea_results,
                                 label_n = 12L,
                                 term_groups = NULL,
                                 term_group_colors = NULL,
+                                point_size = 1.3,
                                 label_size = 7.5,
                                 label_fontface = 'plain',
                                 label_words_per_line = 2L,
@@ -82,6 +84,7 @@ plot_gsea_waterfall <- function(gsea_results,
   direction <- match.arg(direction)
   rank_by <- .gsea_normalize_rank_by(rank_by)
   top_n <- .gsea_validate_count(top_n, 'top_n', minimum = 1L)
+  point_size <- .gsea_validate_number(point_size, 'point_size', minimum = 0)
   if (length(label_terms) == 0L && length(label_ranks) == 0L) {
     label_n <- .gsea_validate_count(label_n, 'label_n')
   }
@@ -160,13 +163,13 @@ plot_gsea_waterfall <- function(gsea_results,
     ggplot2::geom_point(
       data = point_layers$background,
       ggplot2::aes(color = .data$term_group),
-      size = 0.95,
+      size = point_size,
       alpha = 1,
       stroke = 0) +
     ggplot2::geom_point(
       data = point_layers$foreground,
       ggplot2::aes(color = .data$term_group),
-      size = 0.95,
+      size = point_size,
       alpha = 1,
       stroke = 0) +
     ggrepel::geom_text_repel(
@@ -197,7 +200,7 @@ plot_gsea_waterfall <- function(gsea_results,
     ggplot2::scale_y_continuous(breaks = y_breaks, expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = c(0, nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
     ggplot2::labs(x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
-    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = 1.5))) +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size + 0.5))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
       axis.ticks.length = grid::unit(1.4, 'pt'),
