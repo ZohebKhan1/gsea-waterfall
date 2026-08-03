@@ -262,20 +262,14 @@ citations are provided at the end of this tutorial.</p>
 <h1><span class="header-section-number">2</span> Install and source<a href="#install-and-source" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Install the plotting dependencies once:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;RColorBrewer&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
-<p>Download the shared utilities first, then the plot modules:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>base_url <span class="ot">&lt;-</span> <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions&#39;</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_plot_utils.R&#39;</span>), <span class="st">&#39;gsea_plot_utils.R&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_waterfall_plot.R&#39;</span>), <span class="st">&#39;gsea_waterfall_plot.R&#39;</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_volcano_plot.R&#39;</span>), <span class="st">&#39;gsea_volcano_plot.R&#39;</span>)</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_half_volcano_plot.R&#39;</span>), <span class="st">&#39;gsea_half_volcano_plot.R&#39;</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">download.file</span>(<span class="fu">paste0</span>(base_url, <span class="st">&#39;/gsea_nes_scatter_plot.R&#39;</span>), <span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_plot_utils.R&#39;</span>)</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_waterfall_plot.R&#39;</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_volcano_plot.R&#39;</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_half_volcano_plot.R&#39;</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span></code></pre></div>
+<p>Download and source the consolidated plotting file:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">download.file</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R&#39;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="st">&#39;gsea_visualizations.R&#39;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_visualizations.R&#39;</span>)</span></code></pre></div>
+<p>This provides <code>read_gsea_result_csv()</code>, <code>plot_gsea_waterfall()</code>,
+<code>plot_gsea_volcano()</code>, <code>plot_gsea_half_volcano()</code>, and
+<code>plot_gsea_nes_scatter()</code>.</p>
 </div>
 <div id="input-data" class="section level1 hasAnchor" number="3">
 <h1><span class="header-section-number">3</span> Input data<a href="#input-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>

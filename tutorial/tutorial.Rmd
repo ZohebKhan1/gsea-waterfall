@@ -86,23 +86,18 @@ Install the plotting dependencies once:
 install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
-Download the shared utilities first, then the plot modules:
+Download and source the consolidated plotting file:
 
 ```r
-base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
-
-download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
-download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
-download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
-download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
-download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
-
-source('gsea_plot_utils.R')
-source('gsea_waterfall_plot.R')
-source('gsea_volcano_plot.R')
-source('gsea_half_volcano_plot.R')
-source('gsea_nes_scatter_plot.R')
+download.file(
+  'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R',
+  'gsea_visualizations.R')
+source('gsea_visualizations.R')
 ```
+
+This provides `read_gsea_result_csv()`, `plot_gsea_waterfall()`,
+`plot_gsea_volcano()`, `plot_gsea_half_volcano()`, and
+`plot_gsea_nes_scatter()`.
 
 # Input data
 

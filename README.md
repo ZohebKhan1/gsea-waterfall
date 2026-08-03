@@ -40,8 +40,8 @@ citations are provided at the end of this README.
 ## Repository layout
 
 ```text
-functions/          downloadable plotting functions and shared utilities
-R/                  figure generation, site rendering, and contract checks
+functions/          single downloadable plotting source file
+R/                  bundled figure generation and site rendering
 tutorial/data/      fixed precomputed example GSEA tables
 tutorial/assets/    generated tutorial figures and bundled fonts
 tutorial/tutorial.Rmd
@@ -56,23 +56,18 @@ Install the plotting dependencies:
 install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
-Download the shared utilities first, followed by the plot modules:
+Download and source the consolidated plotting file:
 
 ```r
-base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
-
-download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
-download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
-download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
-download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
-download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
-
-source('gsea_plot_utils.R')
-source('gsea_waterfall_plot.R')
-source('gsea_volcano_plot.R')
-source('gsea_half_volcano_plot.R')
-source('gsea_nes_scatter_plot.R')
+download.file(
+  'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R',
+  'gsea_visualizations.R')
+source('gsea_visualizations.R')
 ```
+
+This provides `read_gsea_result_csv()`, `plot_gsea_waterfall()`,
+`plot_gsea_volcano()`, `plot_gsea_half_volcano()`, and
+`plot_gsea_nes_scatter()`.
 
 Read one precomputed contrast and build a plot:
 
@@ -120,25 +115,42 @@ fgsea_results <- read_gsea_result_csv(
 
 ## Most-used parameters
 
-The following controls cover most user workflows. Styling and layout arguments
-remain available in the function definitions for users who need them.
+The following controls cover the main user decisions. Styling and layout
+arguments remain available in the function definitions.
 
-| Function | Parameter | What it changes |
-| :-- | :-- | :-- |
-| `plot_gsea_waterfall()` | `direction` | Plots positive or negative NES terms. |
-|  | `top_n` | Keeps this many terms after direction filtering and ranking. |
-|  | `rank_by` | Ranks by NES, adjusted p-value, or nominal p-value. |
-|  | `label_terms`, `label_n` | Labels selected terms or automatically selects labels. |
-|  | `term_groups` | Applies caller-defined keyword/ID groups; omitted groups remain neutral. |
-| `plot_gsea_volcano()` | `padj_cutoff` | Defines the significance colors and count labels. |
-|  | `label_terms`, `label_n` | Selects exact labels or the strongest significant labels. |
-| `plot_gsea_half_volcano()` | `direction` | Shows one NES direction. |
-|  | `p_col` | Chooses nominal or adjusted p-value for the y-axis. |
-|  | `inner_nes_limit` | Removes terms whose absolute NES is below the boundary. |
-| `plot_gsea_nes_scatter()` | `include_nonsignificant` | Keeps terms that are not significant in either contrast. |
-|  | `quadrant` | Shows all terms, Q1, or Q3. |
-|  | `equal_axis_limits` | Uses matched x/y limits for direct comparison. |
-|  | `show_fit_line` | Adds an optional descriptive linear fit to the plotted terms. |
+### `plot_gsea_waterfall()`
+
+| Parameter | Practical effect |
+| :-- | :-- |
+| `direction` | Shows positive or negative NES terms. |
+| `top_n` | Retains this many terms after direction filtering and ranking. |
+| `rank_by` | Sets the ordering measure: NES, adjusted p-value, or nominal p-value. |
+| `label_terms` / `label_n` | Labels specified terms, or automatically selects the requested number. |
+| `term_groups` | Adds caller-defined keyword/ID categories; unmatched terms remain neutral. |
+
+### `plot_gsea_volcano()`
+
+| Parameter | Practical effect |
+| :-- | :-- |
+| `padj_cutoff` | Sets significance colors and counts; it does not remove rows. |
+| `label_terms` / `label_n` | Labels specified terms, or automatically selects the strongest significant terms. |
+
+### `plot_gsea_half_volcano()`
+
+| Parameter | Practical effect |
+| :-- | :-- |
+| `direction` | Shows one NES direction. |
+| `p_col` | Chooses nominal or adjusted p-value for the y-axis. |
+| `inner_nes_limit` | Hides terms with absolute NES below the specified boundary. |
+
+### `plot_gsea_nes_scatter()`
+
+| Parameter | Practical effect |
+| :-- | :-- |
+| `include_nonsignificant` | Includes terms that are not significant in either contrast. |
+| `quadrant` | Shows all terms, or focuses on Q1 or Q3. |
+| `equal_axis_limits` | Matches x/y limits for direct comparison. |
+| `show_fit_line` | Adds an optional descriptive fit line; off by default. |
 
 All plot functions return `ggplot` objects. They only select rows for display;
 they do not rewrite the supplied GSEA statistics or write files.

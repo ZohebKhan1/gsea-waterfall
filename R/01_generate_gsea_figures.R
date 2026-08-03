@@ -8,11 +8,7 @@
 # - R/01_generate_gsea_figures.R
 #
 # functions:
-# - functions/gsea_plot_utils.R
-# - functions/gsea_waterfall_plot.R
-# - functions/gsea_volcano_plot.R
-# - functions/gsea_half_volcano_plot.R
-# - functions/gsea_nes_scatter_plot.R
+# - functions/gsea_visualizations.R
 #
 # input data:
 # - tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv
@@ -39,11 +35,7 @@ if (!file.exists('gsea.Rproj')) {
 }
 
 # source GSEA plotting functions
-source('functions/gsea_plot_utils.R')
-source('functions/gsea_waterfall_plot.R')
-source('functions/gsea_volcano_plot.R')
-source('functions/gsea_half_volcano_plot.R')
-source('functions/gsea_nes_scatter_plot.R')
+source('functions/gsea_visualizations.R')
 
 # 1.0 define figure parameters and paths -----------------
 
