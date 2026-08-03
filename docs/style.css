@@ -432,6 +432,17 @@ body > #header,
   margin-top: 1.15rem;
 }
 
+.book .book-body .page-wrapper .page-inner section.normal #input-contract > table {
+  font-size: 0.86em;
+  line-height: 1.25;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal #input-contract > table th,
+.book .book-body .page-wrapper .page-inner section.normal #input-contract > table td {
+  padding: 0.28rem 0.55rem;
+  white-space: nowrap;
+}
+
 .book .book-body .page-wrapper .page-inner section.normal .anchor-section {
   display: none !important;
 }

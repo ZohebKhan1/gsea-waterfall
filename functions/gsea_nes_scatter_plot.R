@@ -55,7 +55,8 @@
 #' @param x_max Optional upper x-axis limit.
 #' @param y_min Optional lower y-axis limit.
 #' @param y_max Optional upper y-axis limit.
-#' @param show_fit_line Draw a linear best-fit line through plotted terms.
+#' @param show_fit_line Draw a descriptive linear best-fit line through plotted
+#'   terms. The line is fitted after filtering and is disabled by default.
 #' @param legend_nrow Optional number of legend rows. If `NULL`, significance
 #'   legends use two rows and term-group legends use one row.
 #' @param legend_position Legend position passed to `ggplot2::theme()`.
@@ -96,7 +97,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
                                   x_max = NULL,
                                   y_min = NULL,
                                   y_max = NULL,
-                                  show_fit_line = TRUE,
+                                  show_fit_line = FALSE,
                                   legend_nrow = NULL,
                                   legend_position = 'top',
                                   font_family = 'Nimbus Sans') {

@@ -125,13 +125,6 @@ read_gsea_result_csv <- function(path,
   'Significantly down' = '#0072B2',
   'Not significant' = .gsea_nonsignificant_color)
 
-.gsea_default_term_group_colors <- c(
-  'Development/morphogenesis' = '#1B9E77',
-  'Neuronal/signaling' = '#4F61BD',
-  'Cell cycle/genome' = '#D73027',
-  'Metabolism/translation' = '#7A5195',
-  'Other' = .gsea_neutral_color)
-
 .gsea_validate_number <- function(value,
                                   parameter_name,
                                   minimum = -Inf,
@@ -215,7 +208,7 @@ read_gsea_result_csv <- function(path,
 .gsea_resolve_term_group_colors <- function(term_groups = NULL,
                                             term_group_colors = NULL) {
   if (is.null(term_groups)) {
-    return(.gsea_default_term_group_colors)
+    return(c('Other' = .gsea_neutral_color))
   }
   group_names <- names(term_groups)
   if (is.null(term_group_colors)) {
@@ -262,25 +255,9 @@ read_gsea_result_csv <- function(path,
     foreground = plot_tbl[!background_rows, , drop = FALSE])
 }
 
-# define default biological groups when callers do not supply category seeds
+# keep terms neutral when callers do not supply category seeds
 .gsea_classify_terms <- function(go_description) {
-  term_text <- tolower(as.character(go_description))
-  term_group <- rep('Other', length(term_text))
-
-  term_group[grepl(
-    'cell cycle|mitotic|meiotic|chromosom|spindle|centromer|kinetochore|dna replication|dna repair|recombination',
-    term_text)] <- 'Cell cycle/genome'
-  term_group[term_group == 'Other' & grepl(
-    'development|morphogenesis|differentiation|mesoderm|mesenchyme|embryo|organogenesis|migration|pattern specification',
-    term_text)] <- 'Development/morphogenesis'
-  term_group[term_group == 'Other' & grepl(
-    'synap|neuro|axon|dendrit|transmitter|ion channel|receptor|signaling|signal transduction|membrane potential|secretion',
-    term_text)] <- 'Neuronal/signaling'
-  term_group[term_group == 'Other' & grepl(
-    'ribosom|translation|rrna|metabolic|biosynthetic|mitochond|oxidative|protein folding|rna processing',
-    term_text)] <- 'Metabolism/translation'
-
-  factor(term_group, levels = names(.gsea_default_term_group_colors))
+  factor(rep('Other', length(go_description)), levels = 'Other')
 }
 
 .gsea_match_term_groups <- function(gsea_results,

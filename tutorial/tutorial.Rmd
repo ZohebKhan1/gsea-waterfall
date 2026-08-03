@@ -22,7 +22,8 @@ knitr::opts_chunk$set(
 <div><span>Author:</span> Zoheb Khan</div>
 <div><span>Modified:</span> 2026-08-01</div>
 <div><span>Compiled:</span> 2026-08-01</div>
-<div><span>Environment:</span> R version 4.6.1 (2026-06-24); Bioconductor 3.23</div>
+<div><span>Environment:</span> R version 4.6.1 (2026-06-24)</div>
+<div><span>Bioconductor:</span> 3.23</div>
 <div><span>Example:</span> GSE122380 GO biological-process GSEA contrasts</div>
 <div><span>Source:</span> <a href="https://github.com/ZohebKhan1/gsea-waterfall">GitHub repository</a></div>
 </div>
@@ -34,6 +35,13 @@ knitr::opts_chunk$set(
 
 The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plot controls select, group, and label displayed rows; significance classes use the explicit adjusted-p-value cutoff without altering the supplied statistics.
 
+The code below is the user-facing workflow. The exact export settings used to
+produce the bundled SVG files are maintained in `R/01_generate_gsea_figures.R`;
+the tutorial keeps those export-only styling details out of the main workflow.
+The figures below are the bundled examples produced by that export script, so
+their labels and category seeds may be more specific than the compact calls
+shown here.
+
 The waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8), [Xu, *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5), [Vuong, *Science*, 2026](https://doi.org/10.1126/science.aea1259), and [Risgaard, *Science*, 2026](https://doi.org/10.1126/science.aea1549).
 
 # Install and source
@@ -41,7 +49,7 @@ The waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 
 Install the plotting dependencies once:
 
 ```r
-utils::install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
+install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
 Download the shared utilities first, then the plot modules:
@@ -49,11 +57,11 @@ Download the shared utilities first, then the plot modules:
 ```r
 base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
 
-utils::download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
-utils::download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
-utils::download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
-utils::download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
-utils::download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
+download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
+download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
+download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
+download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
+download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
 
 source('gsea_plot_utils.R')
 source('gsea_waterfall_plot.R')
@@ -76,6 +84,22 @@ Each table represents one GSEA contrast with one row per unique term. The defaul
 
 Required columns must be complete, and NES values must be finite. Key precedence is explicit `id_col`, then `go_term_id` when present, otherwise `go_description`. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
 
+If your result table uses different column names, map them when reading it:
+
+```r
+fgsea_results <- read_gsea_result_csv(
+  'fgsea_results.csv',
+  term_col = 'pathway',
+  nes_col = 'NES',
+  pvalue_col = 'pval',
+  padj_col = 'padj'
+)
+```
+
+For comparative plots, use `id_col` with a stable term identifier whenever one
+is available. Without stable IDs, term descriptions must match exactly across
+tables.
+
 Load the bundled examples from the repository root:
 
 ```r
@@ -88,6 +112,8 @@ gsea_day9_vs_day6 <- read_gsea_result_csv(
 gsea_day3_vs_day1 <- read_gsea_result_csv(
   'tutorial/data/GSE122380_gsea_day3_vs_day1.csv'
 )
+
+print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
 ```
 
 # Ranked waterfall plots
@@ -98,38 +124,8 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 
 ```r
 positive_term_groups <- list(
-  'Ion channel' = c(
-    'Calcium', 'Sodium', 'Potassium', 'Ion', 'Voltage', 'Channel',
-    'electrical', 'Action potential', 'transmembrane', 'conduction'
-  ),
-  'Metabolism' = c(
-    'Metabolic', 'Metabolism', 'Electron transport chain', 'Mitochondria',
-    'Mitochondrial', 'Oxidative', 'Phosphorylation', 'ATP', 'lipid',
-    'biosynthetic', 'respiration'
-  ),
-  'Muscle contraction' = c(
-    'Muscle contraction', 'Muscle cell differentiation', 'Striated',
-    'Sarcomere', 'Myofibril', 'Actin', 'Muscle'
-  ),
-  'Heart development' = c('atrial', 'ventricular', 'heart', 'cardiac')
-)
-
-positive_waterfall_label_terms <- c(
-  'myofibril assembly',
-  'cardiac muscle contraction',
-  'cardiac muscle cell action potential',
-  'calcium-mediated signaling',
-  'electron transport chain',
-  'muscle cell differentiation',
-  'ATP metabolic process',
-  'cardiac cell development',
-  'cardiac chamber morphogenesis',
-  'muscle contraction',
-  'cardiac conduction',
-  'cardiac muscle cell contraction',
-  'heart growth',
-  'cardiac atrium development',
-  'heart trabecula morphogenesis'
+  'Cardiac development' = c('cardiac', 'heart', 'muscle'),
+  'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')
 )
 
 positive_waterfall_plot <- plot_gsea_waterfall(
@@ -137,11 +133,14 @@ positive_waterfall_plot <- plot_gsea_waterfall(
   direction = 'positive',
   top_n = 100L,
   rank_by = 'NES',
-  x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
-  label_terms = positive_waterfall_label_terms,
+  label_n = 12L,
   term_groups = positive_term_groups
 )
 ```
+
+`direction` chooses the NES side to display. `top_n` is applied after that
+filter and after ranking. Terms are neutral unless `term_groups` is supplied;
+each seed is matched case-insensitively against term IDs or descriptions.
 
 ```{r positive-waterfall-figure, results='asis', out.width='80%', fig.alt='Positive NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-waterfall" class="figure-anchor"></div>\n')
@@ -153,39 +152,26 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_v
 ## Negative NES waterfall
 
 ```r
-negative_term_groups <- list(
-  'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
-  'Mitosis' = c(
-    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
-    'spindle', 'Mitotic', 'Meiotic'
-  ),
-  'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-')
-)
-
-negative_term_group_colors <- c(
-  'Ribosomal' = '#377EB8',
-  'Mitosis' = '#984EA3',
-  'DNA replication' = '#E41A1C'
-)
-
 negative_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
   top_n = 100L,
   rank_by = 'NES',
-  x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
-  label_n = 10L,
-  term_groups = negative_term_groups,
-  term_group_colors = negative_term_group_colors
+  label_n = 10L
 )
 ```
+
+Use `rank_by = 'padj'` or `rank_by = 'pvalue'` when statistical significance,
+rather than NES magnitude, should determine the displayed order. `label_n`
+selects labels automatically; use `label_terms` when specific terms should be
+shown.
 
 ```{r negative-waterfall-figure, results='asis', out.width='80%', fig.alt='Negative NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES terms highlighting ribosomal, mitotic, and DNA-replication term groups.</div>
+<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Bundled negative NES example with caller-defined ribosomal, mitotic, and DNA-replication term groups.</div>
 
 # Volcano plots
 
@@ -194,27 +180,17 @@ Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_ha
 ## Symmetric volcano
 
 ```r
-volcano_label_terms <- c(
-  'cardiac muscle contraction',
-  'muscle cell differentiation',
-  'cardiac chamber morphogenesis',
-  'heart growth',
-  'heart valve development',
-  'mitotic nuclear division',
-  'DNA replication initiation',
-  'mitotic G2/M transition checkpoint',
-  'centriole assembly',
-  'ribosome assembly'
-)
-
 symmetric_volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   padj_cutoff = 0.05,
-  label_terms = volcano_label_terms,
-  contrast_label = 'Cardiomyocyte vs. Mesoderm',
-  label_words_per_line = 3L
+  label_n = 10L,
+  contrast_label = 'Cardiomyocyte vs. Mesoderm'
 )
 ```
+
+`padj_cutoff` controls significance coloring and the displayed counts. It does
+not remove rows from the plot. Use `label_terms` instead of `label_n` when you
+want to label exact terms.
 
 ```{r symmetric-volcano-figure, results='asis', out.width='58%', fig.alt='Symmetric GSEA volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-symmetric-volcano" class="figure-anchor"></div>\n')
@@ -226,60 +202,36 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_
 ## Directional half-volcano plots
 
 ```r
-positive_half_volcano_label_terms <- c(
-  'myofibril assembly',
-  'cardiac muscle contraction',
-  'cardiac muscle cell action potential',
-  'electron transport chain',
-  'muscle cell differentiation',
-  'cardiac cell development',
-  'cardiac chamber morphogenesis',
-  'muscle contraction',
-  'cardiac conduction',
-  'heart growth',
-  'heart trabecula morphogenesis'
-)
-
 positive_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'positive',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_terms = positive_half_volcano_label_terms,
+  label_n = 10L,
   term_groups = positive_term_groups,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
 )
 ```
 
+`inner_nes_limit = 1` keeps terms with positive NES at least 1 in magnitude.
+Set `p_col = 'pvalue'` to show nominal p-values instead; significance coloring
+continues to use `padj_cutoff`.
+
 ```{r positive-half-volcano-figure, results='asis', out.width='72%', fig.alt='Positive NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Positive NES half-volcano using the waterfall plot's term groups.</div>
+<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Bundled positive NES half-volcano with caller-defined term groups and labels.</div>
 
 ```r
-negative_half_volcano_label_terms <- c(
-  'DNA-templated DNA replication',
-  'DNA replication',
-  'cell cycle checkpoint signaling',
-  'mitotic cell cycle checkpoint signaling',
-  'ribosome biogenesis',
-  'recombinational repair',
-  'DNA replication initiation',
-  'cell cycle DNA replication',
-  'spindle organization'
-)
-
 negative_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_terms = negative_half_volcano_label_terms,
-  term_groups = negative_term_groups,
-  term_group_colors = negative_term_group_colors,
+  label_n = 10L,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
 )
@@ -290,23 +242,15 @@ cat('<div id="fig-negative-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Negative NES half-volcano emphasizing DNA replication, checkpoint, and ribosome-associated terms.</div>
+<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Bundled negative NES half-volcano with caller-defined term groups and labels.</div>
 
 # Comparative NES scatterplot
 
-`plot_gsea_nes_scatter()` compares exact shared term keys. The fitted line is descriptive and does not alter enrichment statistics.
+`plot_gsea_nes_scatter()` compares exact shared term keys. By default it keeps
+terms significant in at least one contrast and does not draw a fitted line. The
+line is descriptive when requested and does not alter enrichment statistics.
 
 ```r
-nes_scatter_label_terms <- c(
-  'mesenchyme development',
-  'mesoderm development',
-  'mesodermal cell differentiation',
-  'myofibril assembly',
-  'heart process',
-  'oxidative phosphorylation',
-  'regulation of nuclear division'
-)
-
 nes_scatter_plot <- plot_gsea_nes_scatter(
   gsea_x = gsea_day9_vs_day6,
   gsea_y = gsea_day3_vs_day1,
@@ -316,7 +260,9 @@ nes_scatter_plot <- plot_gsea_nes_scatter(
   quadrant = 'all',
   x_name = 'Day 9 vs. Day 6',
   y_name = 'Day 3 vs. Day 1',
-  label_terms = nes_scatter_label_terms,
+  label_n_x_only = 3L,
+  label_n_y_only = 3L,
+  label_n_both = 3L,
   padj_cutoff = 0.05,
   include_nonsignificant = TRUE,
   equal_axis_limits = TRUE,
@@ -331,6 +277,11 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 
 <div class="tutorial-figure-caption"><strong>Figure 6.</strong> Shared terms colored by significance in one, both, or neither contrast.</div>
 
+Set `include_nonsignificant = FALSE` to focus on terms significant in at least
+one contrast. Use `quadrant = 'q1'` or `quadrant = 'q3'` to focus on concordant
+positive or negative NES values. `equal_axis_limits = TRUE` makes the two NES
+axes directly comparable.
+
 # API summary
 
 | Function | Contract |
@@ -342,28 +293,6 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 | `plot_gsea_nes_scatter()` | returns a ggplot from the exact shared term-key intersection |
 
 Source documentation defines the complete argument contracts, including the common `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col` arguments.
-
-# Reproduce the repository
-
-Install the rendering dependencies and run the maintained scripts from the repository root:
-
-```r
-utils::install.packages(c(
-  'base64enc', 'bookdown', 'knitr', 'rmarkdown', 'svglite', 'systemfonts'
-))
-```
-
-```sh
-Rscript R/01_generate_gsea_figures.R
-Rscript R/02_render_github_pages.R
-Rscript R/03_check_gsea_contracts.R
-```
-
-The figure script writes six editable, font-embedded SVGs under
-`tutorial/assets/figures/`. The site script renders this source into `docs/`,
-and the regression script verifies fixed scientific counts, stable-key
-matching, and invalid-input boundaries. Local and continuous-integration checks
-are documented in `MAINTENANCE.md`.
 
 # References
 

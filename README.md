@@ -44,6 +44,11 @@ waterfall_plot <- plot_gsea_waterfall(
   top_n = 100L,
   rank_by = 'NES'
 )
+
+ggplot2::ggsave(
+  'gsea_waterfall.svg', waterfall_plot,
+  width = 7.4, height = 4.3, units = 'in'
+)
 ```
 
 ## Input contract
@@ -63,11 +68,57 @@ is explicit `id_col`, then `go_term_id` when present, otherwise
 `go_description`. Comparative plots use the exact shared-key intersection and
 do not impute absent terms.
 
+If your GSEA table uses different column names, map them when reading it:
+
+```r
+fgsea_results <- read_gsea_result_csv(
+  'fgsea_results.csv',
+  term_col = 'pathway',
+  nes_col = 'NES',
+  pvalue_col = 'pval',
+  padj_col = 'padj'
+)
+```
+
+For comparative plots, use `id_col` with a stable term identifier whenever one
+is available. Without stable IDs, term descriptions must match exactly across
+tables.
+
+## Most-used parameters
+
+The following controls cover most user workflows. Styling and layout arguments
+remain available in the function definitions for users who need them.
+
+| Function | Parameter | What it changes |
+| :-- | :-- | :-- |
+| `plot_gsea_waterfall()` | `direction` | Plots positive or negative NES terms. |
+|  | `top_n` | Keeps this many terms after direction filtering and ranking. |
+|  | `rank_by` | Ranks by NES, adjusted p-value, or nominal p-value. |
+|  | `label_terms`, `label_n` | Labels selected terms or automatically selects labels. |
+|  | `term_groups` | Applies caller-defined keyword/ID groups; omitted groups remain neutral. |
+| `plot_gsea_volcano()` | `padj_cutoff` | Defines the significance colors and count labels. |
+|  | `label_terms`, `label_n` | Selects exact labels or the strongest significant labels. |
+| `plot_gsea_half_volcano()` | `direction` | Shows one NES direction. |
+|  | `p_col` | Chooses nominal or adjusted p-value for the y-axis. |
+|  | `inner_nes_limit` | Removes terms whose absolute NES is below the boundary. |
+| `plot_gsea_nes_scatter()` | `include_nonsignificant` | Keeps terms that are not significant in either contrast. |
+|  | `quadrant` | Shows all terms, Q1, or Q3. |
+|  | `equal_axis_limits` | Uses matched x/y limits for direct comparison. |
+|  | `show_fit_line` | Adds an optional descriptive linear fit to the plotted terms. |
+
+All plot functions return `ggplot` objects. They only select rows for display;
+they do not rewrite the supplied GSEA statistics or write files.
+
 ## Plot functions
 
 ### `plot_gsea_waterfall()`
 
-Ranks one NES direction and colors default or caller-supplied term groups.
+Ranks one NES direction. Terms are neutral by default; supply `term_groups` to
+color caller-defined categories.
+
+The displayed assets use explicit category seeds and selected labels from
+`R/01_generate_gsea_figures.R`; the parameter examples above are intentionally
+compact for reuse with other GSEA tables.
 
 <img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES waterfall" width="760">
 
@@ -111,8 +162,8 @@ significance pattern or a supplied biological grouping.
 **Figure 6.** Comparative NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day
 1.
 
-The [tutorial](https://zohebkhan1.github.io/gsea-waterfall/) provides complete
-worked calls and the source files document every argument and return contract.
+The [tutorial](https://zohebkhan1.github.io/gsea-waterfall/) walks through the
+same workflow with copyable calls and figure-specific parameter explanations.
 
 ## Reproduce the figures and site
 
@@ -135,9 +186,6 @@ The figure script writes six editable, font-embedded SVGs under
 directly to `docs/`; generated files under `docs/` should not be edited by
 hand. The contract script verifies fixed scientific counts, stable-key matching,
 and invalid-input boundaries.
-
-Maintainer contracts, output ownership, and canonical validation commands are
-recorded in [`MAINTENANCE.md`](MAINTENANCE.md).
 
 ## Repository layout
 

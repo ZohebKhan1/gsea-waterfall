@@ -66,10 +66,19 @@ nes_scatter_plot <- plot_gsea_nes_scatter(
   include_nonsignificant = TRUE,
   equal_axis_limits = TRUE)
 
+extreme_volcano_plot <- plot_gsea_volcano(data.frame(
+  go_description = c('extreme negative', 'extreme positive'),
+  NES = c(-4.2, 5.1),
+  pval = c(0.01, 0.01),
+  padj = c(0.01, 0.01),
+  stringsAsFactors = FALSE))
+
 stopifnot(
   nrow(waterfall_plot$data) == 100L,
+  all(as.character(waterfall_plot$data$term_group) == 'Other'),
   sum(volcano_plot$data$point_group == 'Significantly down') == 272L,
-  sum(volcano_plot$data$point_group == 'Significantly up') == 445L)
+  sum(volcano_plot$data$point_group == 'Significantly up') == 445L,
+  extreme_volcano_plot$coordinates$limits$x[[2L]] > 5.1)
 
 expected_nes_scatter_counts <- c(
   'Not significant in either' = 1327L,

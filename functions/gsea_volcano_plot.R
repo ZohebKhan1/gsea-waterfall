@@ -111,7 +111,9 @@ plot_gsea_volcano <- function(gsea_results,
   } else {
     label_tbl <- .gsea_select_volcano_labels(plot_tbl, label_n = label_n)
   }
-  x_limits <- c(-3.5, 3.5)
+  x_limit <- max(abs(plot_tbl$NES), na.rm = TRUE)
+  x_limit <- max(1, x_limit) * 1.10
+  x_limits <- c(-x_limit, x_limit)
   y_limits <- c(y_min, y_max + 3.5)
   label_tbl$plot_neg_log10_padj <- pmin(label_tbl$plot_neg_log10_padj, y_max - 2.0)
   label_tbl$label_text <- .gsea_wrap_label(label_tbl$go_description, words_per_line = label_words_per_line)
@@ -211,7 +213,7 @@ plot_gsea_volcano <- function(gsea_results,
     ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
     ggplot2::scale_x_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
-      breaks = c(-3, -2, -1, 0, 1, 2, 3),
+      breaks = scales::breaks_pretty(n = 7)(x_limits),
       expand = ggplot2::expansion(mult = 0.02)) +
     ggplot2::scale_y_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
