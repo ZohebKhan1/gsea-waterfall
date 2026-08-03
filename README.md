@@ -1,18 +1,84 @@
 # gsea-waterfall
 
-`gsea-waterfall` is a small, copyable R toolkit for visualizing precomputed Gene
-Set Enrichment Analysis (GSEA) results. It provides ranked NES waterfall plots,
-symmetric and directional volcano plots, and cross-contrast NES scatterplots.
-The functions return ggplot objects and do not run GSEA or write files.
+`gsea-waterfall` visualizes precomputed Gene Set Enrichment Analysis (GSEA)
+results as ranked NES waterfall plots, volcano plots, and cross-contrast
+comparative NES scatterplots. The functions return `ggplot` objects. They are a
+visualization layer applied after GSEA has been performed; they do not run GSEA
+or write files.
 
-[Rendered tutorial](https://zohebkhan1.github.io/gsea-waterfall/)
+[GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
+
+## What is GSEA?
+
+Gene Set Enrichment Analysis evaluates whether the genes in a predefined gene
+set are concentrated toward the top or bottom of a ranked gene list. Rather
+than testing genes one at a time, GSEA summarizes coordinated changes across
+biological processes or pathways. A typical result table contains one row per
+gene set with a term description, normalized enrichment score (NES), nominal
+p-value, and adjusted p-value.
+
+GSEA can be performed with any appropriate tool, including `fgsea`,
+`clusterProfiler`, or another package. This repository accepts completed GSEA
+result tables and does not select gene sets, calculate enrichment statistics,
+or perform multiple-testing correction. At minimum, a waterfall needs a term
+description and NES. The shared reader in this repository also validates
+nominal and adjusted p-values so the same standardized table can support
+volcano and comparative plots. If your source uses different column names,
+map them when reading the table as shown below.
+
+NES is the primary direction and ranking measure: positive and negative values
+indicate enrichment on opposite sides of the ranked gene list. Adjusted
+p-values describe statistical significance and are used by the volcano and
+comparative plots for coloring and display decisions. NES and adjusted
+p-values answer different questions and should not be interpreted
+interchangeably. The plots use these fields differently: waterfalls rank by
+NES or a p-value, volcanoes show NES against adjusted p-value, half-volcanoes
+can show nominal or adjusted p-value, and comparative scatterplots use NES with
+adjusted-p-value significance classes.
+
+## Repository layout
+
+```text
+functions/          downloadable plotting functions and shared utilities
+R/                  figure generation, site rendering, and contract checks
+tutorial/data/      fixed precomputed example GSEA tables
+tutorial/assets/    generated tutorial figures and bundled fonts
+tutorial/tutorial.Rmd
+docs/               generated GitHub Pages site
+```
+
+## Why use GSEA waterfall plots?
+
+GSEA results are often presented as a running-score enrichment plot when one
+pathway is the focus, or as a dotplot/barplot-style figure in which NES or
+adjusted p-value is encoded on the x-axis and other GSEA metrics are shown by
+point size or color. These compact plots are useful for a short list of terms,
+but they become crowded when many results are displayed and commonly focus on
+only the top 10–20 terms.
+
+The top-ranked terms can also be functionally redundant: related GO parent and
+child terms may appear next to one another because they represent overlapping
+gene sets. A waterfall plot does not remove this redundancy automatically, but
+it provides a broader view of the ranked enrichment landscape, often allowing
+100–200 terms to be inspected rather than only the first few rows.
+
+The waterfall functions also allow displayed GO terms to be grouped using
+caller-supplied keyword or identifier categories. In the cardiomyocyte iPSC
+time-course bulk RNA-seq example, these annotations highlight processes such
+as cardiac development, metabolism, ribosomal activity, mitosis, and DNA
+replication. They are visualization annotations, not additional statistical
+tests; terms remain neutral by default unless `term_groups` is supplied.
+
+The initial idea for the waterfall presentation was informed by pathway-level
+figures from Ciceri et al. (2024), Xu et al. (2025), Vuong et al. (2026), and
+Risgaard et al. (2026). Full citations are provided at the end of this README.
 
 ## Quick start
 
 Install the plotting dependencies:
 
 ```r
-utils::install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
+install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
 ```
 
 Download the shared utilities first, followed by the plot modules:
@@ -20,11 +86,11 @@ Download the shared utilities first, followed by the plot modules:
 ```r
 base_url <- 'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions'
 
-utils::download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
-utils::download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
-utils::download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
-utils::download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
-utils::download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
+download.file(paste0(base_url, '/gsea_plot_utils.R'), 'gsea_plot_utils.R')
+download.file(paste0(base_url, '/gsea_waterfall_plot.R'), 'gsea_waterfall_plot.R')
+download.file(paste0(base_url, '/gsea_volcano_plot.R'), 'gsea_volcano_plot.R')
+download.file(paste0(base_url, '/gsea_half_volcano_plot.R'), 'gsea_half_volcano_plot.R')
+download.file(paste0(base_url, '/gsea_nes_scatter_plot.R'), 'gsea_nes_scatter_plot.R')
 
 source('gsea_plot_utils.R')
 source('gsea_waterfall_plot.R')
@@ -44,14 +110,9 @@ waterfall_plot <- plot_gsea_waterfall(
   top_n = 100L,
   rank_by = 'NES'
 )
-
-ggplot2::ggsave(
-  'gsea_waterfall.svg', waterfall_plot,
-  width = 7.4, height = 4.3, units = 'in'
-)
 ```
 
-## Input contract
+## Input data
 
 Each input table represents one GSEA contrast with one row per unique term:
 
@@ -80,10 +141,6 @@ fgsea_results <- read_gsea_result_csv(
 )
 ```
 
-For comparative plots, use `id_col` with a stable term identifier whenever one
-is available. Without stable IDs, term descriptions must match exactly across
-tables.
-
 ## Most-used parameters
 
 The following controls cover most user workflows. Styling and layout arguments
@@ -109,104 +166,31 @@ remain available in the function definitions for users who need them.
 All plot functions return `ggplot` objects. They only select rows for display;
 they do not rewrite the supplied GSEA statistics or write files.
 
-## Plot functions
+## Public API
 
-### `plot_gsea_waterfall()`
+Each plot function returns a `ggplot` object and does not write files. The
+source files contain the complete argument documentation; the table below is
+the practical overview of the public functions.
 
-Ranks one NES direction. Terms are neutral by default; supply `term_groups` to
-color caller-defined categories.
+| Function | Purpose |
+| :-- | :-- |
+| `read_gsea_result_csv()` | Reads and validates one completed GSEA result table, with optional source-column mapping. |
+| `plot_gsea_waterfall()` | Ranks positive or negative NES terms and optionally groups or labels them. |
+| `plot_gsea_volcano()` | Shows both NES directions against adjusted-p-value significance in one panel. |
+| `plot_gsea_half_volcano()` | Shows one NES direction with nominal or adjusted p-value on the y-axis. |
+| `plot_gsea_nes_scatter()` | Compares matching term NES values across two GSEA contrasts. |
 
-The displayed assets use explicit category seeds and selected labels from
-`R/01_generate_gsea_figures.R`; the parameter examples above are intentionally
-compact for reuse with other GSEA tables.
+The [GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
+walk through the same workflow with copyable calls and figure-specific
+parameter explanations.
 
-<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES waterfall" width="760">
+## Citations
 
-**Figure 1.** Positive NES GO biological-process waterfall for Cardiomyocyte vs.
-Mesoderm.
+1. Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. *PNAS*. 2005. [Link](https://www.pnas.org/doi/10.1073/pnas.0506580102)
+2. Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. *Nature*. 2024;626:881–890. [Link](https://doi.org/10.1038/s41586-023-06984-8)
+3. Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. *Nature Cell Biology*. 2025;27:1411–1421. [Link](https://doi.org/10.1038/s41556-025-01751-5)
+4. Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. *Science*. 2026;392:eaea1259. [Link](https://doi.org/10.1126/science.aea1259)
+5. Risgaard RD, et al. Molecular and cellular processes disrupted in the early postnatal Down syndrome prefrontal cortex. *Science*. 2026;392:eaea1549. [Link](https://doi.org/10.1126/science.aea1549)
 
-<img src="tutorial/assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES waterfall" width="760">
-
-**Figure 2.** Negative NES waterfall highlighting ribosomal, mitotic, and
-DNA-replication term groups.
-
-### `plot_gsea_volcano()`
-
-Shows positive, negative, and non-significant terms in one symmetric NES
-volcano plot.
-
-<img src="tutorial/assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg" alt="Symmetric GSEA volcano" width="560">
-
-**Figure 3.** Symmetric GO biological-process GSEA volcano for Cardiomyocyte vs.
-Mesoderm.
-
-### `plot_gsea_half_volcano()`
-
-Expands one NES direction and optionally applies caller-supplied term groups.
-
-<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES half-volcano" width="760">
-
-**Figure 4.** Positive NES half-volcano.
-
-<img src="tutorial/assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES half-volcano" width="760">
-
-**Figure 5.** Negative NES half-volcano.
-
-### `plot_gsea_nes_scatter()`
-
-Compares matched term NES values across two contrasts and can color terms by
-significance pattern or a supplied biological grouping.
-
-<img src="tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg" alt="Comparative NES scatterplot" width="900">
-
-**Figure 6.** Comparative NES scatterplot for Day 9 vs. Day 6 and Day 3 vs. Day
-1.
-
-The [tutorial](https://zohebkhan1.github.io/gsea-waterfall/) walks through the
-same workflow with copyable calls and figure-specific parameter explanations.
-
-## Reproduce the figures and site
-
-Open `gsea.Rproj` or run from the repository root:
-
-```r
-utils::install.packages(c(
-  'base64enc', 'bookdown', 'knitr', 'rmarkdown', 'svglite', 'systemfonts'
-))
-```
-
-```sh
-Rscript R/01_generate_gsea_figures.R
-Rscript R/02_render_github_pages.R
-Rscript R/03_check_gsea_contracts.R
-```
-
-The figure script writes six editable, font-embedded SVGs under
-`tutorial/assets/figures/`. The site script renders `tutorial/tutorial.Rmd`
-directly to `docs/`; generated files under `docs/` should not be edited by
-hand. The contract script verifies fixed scientific counts, stable-key matching,
-and invalid-input boundaries.
-
-## Repository layout
-
-```text
-functions/          downloadable plotting functions and shared utilities
-R/                  figure generation, site rendering, and contract checks
-tutorial/data/      fixed precomputed example GSEA tables
-tutorial/assets/    generated tutorial figures and bundled fonts
-tutorial/tutorial.Rmd
-docs/               generated GitHub Pages site
-```
-
-## Scientific context
-
-The waterfall presentation was inspired by pathway-level figures in
-[Ciceri et al., *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8),
-[Xu et al., *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5),
-[Vuong et al., *Science*, 2026](https://doi.org/10.1126/science.aea1259), and
-[Risgaard et al., *Science*, 2026](https://doi.org/10.1126/science.aea1549).
-
-The underlying GSEA method is described by
-[Subramanian et al.](https://www.pnas.org/doi/10.1073/pnas.0506580102). The
-[fgsea](https://bioconductor.org/packages/fgsea/) package is one source of
-precomputed tables compatible with this plotting contract.
+The [`fgsea`](https://bioconductor.org/packages/fgsea/) package is one source
+of precomputed tables compatible with this plotting contract.

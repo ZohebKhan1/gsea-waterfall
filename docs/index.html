@@ -139,10 +139,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="./">GSEA visualization toolkit</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a></li>
+<li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path=""><a href="#what-is-gsea"><i class="fa fa-check"></i><b>1.1</b> What is GSEA?</a></li>
+<li class="chapter" data-level="1.2" data-path=""><a href="#why-use-gsea-waterfall-plots"><i class="fa fa-check"></i><b>1.2</b> Why use GSEA waterfall plots?</a></li>
+</ul></li>
 <li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a></li>
-<li class="chapter" data-level="3" data-path=""><a href="#input-contract"><i class="fa fa-check"></i><b>3</b> Input contract</a></li>
-<li class="chapter" data-level="4" data-path=""><a href="#ranked-waterfall-plots"><i class="fa fa-check"></i><b>4</b> Ranked waterfall plots</a>
+<li class="chapter" data-level="3" data-path=""><a href="#input-data"><i class="fa fa-check"></i><b>3</b> Input data</a></li>
+<li class="chapter" data-level="4" data-path=""><a href="#ranked-gsea-waterfall-plots"><i class="fa fa-check"></i><b>4</b> Ranked GSEA waterfall plots</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path=""><a href="#positive-nes-waterfall"><i class="fa fa-check"></i><b>4.1</b> Positive NES waterfall</a></li>
 <li class="chapter" data-level="4.2" data-path=""><a href="#negative-nes-waterfall"><i class="fa fa-check"></i><b>4.2</b> Negative NES waterfall</a></li>
@@ -190,10 +194,10 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 <span>Author:</span> Zoheb Khan
 </div>
 <div>
-<span>Modified:</span> 2026-08-01
+<span>Modified:</span> 2026-08-02
 </div>
 <div>
-<span>Compiled:</span> 2026-08-01
+<span>Compiled:</span> 2026-08-02
 </div>
 <div>
 <span>Environment:</span> R version 4.6.1 (2026-06-24)
@@ -211,15 +215,70 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 </div>
 <div id="overview" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">1</span> Overview<a href="#overview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><code>gsea-waterfall</code> visualizes <strong>precomputed</strong> Gene Set Enrichment Analysis (GSEA) results as ranked NES waterfalls, symmetric or directional volcano plots, and cross-contrast NES scatterplots. The functions return ggplot objects without running GSEA, changing supplied statistics, or writing files.</p>
-<p>The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plot controls select, group, and label displayed rows; significance classes use the explicit adjusted-p-value cutoff without altering the supplied statistics.</p>
+<p><code>gsea-waterfall</code> visualizes <strong>precomputed</strong> Gene Set Enrichment Analysis
+(GSEA) results as ranked NES waterfalls, volcano plots, and cross-contrast
+comparative NES scatterplots. The functions return <code>ggplot</code> objects. They are a
+visualization layer applied after GSEA has been performed and do not change
+supplied statistics or write files.</p>
+<p>The examples use fixed GO biological-process results from the GSE122380
+cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
+group, and label displayed rows; significance classes use the explicit
+adjusted-p-value cutoff without altering the supplied statistics.</p>
 <p>The code below is the user-facing workflow. The exact export settings used to
 produce the bundled SVG files are maintained in <code>R/01_generate_gsea_figures.R</code>;
 the tutorial keeps those export-only styling details out of the main workflow.
 The figures below are the bundled examples produced by that export script, so
 their labels and category seeds may be more specific than the compact calls
 shown here.</p>
-<p>The waterfall layout is inspired by pathway-level figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri, <em>Nature</em>, 2024</a>, <a href="https://doi.org/10.1038/s41556-025-01751-5">Xu, <em>Nature Cell Biology</em>, 2025</a>, <a href="https://doi.org/10.1126/science.aea1259">Vuong, <em>Science</em>, 2026</a>, and <a href="https://doi.org/10.1126/science.aea1549">Risgaard, <em>Science</em>, 2026</a>.</p>
+<div id="what-is-gsea" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> What is GSEA?<a href="#what-is-gsea" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Gene Set Enrichment Analysis evaluates whether the genes in a predefined gene
+set are concentrated toward the top or bottom of a ranked gene list. Rather
+than testing genes one at a time, GSEA summarizes coordinated changes across
+biological processes or pathways. A typical result table contains one row per
+gene set with a term description, normalized enrichment score (NES), nominal
+p-value, and adjusted p-value.</p>
+<p>GSEA can be performed with any appropriate tool, including <code>fgsea</code>,
+<code>clusterProfiler</code>, or another package. This repository accepts completed GSEA
+result tables and does not calculate enrichment statistics or perform
+multiple-testing correction. At minimum, a waterfall needs a term description
+and NES. The shared reader also validates nominal and adjusted p-values so the
+same standardized table can support volcano and comparative plots.</p>
+<p>NES is the primary direction and ranking measure: positive and negative values
+indicate enrichment on opposite sides of the ranked gene list. Adjusted
+p-values describe statistical significance and are used by the volcano and
+comparative plots for coloring and display decisions. NES and adjusted
+p-values answer different questions and should not be interpreted
+interchangeably. The plots use these fields differently: waterfalls rank by
+NES or a p-value, volcanoes show NES against adjusted p-value, half-volcanoes
+can show nominal or adjusted p-value, and comparative scatterplots use NES with
+adjusted-p-value significance classes.</p>
+</div>
+<div id="why-use-gsea-waterfall-plots" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Why use GSEA waterfall plots?<a href="#why-use-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>GSEA results are often presented as a running-score enrichment plot when one
+pathway is the focus, or as a dotplot/barplot-style figure in which NES or
+adjusted p-value is encoded on the x-axis and other GSEA metrics are shown by
+point size or color. These compact plots are useful for a short list of terms,
+but they become crowded when many results are displayed and commonly focus on
+only the top 10–20 terms.</p>
+<p>The top-ranked terms can also be functionally redundant: related GO parent and
+child terms may appear next to one another because they represent overlapping
+gene sets. A waterfall plot does not remove this redundancy automatically, but
+it provides a broader view of the ranked enrichment landscape, often allowing
+100–200 terms to be inspected rather than only the first few rows.</p>
+<p>The waterfall functions also allow displayed GO terms to be grouped using
+caller-supplied keyword or identifier categories. In the cardiomyocyte iPSC
+time-course bulk RNA-seq example, these annotations highlight processes such
+as cardiac development, metabolism, ribosomal activity, mitosis, and DNA
+replication. They are visualization annotations, not additional statistical
+tests; terms remain neutral by default unless <code>term_groups</code> is supplied.</p>
+<p>The initial idea for the waterfall presentation was informed by pathway-level
+figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri et al., <em>Nature</em>, 2024</a>,
+<a href="https://doi.org/10.1038/s41556-025-01751-5">Xu et al., <em>Nature Cell Biology</em>, 2025</a>,
+<a href="https://doi.org/10.1126/science.aea1259">Vuong et al., <em>Science</em>, 2026</a>, and
+<a href="https://doi.org/10.1126/science.aea1549">Risgaard et al., <em>Science</em>, 2026</a>.</p>
+</div>
 </div>
 <div id="install-and-source" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">2</span> Install and source<a href="#install-and-source" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -240,8 +299,8 @@ shown here.</p>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_half_volcano_plot.R&#39;</span>)</span>
 <span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_nes_scatter_plot.R&#39;</span>)</span></code></pre></div>
 </div>
-<div id="input-contract" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">3</span> Input contract<a href="#input-contract" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="input-data" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> Input data<a href="#input-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Each table represents one GSEA contrast with one row per unique term. The default columns are:</p>
 <table>
 <colgroup>
@@ -309,8 +368,8 @@ tables.</p>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(gsea_cardiomyocyte_vs_mesoderm, <span class="dv">5</span><span class="dt">L</span>))</span></code></pre></div>
 </div>
-<div id="ranked-waterfall-plots" class="section level1 hasAnchor" number="4">
-<h1><span class="header-section-number">4</span> Ranked waterfall plots<a href="#ranked-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code>, <code>padj</code>, <code>pvalue</code>, or <code>pval</code>, and retains <code>top_n</code> terms. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
 <div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Positive NES waterfall<a href="#positive-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>

@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
 
 <div class="tutorial-meta-block">
 <div><span>Author:</span> Zoheb Khan</div>
-<div><span>Modified:</span> 2026-08-01</div>
-<div><span>Compiled:</span> 2026-08-01</div>
+<div><span>Modified:</span> 2026-08-02</div>
+<div><span>Compiled:</span> 2026-08-02</div>
 <div><span>Environment:</span> R version 4.6.1 (2026-06-24)</div>
 <div><span>Bioconductor:</span> 3.23</div>
 <div><span>Example:</span> GSE122380 GO biological-process GSEA contrasts</div>
@@ -31,9 +31,16 @@ knitr::opts_chunk$set(
 
 # Overview
 
-`gsea-waterfall` visualizes **precomputed** Gene Set Enrichment Analysis (GSEA) results as ranked NES waterfalls, symmetric or directional volcano plots, and cross-contrast NES scatterplots. The functions return ggplot objects without running GSEA, changing supplied statistics, or writing files.
+`gsea-waterfall` visualizes **precomputed** Gene Set Enrichment Analysis
+(GSEA) results as ranked NES waterfalls, volcano plots, and cross-contrast
+comparative NES scatterplots. The functions return `ggplot` objects. They are a
+visualization layer applied after GSEA has been performed and do not change
+supplied statistics or write files.
 
-The examples use fixed GO biological-process results from GSE122380 cardiomyocyte differentiation contrasts. Plot controls select, group, and label displayed rows; significance classes use the explicit adjusted-p-value cutoff without altering the supplied statistics.
+The examples use fixed GO biological-process results from the GSE122380
+cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
+group, and label displayed rows; significance classes use the explicit
+adjusted-p-value cutoff without altering the supplied statistics.
 
 The code below is the user-facing workflow. The exact export settings used to
 produce the bundled SVG files are maintained in `R/01_generate_gsea_figures.R`;
@@ -42,7 +49,59 @@ The figures below are the bundled examples produced by that export script, so
 their labels and category seeds may be more specific than the compact calls
 shown here.
 
-The waterfall layout is inspired by pathway-level figures in [Ciceri, *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8), [Xu, *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5), [Vuong, *Science*, 2026](https://doi.org/10.1126/science.aea1259), and [Risgaard, *Science*, 2026](https://doi.org/10.1126/science.aea1549).
+## What is GSEA?
+
+Gene Set Enrichment Analysis evaluates whether the genes in a predefined gene
+set are concentrated toward the top or bottom of a ranked gene list. Rather
+than testing genes one at a time, GSEA summarizes coordinated changes across
+biological processes or pathways. A typical result table contains one row per
+gene set with a term description, normalized enrichment score (NES), nominal
+p-value, and adjusted p-value.
+
+GSEA can be performed with any appropriate tool, including `fgsea`,
+`clusterProfiler`, or another package. This repository accepts completed GSEA
+result tables and does not calculate enrichment statistics or perform
+multiple-testing correction. At minimum, a waterfall needs a term description
+and NES. The shared reader also validates nominal and adjusted p-values so the
+same standardized table can support volcano and comparative plots.
+
+NES is the primary direction and ranking measure: positive and negative values
+indicate enrichment on opposite sides of the ranked gene list. Adjusted
+p-values describe statistical significance and are used by the volcano and
+comparative plots for coloring and display decisions. NES and adjusted
+p-values answer different questions and should not be interpreted
+interchangeably. The plots use these fields differently: waterfalls rank by
+NES or a p-value, volcanoes show NES against adjusted p-value, half-volcanoes
+can show nominal or adjusted p-value, and comparative scatterplots use NES with
+adjusted-p-value significance classes.
+
+## Why use GSEA waterfall plots?
+
+GSEA results are often presented as a running-score enrichment plot when one
+pathway is the focus, or as a dotplot/barplot-style figure in which NES or
+adjusted p-value is encoded on the x-axis and other GSEA metrics are shown by
+point size or color. These compact plots are useful for a short list of terms,
+but they become crowded when many results are displayed and commonly focus on
+only the top 10–20 terms.
+
+The top-ranked terms can also be functionally redundant: related GO parent and
+child terms may appear next to one another because they represent overlapping
+gene sets. A waterfall plot does not remove this redundancy automatically, but
+it provides a broader view of the ranked enrichment landscape, often allowing
+100–200 terms to be inspected rather than only the first few rows.
+
+The waterfall functions also allow displayed GO terms to be grouped using
+caller-supplied keyword or identifier categories. In the cardiomyocyte iPSC
+time-course bulk RNA-seq example, these annotations highlight processes such
+as cardiac development, metabolism, ribosomal activity, mitosis, and DNA
+replication. They are visualization annotations, not additional statistical
+tests; terms remain neutral by default unless `term_groups` is supplied.
+
+The initial idea for the waterfall presentation was informed by pathway-level
+figures in [Ciceri et al., *Nature*, 2024](https://doi.org/10.1038/s41586-023-06984-8),
+[Xu et al., *Nature Cell Biology*, 2025](https://doi.org/10.1038/s41556-025-01751-5),
+[Vuong et al., *Science*, 2026](https://doi.org/10.1126/science.aea1259), and
+[Risgaard et al., *Science*, 2026](https://doi.org/10.1126/science.aea1549).
 
 # Install and source
 
@@ -70,7 +129,7 @@ source('gsea_half_volcano_plot.R')
 source('gsea_nes_scatter_plot.R')
 ```
 
-# Input contract
+# Input data
 
 Each table represents one GSEA contrast with one row per unique term. The default columns are:
 
@@ -116,7 +175,7 @@ gsea_day3_vs_day1 <- read_gsea_result_csv(
 print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
 ```
 
-# Ranked waterfall plots
+# Ranked GSEA waterfall plots
 
 `plot_gsea_waterfall()` selects one NES direction, ranks by `NES`, `padj`, `pvalue`, or `pval`, and retains `top_n` terms. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
 
