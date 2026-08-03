@@ -45,8 +45,11 @@ R/                  bundled figure generation and site rendering
 tutorial/data/      fixed precomputed example GSEA tables
 tutorial/assets/    generated tutorial figures and bundled fonts
 tutorial/tutorial.Rmd
-docs/               generated GitHub Pages site
+docs/               generated GitHub Pages deployment output
 ```
+
+The tutorial source lives under `tutorial/`; `docs/` contains the generated
+files published by GitHub Pages and should not be edited directly.
 
 ## Quick start
 

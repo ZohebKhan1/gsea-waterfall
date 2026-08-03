@@ -36,6 +36,9 @@ if (!file.exists('gsea.Rproj')) {
 
 # 1.0 replace the generated GitHub Pages site -----------------
 
+# The top-level `docs/` output is intentional: GitHub Pages is configured to
+# publish the `main` branch from this directory.
+
 # remove only bookdown-owned site artifacts before regeneration
 unlink(c('docs/index.html', 'docs/search_index.json', 'docs/style.css'))
 unlink('docs/libs', recursive = TRUE)
