@@ -141,8 +141,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path=""><a href="#what-is-gsea"><i class="fa fa-check"></i><b>1.1</b> What is GSEA?</a></li>
-<li class="chapter" data-level="1.2" data-path=""><a href="#why-use-gsea-waterfall-plots"><i class="fa fa-check"></i><b>1.2</b> Why use GSEA waterfall plots?</a></li>
+<li class="chapter" data-level="1.1" data-path=""><a href="#use-case"><i class="fa fa-check"></i><b>1.1</b> Use case</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a></li>
 <li class="chapter" data-level="3" data-path=""><a href="#input-data"><i class="fa fa-check"></i><b>3</b> Input data</a></li>
@@ -230,54 +229,22 @@ the tutorial keeps those export-only styling details out of the main workflow.
 The figures below are the bundled examples produced by that export script, so
 their labels and category seeds may be more specific than the compact calls
 shown here.</p>
-<div id="what-is-gsea" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> What is GSEA?<a href="#what-is-gsea" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>Gene Set Enrichment Analysis evaluates whether the genes in a predefined gene
-set are concentrated toward the top or bottom of a ranked gene list. Rather
-than testing genes one at a time, GSEA summarizes coordinated changes across
-biological processes or pathways. A typical result table contains one row per
-gene set with a term description, normalized enrichment score (NES), nominal
-p-value, and adjusted p-value.</p>
-<p>GSEA can be performed with any appropriate tool, including <code>fgsea</code>,
-<code>clusterProfiler</code>, or another package. This repository accepts completed GSEA
-result tables and does not calculate enrichment statistics or perform
-multiple-testing correction. At minimum, a waterfall needs a term description
-and NES. The shared reader also validates nominal and adjusted p-values so the
-same standardized table can support volcano and comparative plots.</p>
-<p>NES is the primary direction and ranking measure: positive and negative values
-indicate enrichment on opposite sides of the ranked gene list. Adjusted
-p-values describe statistical significance and are used by the volcano and
-comparative plots for coloring and display decisions. NES and adjusted
-p-values answer different questions and should not be interpreted
-interchangeably. The plots use these fields differently: waterfalls rank by
-NES or a p-value, volcanoes show NES against adjusted p-value, half-volcanoes
-can show nominal or adjusted p-value, and comparative scatterplots use NES with
-adjusted-p-value significance classes.</p>
-</div>
-<div id="why-use-gsea-waterfall-plots" class="section level2 hasAnchor" number="1.2">
-<h2><span class="header-section-number">1.2</span> Why use GSEA waterfall plots?<a href="#why-use-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>GSEA results are often presented as a running-score enrichment plot when one
-pathway is the focus, or as a dotplot/barplot-style figure in which NES or
-adjusted p-value is encoded on the x-axis and other GSEA metrics are shown by
-point size or color. These compact plots are useful for a short list of terms,
-but they become crowded when many results are displayed and commonly focus on
-only the top 10–20 terms.</p>
-<p>The top-ranked terms can also be functionally redundant: related GO parent and
-child terms may appear next to one another because they represent overlapping
-gene sets. A waterfall plot does not remove this redundancy automatically, but
-it provides a broader view of the ranked enrichment landscape, often allowing
-100–200 terms to be inspected rather than only the first few rows.</p>
-<p>The waterfall functions also allow displayed GO terms to be grouped using
-caller-supplied keyword or identifier categories. In the cardiomyocyte iPSC
-time-course bulk RNA-seq example, these annotations highlight processes such
-as cardiac development, metabolism, ribosomal activity, mitosis, and DNA
-replication. They are visualization annotations, not additional statistical
-tests; terms remain neutral by default unless <code>term_groups</code> is supplied.</p>
-<p>The initial idea for the waterfall presentation was informed by pathway-level
-figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri et al., <em>Nature</em>, 2024</a>,
-<a href="https://doi.org/10.1038/s41556-025-01751-5">Xu et al., <em>Nature Cell Biology</em>, 2025</a>,
-<a href="https://doi.org/10.1126/science.aea1259">Vuong et al., <em>Science</em>, 2026</a>, and
-<a href="https://doi.org/10.1126/science.aea1549">Risgaard et al., <em>Science</em>, 2026</a>.</p>
+<div id="use-case" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Use case<a href="#use-case" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>GSEA results are commonly shown as running enrichment plots for individual
+pathways or as dotplot/barplot-style summaries of a short list of terms. Those
+views work well for a focused pathway or compact top-term summary, but they
+provide limited room to inspect the broader ranked result.</p>
+<p>The waterfall plots are intended for that complementary use case. They allow
+roughly 100–200 ranked GO terms to be viewed together, including terms beyond
+the usual top 10–20. This can make related parent/child terms and broader
+functional patterns visible in the same ranked context. Caller-defined
+<code>term_groups</code> can organize displayed terms by biological theme; they are
+annotations only and do not perform redundancy reduction or additional
+statistics.</p>
+<p>The visual design was informed by pathway-level figures from Ciceri et al.
+(2024), Xu et al. (2025), Vuong et al. (2026), and Risgaard et al. (2026). Full
+citations are provided at the end of this tutorial.</p>
 </div>
 </div>
 <div id="install-and-source" class="section level1 hasAnchor" number="2">
@@ -301,7 +268,9 @@ figures in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri et al., <
 </div>
 <div id="input-data" class="section level1 hasAnchor" number="3">
 <h1><span class="header-section-number">3</span> Input data<a href="#input-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Each table represents one GSEA contrast with one row per unique term. The default columns are:</p>
+<p>Each table represents one GSEA contrast with one row per unique term. Results
+can come from any GSEA workflow, including <code>fgsea</code>, <code>clusterProfiler</code>, or
+another package. The default columns are:</p>
 <table>
 <colgroup>
 <col width="33%" />

@@ -8,33 +8,24 @@ or write files.
 
 [GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
 
-## What is GSEA?
+## Use case
 
-Gene Set Enrichment Analysis evaluates whether the genes in a predefined gene
-set are concentrated toward the top or bottom of a ranked gene list. Rather
-than testing genes one at a time, GSEA summarizes coordinated changes across
-biological processes or pathways. A typical result table contains one row per
-gene set with a term description, normalized enrichment score (NES), nominal
-p-value, and adjusted p-value.
+GSEA results are commonly shown as running enrichment plots for individual
+pathways or as dotplot/barplot-style summaries of a short list of terms. Those
+views work well for a focused pathway or compact top-term summary, but they
+provide limited room to inspect the broader ranked result.
 
-GSEA can be performed with any appropriate tool, including `fgsea`,
-`clusterProfiler`, or another package. This repository accepts completed GSEA
-result tables and does not select gene sets, calculate enrichment statistics,
-or perform multiple-testing correction. At minimum, a waterfall needs a term
-description and NES. The shared reader in this repository also validates
-nominal and adjusted p-values so the same standardized table can support
-volcano and comparative plots. If your source uses different column names,
-map them when reading the table as shown below.
+The waterfall plots are intended for that complementary use case. They allow
+roughly 100–200 ranked GO terms to be viewed together, including terms beyond
+the usual top 10–20. This can make related parent/child terms and broader
+functional patterns visible in the same ranked context. Caller-defined
+`term_groups` can organize displayed terms by biological theme; they are
+annotations only and do not perform redundancy reduction or additional
+statistics.
 
-NES is the primary direction and ranking measure: positive and negative values
-indicate enrichment on opposite sides of the ranked gene list. Adjusted
-p-values describe statistical significance and are used by the volcano and
-comparative plots for coloring and display decisions. NES and adjusted
-p-values answer different questions and should not be interpreted
-interchangeably. The plots use these fields differently: waterfalls rank by
-NES or a p-value, volcanoes show NES against adjusted p-value, half-volcanoes
-can show nominal or adjusted p-value, and comparative scatterplots use NES with
-adjusted-p-value significance classes.
+The visual design was informed by pathway-level figures from Ciceri et al.
+(2024), Xu et al. (2025), Vuong et al. (2026), and Risgaard et al. (2026). Full
+citations are provided at the end of this README.
 
 ## Repository layout
 
@@ -46,32 +37,6 @@ tutorial/assets/    generated tutorial figures and bundled fonts
 tutorial/tutorial.Rmd
 docs/               generated GitHub Pages site
 ```
-
-## Why use GSEA waterfall plots?
-
-GSEA results are often presented as a running-score enrichment plot when one
-pathway is the focus, or as a dotplot/barplot-style figure in which NES or
-adjusted p-value is encoded on the x-axis and other GSEA metrics are shown by
-point size or color. These compact plots are useful for a short list of terms,
-but they become crowded when many results are displayed and commonly focus on
-only the top 10–20 terms.
-
-The top-ranked terms can also be functionally redundant: related GO parent and
-child terms may appear next to one another because they represent overlapping
-gene sets. A waterfall plot does not remove this redundancy automatically, but
-it provides a broader view of the ranked enrichment landscape, often allowing
-100–200 terms to be inspected rather than only the first few rows.
-
-The waterfall functions also allow displayed GO terms to be grouped using
-caller-supplied keyword or identifier categories. In the cardiomyocyte iPSC
-time-course bulk RNA-seq example, these annotations highlight processes such
-as cardiac development, metabolism, ribosomal activity, mitosis, and DNA
-replication. They are visualization annotations, not additional statistical
-tests; terms remain neutral by default unless `term_groups` is supplied.
-
-The initial idea for the waterfall presentation was informed by pathway-level
-figures from Ciceri et al. (2024), Xu et al. (2025), Vuong et al. (2026), and
-Risgaard et al. (2026). Full citations are provided at the end of this README.
 
 ## Quick start
 
@@ -116,6 +81,10 @@ waterfall_plot <- plot_gsea_waterfall(
 
 Each input table represents one GSEA contrast with one row per unique term:
 
+The completed result table can come from any GSEA workflow, including `fgsea`,
+`clusterProfiler`, or another package. If the source uses different column
+names, map them when reading the table as shown below.
+
 | Column | Required | Meaning |
 | :-- | :-- | :-- |
 | `go_description` | yes | term description and fallback matching key |
@@ -128,8 +97,6 @@ Required columns must be complete, and NES values must be finite. Key precedence
 is explicit `id_col`, then `go_term_id` when present, otherwise
 `go_description`. Comparative plots use the exact shared-key intersection and
 do not impute absent terms.
-
-If your GSEA table uses different column names, map them when reading it:
 
 ```r
 fgsea_results <- read_gsea_result_csv(
