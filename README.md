@@ -8,6 +8,16 @@ or write files.
 
 [GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
 
+## Example data and preprocessing
+
+The bundled tables are derived from the public [NCBI GEO accession
+GSE122380](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380), a
+bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
+Basic sequencing and sample-level QC was performed before differential
+expression analysis. A DESeq2 comparison of day 9 (cardiomyocyte) versus day 3
+(mesoderm) generated the cardiomyocyte-versus-mesoderm contrast used for the
+bundled GSEA results.
+
 ## Use case
 
 GSEA results are commonly shown as running enrichment plots for individual

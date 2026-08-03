@@ -141,7 +141,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path=""><a href="#use-case"><i class="fa fa-check"></i><b>1.1</b> Use case</a></li>
+<li class="chapter" data-level="1.1" data-path=""><a href="#example-data-and-preprocessing"><i class="fa fa-check"></i><b>1.1</b> Example data and preprocessing</a></li>
+<li class="chapter" data-level="1.2" data-path=""><a href="#use-case"><i class="fa fa-check"></i><b>1.2</b> Use case</a></li>
 </ul></li>
 <li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a></li>
 <li class="chapter" data-level="3" data-path=""><a href="#input-data"><i class="fa fa-check"></i><b>3</b> Input data</a></li>
@@ -229,8 +230,18 @@ the tutorial keeps those export-only styling details out of the main workflow.
 The figures below are the bundled examples produced by that export script, so
 their labels and category seeds may be more specific than the compact calls
 shown here.</p>
-<div id="use-case" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> Use case<a href="#use-case" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="example-data-and-preprocessing" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Example data and preprocessing<a href="#example-data-and-preprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The bundled tables are derived from the public <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO accession
+GSE122380</a>, a
+bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
+Basic sequencing and sample-level QC was performed before differential
+expression analysis. A DESeq2 comparison of day 9 (cardiomyocyte) versus day 3
+(mesoderm) generated the cardiomyocyte-versus-mesoderm contrast used for the
+bundled GSEA results.</p>
+</div>
+<div id="use-case" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Use case<a href="#use-case" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>GSEA results are commonly shown as running enrichment plots for individual
 pathways or as dotplot/barplot-style summaries of a short list of terms. Those
 views work well for a focused pathway or compact top-term summary, but they
@@ -340,6 +351,9 @@ tables.</p>
 <div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code>, <code>padj</code>, <code>pvalue</code>, or <code>pval</code>, and retains <code>top_n</code> terms. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
+<p>For the bundled waterfall figures, classifications use caller-defined keyword
+groups for ion-channel, metabolic, muscle-contraction, heart-development,
+ribosomal, mitotic, and DNA-replication terms; unmatched terms remain <code>Other</code>.</p>
 <div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Positive NES waterfall<a href="#positive-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>positive_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
