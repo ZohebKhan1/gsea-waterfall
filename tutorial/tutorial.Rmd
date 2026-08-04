@@ -189,6 +189,18 @@ negative_term_groups <- list(
     'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
     'spindle', 'Mitotic', 'Meiotic'),
   'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
+
+negative_waterfall_label_terms <- c(
+  'DNA replication',
+  'rRNA processing',
+  'chromosome segregation',
+  'double-strand break repair',
+  'cell cycle G2/M phase transition',
+  'maturation of 5.8S rRNA',
+  'mitotic nuclear division',
+  'regulation of cell cycle phase transition',
+  'regulation of mitotic cell cycle phase transition',
+  'spliceosomal complex assembly')
 ```
 
 ```r
@@ -197,10 +209,7 @@ negative_waterfall_plot <- plot_gsea_waterfall(
   direction = 'negative',
   top_n = 100L,
   rank_by = 'NES',
-  label_terms = c(
-    'maturation of 5.8S rRNA',
-    'spliceosomal complex assembly',
-    'rRNA processing'),
+  label_terms = negative_waterfall_label_terms,
   term_groups = negative_term_groups
 )
 ```
@@ -224,11 +233,41 @@ Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_ha
 
 ## Symmetric volcano
 
+The example labels eight padj-significant terms across each NES direction, from
+approximately NES 2 to the most extreme observed value. The same terms are
+used in the directional half-volcano plots.
+
+```r
+negative_volcano_label_terms <- c(
+  'DNA-templated DNA replication',
+  'DNA replication',
+  'recombinational repair',
+  'double-strand break repair',
+  'RNA-templated DNA biosynthetic process',
+  'interstrand cross-link repair',
+  'regulation of double-strand break repair',
+  'positive regulation of mitotic cell cycle')
+
+positive_volcano_label_terms <- c(
+  'vacuolar transport',
+  'endocardial cushion development',
+  'tricarboxylic acid cycle',
+  'muscle tissue development',
+  'regulation of muscle contraction',
+  'heart process',
+  'muscle cell development',
+  'myofibril assembly')
+
+volcano_label_terms <- c(
+  negative_volcano_label_terms,
+  positive_volcano_label_terms)
+```
+
 ```r
 symmetric_volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   padj_cutoff = 0.05,
-  label_n = 10L,
+  label_terms = volcano_label_terms,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
 )
 ```
@@ -253,7 +292,7 @@ positive_half_volcano_plot <- plot_gsea_half_volcano(
   direction = 'positive',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_n = 10L,
+  label_terms = positive_volcano_label_terms,
   term_groups = positive_term_groups,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
@@ -278,7 +317,8 @@ negative_half_volcano_plot <- plot_gsea_half_volcano(
   direction = 'negative',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_n = 10L,
+  label_terms = negative_volcano_label_terms,
+  term_groups = negative_term_groups,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
 )

@@ -375,18 +375,27 @@ each seed is matched case-insensitively against term IDs or descriptions.</p>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="st">&#39;Mitosis&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="st">&#39;Mitosis&#39;</span>, <span class="st">&#39;Meiosis&#39;</span>, <span class="st">&#39;Nuclear division&#39;</span>, <span class="st">&#39;cell cycle&#39;</span>, <span class="st">&#39;telomere&#39;</span>,</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="st">&#39;spindle&#39;</span>, <span class="st">&#39;Mitotic&#39;</span>, <span class="st">&#39;Meiotic&#39;</span>),</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;chromosome&#39;</span>, <span class="st">&#39;DNA&#39;</span>, <span class="st">&#39;base&#39;</span>, <span class="st">&#39;repair&#39;</span>, <span class="st">&#39;DNA-&#39;</span>))</span></code></pre></div>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;chromosome&#39;</span>, <span class="st">&#39;DNA&#39;</span>, <span class="st">&#39;base&#39;</span>, <span class="st">&#39;repair&#39;</span>, <span class="st">&#39;DNA-&#39;</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>negative_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="st">&#39;rRNA processing&#39;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="st">&#39;chromosome segregation&#39;</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="st">&#39;cell cycle G2/M phase transition&#39;</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="st">&#39;regulation of cell cycle phase transition&#39;</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  <span class="st">&#39;regulation of mitotic cell cycle phase transition&#39;</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  <span class="st">&#39;spliceosomal complex assembly&#39;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">label_terms =</span> <span class="fu">c</span>(</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="st">&#39;spliceosomal complex assembly&#39;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="st">&#39;rRNA processing&#39;</span>),</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span></code></pre></div>
 <p>Use <code>rank_by = 'padj'</code> or <code>rank_by = 'pvalue'</code> when statistical significance,
 rather than NES magnitude, should determine the displayed order. <code>label_n</code>
 selects labels automatically when exact terms are not supplied; use
@@ -405,12 +414,38 @@ selects labels automatically when exact terms are not supplied; use
 <p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for a directional view. All examples use the established adjusted p-value cutoff of 0.05.</p>
 <div id="symmetric-volcano" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Symmetric volcano<a href="#symmetric-volcano" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>symmetric_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span><span class="dt">L</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>)</span></code></pre></div>
+<p>The example labels eight padj-significant terms across each NES direction, from
+approximately NES 2 to the most extreme observed value. The same terms are
+used in the directional half-volcano plots.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>negative_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="st">&#39;recombinational repair&#39;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="st">&#39;RNA-templated DNA biosynthetic process&#39;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="st">&#39;interstrand cross-link repair&#39;</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="st">&#39;regulation of double-strand break repair&#39;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="st">&#39;vacuolar transport&#39;</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="st">&#39;endocardial cushion development&#39;</span>,</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="st">&#39;tricarboxylic acid cycle&#39;</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="st">&#39;muscle tissue development&#39;</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="st">&#39;regulation of muscle contraction&#39;</span>,</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="st">&#39;muscle cell development&#39;</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  negative_volcano_label_terms,</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  positive_volcano_label_terms)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>symmetric_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">label_terms =</span> volcano_label_terms,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>padj_cutoff</code> controls significance coloring and the displayed counts. It does
 not remove rows from the plot. Use <code>label_terms</code> instead of <code>label_n</code> when you
 want to label exact terms.</p>
@@ -424,16 +459,16 @@ want to label exact terms.</p>
 </div>
 <div id="directional-half-volcano-plots" class="section level2 hasAnchor" number="5.2">
 <h2><span class="header-section-number">5.2</span> Directional half-volcano plots<a href="#directional-half-volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>positive_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span><span class="dt">L</span>,</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>positive_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_volcano_label_terms,</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>inner_nes_limit = 1</code> keeps terms with positive NES at least 1 in magnitude.
 Set <code>p_col = 'pvalue'</code> to show nominal p-values instead; significance coloring
 continues to use <code>padj_cutoff</code>.</p>
@@ -444,15 +479,16 @@ continues to use <code>padj_cutoff</code>.</p>
 <div class="tutorial-figure-caption">
 <strong>Figure 4.</strong> Positive NES half-volcano with caller-defined term groups and labels.
 </div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">10</span><span class="dt">L</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_volcano_label_terms,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>)</span></code></pre></div>
 <div id="fig-negative-half-volcano" class="figure-anchor">
 
 </div>
@@ -467,23 +503,23 @@ continues to use <code>padj_cutoff</code>.</p>
 <p><code>plot_gsea_nes_scatter()</code> compares exact shared term keys. By default it keeps
 terms significant in at least one contrast and does not draw a fitted line. The
 line is descriptive when requested and does not alter enrichment statistics.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>nes_scatter_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&#39;Day 3 vs. Day 1 NES&#39;</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&#39;significance&#39;</span>,</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&#39;all&#39;</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&#39;Day 9 vs. Day 6&#39;</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&#39;Day 3 vs. Day 1&#39;</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="at">label_n_x_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  <span class="at">label_n_y_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>  <span class="at">label_n_both =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>  <span class="at">show_fit_line =</span> <span class="cn">TRUE</span></span>
-<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>nes_scatter_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&#39;Day 3 vs. Day 1 NES&#39;</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&#39;significance&#39;</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&#39;all&#39;</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&#39;Day 9 vs. Day 6&#39;</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&#39;Day 3 vs. Day 1&#39;</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="at">label_n_x_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="at">label_n_y_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="at">label_n_both =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>  <span class="at">show_fit_line =</span> <span class="cn">TRUE</span></span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>)</span></code></pre></div>
 <div id="fig-all-quadrants-scatter" class="figure-anchor">
 
 </div>

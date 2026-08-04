@@ -137,7 +137,7 @@ read_gsea_result_csv <- function(path,
   blue = '#0055AAFF',
   red = '#BE3428FF',
   gold = '#DABD61FF',
-  purple = '#8E77B8FF',
+  purple = '#6F4FA3FF',
   green = '#2CB11BFF')
 
 .gsea_direction_colors <- c(
@@ -429,6 +429,17 @@ read_gsea_result_csv <- function(path,
   label_tbl[order(label_tbl$NES), , drop = FALSE]
 }
 
+.gsea_geom_text_repel <- function(data,
+                                  mapping,
+                                  label_color = NULL,
+                                  ...) {
+  layer_args <- list(data = data, mapping = mapping, ...)
+  if (!is.null(label_color)) {
+    layer_args$color <- label_color
+  }
+  do.call(ggrepel::geom_text_repel, layer_args)
+}
+
 .gsea_normalize_rank_by <- function(rank_by) {
   rank_by <- match.arg(rank_by, c('NES', 'padj', 'pvalue', 'pval'))
   if (rank_by == 'pval') {
@@ -693,7 +704,7 @@ plot_gsea_waterfall <- function(gsea_results,
     ggplot2::scale_y_continuous(breaks = y_breaks, expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = c(0, nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
     ggplot2::labs(title = title, x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
-    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size * 2))) +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
       axis.ticks.length = grid::unit(1.4, 'pt'),
@@ -701,9 +712,9 @@ plot_gsea_waterfall <- function(gsea_results,
       legend.justification = legend_anchor,
       legend.background = ggplot2::element_blank(),
       legend.box.background = ggplot2::element_blank(),
-      legend.title = ggplot2::element_text(size = 16, hjust = 0),
-      legend.text = ggplot2::element_text(size = 15, color = 'black'),
-      legend.key.size = grid::unit(0.5, 'cm'),
+      legend.title = ggplot2::element_text(size = 8, hjust = 0),
+      legend.text = ggplot2::element_text(size = 7.5, color = 'black'),
+      legend.key.size = grid::unit(0.25, 'cm'),
       legend.box.just = 'left',
       plot.title = ggplot2::element_text(size = 10, face = 'bold', color = 'black', hjust = 0),
       plot.margin = ggplot2::margin(8, 10, 8, 8))
@@ -739,7 +750,8 @@ plot_gsea_waterfall <- function(gsea_results,
 #' @param point_colors Optional named colors for `Positive`, `Negative`, and
 #'   `Not significant`.
 #' @param label_size Label font size in points.
-#' @param label_color Text color for GO term labels.
+#' @param label_color Optional text color for all GO term labels. When `NULL`,
+#'   labels use the color of their corresponding point group.
 #' @param label_nudge_x Horizontal starting offset for labeled terms.
 #' @param label_nudge_y Vertical starting offset for labeled terms.
 #' @param count_label_size Font size in points for significant-count labels.
@@ -764,7 +776,7 @@ plot_gsea_volcano <- function(gsea_results,
                               point_size = 1.3,
                               point_colors = NULL,
                               label_size = 8.0,
-                              label_color = 'black',
+  label_color = NULL,
                               label_nudge_x = 0.18,
                               label_nudge_y = 0,
                               count_label_size = 9,
@@ -845,6 +857,12 @@ plot_gsea_volcano <- function(gsea_results,
     group_col = 'point_group',
     background_groups = 'Not significant')
 
+  label_mapping <- if (is.null(label_color)) {
+    ggplot2::aes(label = .data$label_text, color = .data$point_group)
+  } else {
+    ggplot2::aes(label = .data$label_text)
+  }
+
   ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$NES, y = .data$plot_neg_log10_padj)) +
     ggplot2::geom_point(
       data = point_layers$background,
@@ -858,13 +876,13 @@ plot_gsea_volcano <- function(gsea_results,
       size = point_size,
       alpha = 1,
       stroke = 0) +
-    ggrepel::geom_text_repel(
+    .gsea_geom_text_repel(
       data = repel_tbl,
-      ggplot2::aes(label = .data$label_text),
+      mapping = label_mapping,
+      label_color = label_color,
       nudge_x = repel_tbl$label_nudge_x,
       nudge_y = repel_tbl$label_nudge_y,
       family = font_family,
-      color = label_color,
       size = label_size / ggplot2::.pt,
       lineheight = 0.9,
       min.segment.length = 0,
@@ -970,7 +988,8 @@ plot_gsea_volcano <- function(gsea_results,
 #'   `Not significant` when `term_groups` is omitted. Direction labels are
 #'   `Positive` and `Negative`.
 #' @param label_size Label font size in points.
-#' @param label_color Text color for GO term labels.
+#' @param label_color Optional text color for all GO term labels. When `NULL`,
+#'   labels use the color of their corresponding point group.
 #' @param contrast_label Optional concise contrast label for the NES axis.
 #' @param label_words_per_line Number of GO term words shown on each label line.
 #' @param y_min Optional lower y-axis limit.
@@ -997,7 +1016,7 @@ plot_gsea_half_volcano <- function(gsea_results,
                                    point_size = 1.6,
                                    point_colors = NULL,
                                    label_size = 8.0,
-                                   label_color = 'black',
+                                   label_color = NULL,
                                    contrast_label = NULL,
                                    label_words_per_line = 3L,
                                    y_min = NULL,
@@ -1126,6 +1145,12 @@ plot_gsea_half_volcano <- function(gsea_results,
     NULL
   }
 
+  label_mapping <- if (is.null(label_color)) {
+    ggplot2::aes(label = .data$label_text, color = .data$point_group)
+  } else {
+    ggplot2::aes(label = .data$label_text)
+  }
+
   ggplot2::ggplot(plot_tbl, ggplot2::aes(x = .data$NES, y = .data$neg_log10_p)) +
     ggplot2::geom_point(
       data = point_layers$background,
@@ -1140,13 +1165,13 @@ plot_gsea_half_volcano <- function(gsea_results,
       alpha = 1,
       stroke = 0) +
     significance_line +
-    ggrepel::geom_text_repel(
+    .gsea_geom_text_repel(
       data = repel_tbl,
-      ggplot2::aes(label = .data$label_text),
+      mapping = label_mapping,
+      label_color = label_color,
       nudge_x = repel_tbl$label_nudge_x,
       nudge_y = repel_tbl$label_nudge_y,
       family = font_family,
-      color = label_color,
       size = label_size / ggplot2::.pt,
       lineheight = 0.9,
       hjust = 0.5,

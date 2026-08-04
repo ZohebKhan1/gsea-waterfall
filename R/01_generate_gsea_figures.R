@@ -88,6 +88,18 @@ negative_term_groups <- list(
     'spindle', 'Mitotic', 'Meiotic'),
   'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
 
+negative_waterfall_label_terms <- c(
+  'DNA replication',
+  'rRNA processing',
+  'chromosome segregation',
+  'double-strand break repair',
+  'cell cycle G2/M phase transition',
+  'maturation of 5.8S rRNA',
+  'mitotic nuclear division',
+  'regulation of cell cycle phase transition',
+  'regulation of mitotic cell cycle phase transition',
+  'spliceosomal complex assembly')
+
 positive_waterfall_label_terms <- c(
   'myofibril assembly',
   'cardiac muscle cell action potential',
@@ -103,39 +115,35 @@ positive_waterfall_label_terms <- c(
   'cardiac atrium development',
   'heart trabecula morphogenesis')
 
-volcano_label_terms <- c(
-  'muscle cell differentiation',
-  'cardiac chamber morphogenesis',
-  'heart growth',
-  'heart valve development',
-  'mitotic nuclear division',
-  'DNA replication initiation',
-  'mitotic G2/M transition checkpoint',
-  'centriole assembly',
-  'ribosome assembly')
-
-positive_half_volcano_label_terms <- c(
-  'myofibril assembly',
-  'cardiac muscle cell action potential',
-  'electron transport chain',
-  'muscle cell differentiation',
-  'cardiac cell development',
-  'cardiac chamber morphogenesis',
-  'muscle contraction',
-  'cardiac conduction',
-  'heart growth',
-  'heart trabecula morphogenesis')
-
-negative_half_volcano_label_terms <- c(
+negative_volcano_label_terms <- c(
   'DNA-templated DNA replication',
   'DNA replication',
-  'cell cycle checkpoint signaling',
-  'mitotic cell cycle checkpoint signaling',
-  'ribosome biogenesis',
   'recombinational repair',
-  'DNA replication initiation',
-  'cell cycle DNA replication',
-  'spindle organization')
+  'double-strand break repair',
+  'RNA-templated DNA biosynthetic process',
+  'interstrand cross-link repair',
+  'regulation of double-strand break repair',
+  'positive regulation of mitotic cell cycle')
+
+positive_volcano_label_terms <- c(
+  'vacuolar transport',
+  'endocardial cushion development',
+  'tricarboxylic acid cycle',
+  'muscle tissue development',
+  'regulation of muscle contraction',
+  'heart process',
+  'muscle cell development',
+  'myofibril assembly')
+
+volcano_label_terms <- c(
+  negative_volcano_label_terms,
+  positive_volcano_label_terms)
+
+positive_half_volcano_label_terms <- c(
+  positive_volcano_label_terms)
+
+negative_half_volcano_label_terms <- c(
+  negative_volcano_label_terms)
 
 nes_scatter_label_terms <- c(
   'mesenchyme development',
@@ -244,10 +252,7 @@ save_gsea_figure(
     top_n = waterfall_top_n,
     rank_by = 'NES',
     x_label = 'Ranked GO terms by NES',
-    label_terms = c(
-      'maturation of 5.8S rRNA',
-      'spliceosomal complex assembly',
-      'rRNA processing'),
+    label_terms = negative_waterfall_label_terms,
     term_groups = negative_term_groups,
     point_size = waterfall_point_size,
     font_family = gsea_figure_font_family),
