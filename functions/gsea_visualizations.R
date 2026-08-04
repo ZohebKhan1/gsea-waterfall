@@ -154,7 +154,6 @@ read_gsea_result_csv <- function(path,
 .gsea_category_colors <- c(
   blue = '#0055AAFF',
   red = '#BE3428FF',
-  gold = '#DABD61FF',
   purple = '#6F4FA3FF',
   green = '#2CB11BFF')
 
@@ -171,7 +170,7 @@ read_gsea_result_csv <- function(path,
     'Heart development' = unname(.gsea_category_colors[['green']]),
     'Ribosomal' = unname(.gsea_category_colors[['blue']]),
     'Mitosis' = unname(.gsea_category_colors[['red']]),
-    'DNA replication' = unname(.gsea_category_colors[['gold']]))
+    'DNA replication' = unname(.gsea_category_colors[['purple']]))
   default_colors <- unname(named_defaults[group_names])
   missing_colors <- is.na(default_colors)
   if (any(missing_colors)) {
@@ -1404,7 +1403,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
       color_values <- stats::setNames(
         c(.gsea_category_colors[['blue']],
           .gsea_category_colors[['red']],
-          .gsea_category_colors[['gold']],
+          .gsea_category_colors[['purple']],
           .gsea_nonsignificant_color),
         group_names)
     } else {
