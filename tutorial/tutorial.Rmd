@@ -84,6 +84,7 @@ Download and source the consolidated plotting file:
 download.file(
   'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R',
   'gsea_visualizations.R')
+
 source('gsea_visualizations.R')
 ```
 
@@ -129,9 +130,11 @@ Load the bundled examples from the repository root:
 gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
   'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv'
 )
+
 gsea_day9_vs_day6 <- read_gsea_result_csv(
   'tutorial/data/GSE122380_gsea_day9_vs_day6.csv'
 )
+
 gsea_day3_vs_day1 <- read_gsea_result_csv(
   'tutorial/data/GSE122380_gsea_day3_vs_day1.csv'
 )
@@ -171,6 +174,7 @@ each seed is matched case-insensitively against term IDs or descriptions.
 
 ```{r positive-waterfall-figure, results='asis', out.width='80%', fig.alt='Positive NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-waterfall" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
@@ -195,6 +199,7 @@ shown.
 
 ```{r negative-waterfall-figure, results='asis', out.width='80%', fig.alt='Negative NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
@@ -221,6 +226,7 @@ want to label exact terms.
 
 ```{r symmetric-volcano-figure, results='asis', out.width='58%', fig.alt='Symmetric GSEA volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-symmetric-volcano" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_mesoderm.svg')
 ```
 
@@ -247,6 +253,7 @@ continues to use `padj_cutoff`.
 
 ```{r positive-half-volcano-figure, results='asis', out.width='72%', fig.alt='Positive NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
@@ -266,6 +273,7 @@ negative_half_volcano_plot <- plot_gsea_half_volcano(
 
 ```{r negative-half-volcano-figure, results='asis', out.width='72%', fig.alt='Negative NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-half-volcano" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
@@ -299,6 +307,7 @@ nes_scatter_plot <- plot_gsea_nes_scatter(
 
 ```{r all-quadrants-scatter-figure, results='asis', out.width='100%', fig.alt='Comparative NES scatterplot for Day 9 versus Day 6 and Day 3 versus Day 1'}
 cat('<div id="fig-all-quadrants-scatter" class="figure-anchor"></div>\n')
+
 knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg')
 ```
 

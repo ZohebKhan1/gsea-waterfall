@@ -257,7 +257,8 @@ citations are provided at the end of this tutorial.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">download.file</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R&#39;</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="st">&#39;gsea_visualizations.R&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_visualizations.R&#39;</span>)</span></code></pre></div>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_visualizations.R&#39;</span>)</span></code></pre></div>
 <p>This provides <code>read_gsea_result_csv()</code>, <code>plot_gsea_waterfall()</code>,
 <code>plot_gsea_volcano()</code>, <code>plot_gsea_half_volcano()</code>, and
 <code>plot_gsea_nes_scatter()</code>.</p>
@@ -324,14 +325,16 @@ tables.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>gsea_day9_vs_day6 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day9_vs_day6.csv&#39;</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>gsea_day3_vs_day1 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(gsea_cardiomyocyte_vs_mesoderm, <span class="dv">5</span><span class="dt">L</span>))</span></code></pre></div>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>gsea_day9_vs_day6 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day9_vs_day6.csv&#39;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>gsea_day3_vs_day1 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(gsea_cardiomyocyte_vs_mesoderm, <span class="dv">5</span><span class="dt">L</span>))</span></code></pre></div>
 </div>
 <div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
