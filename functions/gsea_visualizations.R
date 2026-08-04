@@ -25,11 +25,14 @@
 .gsea_standardize_results <- function(gsea_results,
                                       term_col = 'go_description',
                                       nes_col = 'NES',
-                                      pvalue_col = 'pval',
+                                      pvalue_col = NULL,
                                       padj_col = 'padj',
                                       id_col = NULL) {
   if (is.null(id_col) && 'go_term_id' %in% names(gsea_results)) {
     id_col <- 'go_term_id'
+  }
+  if (is.null(pvalue_col) && 'pval' %in% names(gsea_results)) {
+    pvalue_col <- 'pval'
   }
   missing_cols <- setdiff(
     c(term_col, nes_col, pvalue_col, padj_col, id_col),
@@ -62,29 +65,42 @@
       call. = FALSE)
   }
 
+  numeric_columns <- c(nes_col, padj_col, pvalue_col)
   if (!all(vapply(
-    gsea_results[c(nes_col, pvalue_col, padj_col)],
+    gsea_results[numeric_columns],
     is.numeric,
     logical(1)))) {
-    stop('GSEA NES and p-value columns must be numeric.', call. = FALSE)
+    stop('GSEA NES, adjusted p-value, and optional nominal p-value columns must be numeric.', call. = FALSE)
   }
 
+  pvalue <- if (is.null(pvalue_col)) {
+    rep(NA_real_, nrow(gsea_results))
+  } else {
+    as.numeric(gsea_results[[pvalue_col]])
+  }
   plot_data <- data.frame(
     go_term_id = go_term_id,
     go_description = go_description,
     NES = as.numeric(gsea_results[[nes_col]]),
-    pvalue = as.numeric(gsea_results[[pvalue_col]]),
+    pvalue = pvalue,
     padj = as.numeric(gsea_results[[padj_col]]),
     stringsAsFactors = FALSE)
 
-  if (anyNA(plot_data) || any(!is.finite(plot_data$NES))) {
-    stop('GSEA plotting columns must contain complete finite values.', call. = FALSE)
+  if (anyNA(plot_data$NES) || anyNA(plot_data$padj) ||
+    any(!is.finite(plot_data$NES)) || any(!is.finite(plot_data$padj))) {
+    stop('GSEA term, NES, and adjusted p-value columns must be complete and finite.', call. = FALSE)
   }
-  invalid_probability <-
-    plot_data$pvalue < 0 | plot_data$pvalue > 1 |
-      plot_data$padj < 0 | plot_data$padj > 1
+  if (!all(is.na(plot_data$pvalue)) &&
+    (anyNA(plot_data$pvalue) || any(!is.finite(plot_data$pvalue)))) {
+    stop('The optional nominal p-value column must be complete and finite when supplied.', call. = FALSE)
+  }
+  invalid_probability <- plot_data$padj < 0 | plot_data$padj > 1
+  if (!all(is.na(plot_data$pvalue))) {
+    invalid_probability <- invalid_probability |
+      plot_data$pvalue < 0 | plot_data$pvalue > 1
+  }
   if (any(invalid_probability)) {
-    stop('GSEA p-values and adjusted p-values must be between 0 and 1.', call. = FALSE)
+    stop('GSEA p-values must be between 0 and 1.', call. = FALSE)
   }
   plot_data$pval <- plot_data$pvalue
 
@@ -93,26 +109,28 @@
 
 #' Read one precomputed GSEA result table
 #'
-#' The input must contain one row per unique term and numeric NES, nominal
-#' p-value, and adjusted p-value columns. No filtering or GSEA calculation is
-#' performed. Matching uses `id_col` when supplied, then `go_term_id` when
-#' present, and otherwise `term_col`.
+#' The input must contain one row per unique term and numeric NES and adjusted
+#' p-value columns. A nominal p-value column is optional. No filtering or GSEA
+#' calculation is performed. Matching uses `id_col` when supplied, then
+#' `go_term_id` when present, and otherwise `term_col`.
 #'
 #' @param path Path to one CSV file
 #' @param term_col Column containing term descriptions
 #' @param nes_col Column containing normalized enrichment scores
-#' @param pvalue_col Column containing nominal GSEA p-values
+#' @param pvalue_col Optional column containing nominal GSEA p-values. When
+#'   omitted, `pval` is used automatically when present.
 #' @param padj_col Column containing adjusted p-values
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column
 #'
 #' @return A data frame with `go_term_id`, `go_description`, `NES`, `pvalue`,
-#'   `pval`, and `padj` columns
+#'   `pval`, and `padj` columns. The nominal p-value columns contain `NA` when
+#'   no nominal p-value column was supplied.
 #'
 read_gsea_result_csv <- function(path,
                                  term_col = 'go_description',
                                  nes_col = 'NES',
-                                 pvalue_col = 'pval',
+                                 pvalue_col = NULL,
                                  padj_col = 'padj',
                                  id_col = NULL) {
   .gsea_standardize_results(
@@ -514,7 +532,9 @@ read_gsea_result_csv <- function(path,
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
-#' @param pvalue_col Column containing nominal GSEA p-values.
+#' @param pvalue_col Optional column containing nominal GSEA p-values. It is
+#'   needed only when `rank_by = 'pvalue'` and the input does not already use
+#'   the standardized `pval` column.
 #' @param padj_col Column containing adjusted p-values.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
@@ -554,7 +574,7 @@ read_gsea_result_csv <- function(path,
 plot_gsea_waterfall <- function(gsea_results,
                                 term_col = 'go_description',
                                 nes_col = 'NES',
-                                pvalue_col = 'pval',
+                                pvalue_col = NULL,
                                 padj_col = 'padj',
                                 id_col = NULL,
                                 direction = c('positive', 'negative'),
@@ -599,6 +619,9 @@ plot_gsea_waterfall <- function(gsea_results,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
+  if (rank_by == 'pvalue' && all(is.na(gsea_results$pvalue))) {
+    stop("`rank_by = 'pvalue'` requires an optional nominal p-value column.", call. = FALSE)
+  }
 
   if (direction == 'positive') {
     plot_tbl <- gsea_results[gsea_results$NES > 0, , drop = FALSE]
@@ -736,7 +759,6 @@ plot_gsea_waterfall <- function(gsea_results,
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
-#' @param pvalue_col Column containing nominal GSEA p-values.
 #' @param padj_col Column containing adjusted p-values.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
@@ -765,7 +787,6 @@ plot_gsea_waterfall <- function(gsea_results,
 plot_gsea_volcano <- function(gsea_results,
                               term_col = 'go_description',
                               nes_col = 'NES',
-                              pvalue_col = 'pval',
                               padj_col = 'padj',
                               id_col = NULL,
                               padj_cutoff = 0.05,
@@ -776,7 +797,7 @@ plot_gsea_volcano <- function(gsea_results,
                               point_size = 1.3,
                               point_colors = NULL,
                               label_size = 8.0,
-  label_color = NULL,
+                              label_color = NULL,
                               label_nudge_x = 0.18,
                               label_nudge_y = 0,
                               count_label_size = 9,
@@ -798,7 +819,6 @@ plot_gsea_volcano <- function(gsea_results,
     gsea_results = gsea_results,
     term_col = term_col,
     nes_col = nes_col,
-    pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
   plot_tbl$neg_log10_padj <- .gsea_neg_log10(plot_tbl$padj)
@@ -971,7 +991,9 @@ plot_gsea_volcano <- function(gsea_results,
 #' @param gsea_results GSEA result table.
 #' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
-#' @param pvalue_col Column containing nominal GSEA p-values.
+#' @param pvalue_col Optional column containing nominal GSEA p-values. It is
+#'   needed only when `p_col = 'pvalue'` and the input does not already use the
+#'   standardized `pval` column.
 #' @param padj_col Column containing adjusted p-values.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
@@ -1002,7 +1024,7 @@ plot_gsea_volcano <- function(gsea_results,
 plot_gsea_half_volcano <- function(gsea_results,
                                    term_col = 'go_description',
                                    nes_col = 'NES',
-                                   pvalue_col = 'pval',
+                                   pvalue_col = NULL,
                                    padj_col = 'padj',
                                    id_col = NULL,
                                    direction = c('positive', 'negative'),
@@ -1047,6 +1069,9 @@ plot_gsea_half_volcano <- function(gsea_results,
     id_col = id_col)
   if (!p_col %in% c('pvalue', 'padj')) {
     stop("`p_col` must be either 'pvalue' or 'padj'.", call. = FALSE)
+  }
+  if (p_col == 'pvalue' && all(is.na(plot_tbl$pvalue))) {
+    stop("`p_col = 'pvalue'` requires an optional nominal p-value column.", call. = FALSE)
   }
 
   plot_tbl <- plot_tbl[if (direction == 'positive') plot_tbl$NES > 0 else plot_tbl$NES < 0, , drop = FALSE]
@@ -1218,7 +1243,6 @@ plot_gsea_half_volcano <- function(gsea_results,
 #' @param term_col Column containing term descriptions and the fallback key in
 #'   both tables.
 #' @param nes_col Column containing normalized enrichment scores in both tables.
-#' @param pvalue_col Column containing nominal GSEA p-values in both tables.
 #' @param padj_col Column containing adjusted p-values in both tables.
 #' @param id_col Optional column containing unique stable term identifiers in
 #'   both tables; overrides existing `go_term_id` columns.
@@ -1265,7 +1289,6 @@ plot_gsea_nes_scatter <- function(gsea_x,
                                   y_label = 'NES in y contrast',
                                   term_col = 'go_description',
                                   nes_col = 'NES',
-                                  pvalue_col = 'pval',
                                   padj_col = 'padj',
                                   id_col = NULL,
                                   color_by = c('significance', 'term_group'),
@@ -1336,14 +1359,12 @@ plot_gsea_nes_scatter <- function(gsea_x,
     gsea_results = gsea_x,
     term_col = term_col,
     nes_col = nes_col,
-    pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
   y_tbl <- .gsea_standardize_results(
     gsea_results = gsea_y,
     term_col = term_col,
     nes_col = nes_col,
-    pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
   plot_tbl <- merge(x_tbl, y_tbl, by = 'go_term_id', suffixes = c('_x', '_y'))

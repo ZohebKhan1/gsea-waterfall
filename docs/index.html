@@ -299,8 +299,8 @@ another package. The default columns are:</p>
 </tr>
 <tr class="even">
 <td align="left"><code>pval</code></td>
-<td align="left">yes</td>
-<td align="left">nominal GSEA p-value in <code>[0, 1]</code></td>
+<td align="left">no</td>
+<td align="left">optional nominal GSEA p-value; used only for nominal-p-value ranking or y-axes</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>padj</code></td>
@@ -309,15 +309,14 @@ another package. The default columns are:</p>
 </tr>
 </tbody>
 </table>
-<p>Required columns must be complete, and NES values must be finite. Key precedence is explicit <code>id_col</code>, then <code>go_term_id</code> when present, otherwise <code>go_description</code>. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.</p>
+<p><code>go_description</code>, <code>NES</code>, and <code>padj</code> must be complete, and NES values must be finite. If <code>pval</code> is supplied, it is also validated. Key precedence is explicit <code>id_col</code>, then <code>go_term_id</code> when present, otherwise <code>go_description</code>. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.</p>
 <p>If your result table uses different column names, map them when reading it:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fgsea_results <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="st">&#39;fgsea_results.csv&#39;</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">term_col =</span> <span class="st">&#39;pathway&#39;</span>,</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">nes_col =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">pvalue_col =</span> <span class="st">&#39;pval&#39;</span>,</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">padj_col =</span> <span class="st">&#39;padj&#39;</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">padj_col =</span> <span class="st">&#39;padj&#39;</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span></code></pre></div>
 <p>For comparative plots, use <code>id_col</code> with a stable term identifier whenever one
 is available. Without stable IDs, term descriptions must match exactly across
 tables.</p>
@@ -338,7 +337,7 @@ tables.</p>
 </div>
 <div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code>, <code>padj</code>, <code>pvalue</code>, or <code>pval</code>, and retains <code>top_n</code> terms. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
+<p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code> or <code>padj</code> by default, and retains <code>top_n</code> terms. Nominal-p-value ranking is available when an optional <code>pval</code> column is supplied. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
 <p>For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
 ribosomal, mitotic, and DNA-replication terms; unmatched terms remain <code>Other</code>.</p>
@@ -396,10 +395,11 @@ each seed is matched case-insensitively against term IDs or descriptions.</p>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span></code></pre></div>
-<p>Use <code>rank_by = 'padj'</code> or <code>rank_by = 'pvalue'</code> when statistical significance,
-rather than NES magnitude, should determine the displayed order. <code>label_n</code>
-selects labels automatically when exact terms are not supplied; use
-<code>label_terms</code> when specific terms should be shown.</p>
+<p>Use <code>rank_by = 'padj'</code> when adjusted-p-value ranking, rather than NES magnitude,
+should determine the displayed order. <code>rank_by = 'pvalue'</code> is available when an
+optional nominal <code>pval</code> column is supplied. <code>label_n</code> selects labels
+automatically when exact terms are not supplied; use <code>label_terms</code> when
+specific terms should be shown.</p>
 <div id="fig-negative-waterfall" class="figure-anchor">
 
 </div>
@@ -470,8 +470,8 @@ want to label exact terms.</p>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
 <span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>inner_nes_limit = 1</code> keeps terms with positive NES at least 1 in magnitude.
-Set <code>p_col = 'pvalue'</code> to show nominal p-values instead; significance coloring
-continues to use <code>padj_cutoff</code>.</p>
+Set <code>p_col = 'pvalue'</code> to show nominal p-values when the optional <code>pval</code> column
+is supplied; significance coloring continues to use <code>padj_cutoff</code>.</p>
 <div id="fig-positive-half-volcano" class="figure-anchor">
 
 </div>
@@ -568,7 +568,7 @@ axes directly comparable.</p>
 </tr>
 </tbody>
 </table>
-<p>Source documentation defines the complete argument contracts, including the common <code>term_col</code>, <code>nes_col</code>, <code>pvalue_col</code>, <code>padj_col</code>, and optional <code>id_col</code> arguments.</p>
+<p>Source documentation defines the complete argument contracts, including the common <code>term_col</code>, <code>nes_col</code>, <code>padj_col</code>, and optional <code>id_col</code> arguments. Nominal-p-value mapping is only needed when using the optional <code>pval</code>-based controls.</p>
 </div>
 <div id="references" class="section level1 hasAnchor" number="8">
 <h1><span class="header-section-number">8</span> References<a href="#references" class="anchor-section" aria-label="Anchor link to header"></a></h1>

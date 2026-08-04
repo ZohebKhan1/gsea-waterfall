@@ -103,20 +103,20 @@ names, map them when reading the table as shown below.
 | `go_description` | yes | term description and fallback matching key |
 | `go_term_id` | no | stable matching key used automatically when present |
 | `NES` | yes | normalized enrichment score |
-| `pval` | yes | nominal GSEA p-value in `[0, 1]` |
+| `pval` | no | optional nominal GSEA p-value; used only for nominal-p-value ranking or y-axes |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-Required columns must be complete, and NES values must be finite. Key precedence
-is explicit `id_col`, then `go_term_id` when present, otherwise
-`go_description`. Comparative plots use the exact shared-key intersection and
-do not impute absent terms.
+`go_description`, `NES`, and `padj` must be complete; NES values must be finite.
+If `pval` is supplied, it is also validated. Key precedence is explicit
+`id_col`, then `go_term_id` when present, otherwise `go_description`.
+Comparative plots use the exact shared-key intersection and do not impute absent
+terms.
 
 ```r
 fgsea_results <- read_gsea_result_csv(
   'fgsea_results.csv',
   term_col = 'pathway',
   nes_col = 'NES',
-  pvalue_col = 'pval',
   padj_col = 'padj'
 )
 ```
@@ -147,7 +147,7 @@ arguments remain available in the function definitions.
 | `title` | Uses a direction-specific positive or negative NES waterfall title by default; set it to customize the plot title. |
 | `direction` | Shows positive or negative NES terms. |
 | `top_n` | Retains this many terms after direction filtering and ranking. |
-| `rank_by` | Sets the ordering measure: NES, adjusted p-value, or nominal p-value. |
+| `rank_by` | Sets the ordering measure: NES or adjusted p-value by default; nominal p-value requires an optional `pval` column. |
 | `label_terms` / `label_n` | Labels specified terms, or automatically selects the requested number. |
 | `term_groups` | Adds caller-defined keyword/ID categories; unmatched terms remain neutral. |
 
@@ -163,7 +163,7 @@ arguments remain available in the function definitions.
 | Parameter | Practical effect |
 | :-- | :-- |
 | `direction` | Shows one NES direction. |
-| `p_col` | Chooses nominal or adjusted p-value for the y-axis. |
+| `p_col` | Chooses adjusted p-value by default; nominal p-value requires an optional `pval` column. |
 | `inner_nes_limit` | Hides terms with absolute NES below the specified boundary. |
 
 ### `plot_gsea_nes_scatter()`

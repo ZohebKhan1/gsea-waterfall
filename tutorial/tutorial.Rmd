@@ -103,10 +103,10 @@ another package. The default columns are:
 | `go_description` | yes | GO term description and fallback matching key |
 | `go_term_id` | no | stable matching key used automatically when present |
 | `NES` | yes | normalized enrichment score |
-| `pval` | yes | nominal GSEA p-value in `[0, 1]` |
+| `pval` | no | optional nominal GSEA p-value; used only for nominal-p-value ranking or y-axes |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-Required columns must be complete, and NES values must be finite. Key precedence is explicit `id_col`, then `go_term_id` when present, otherwise `go_description`. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
+`go_description`, `NES`, and `padj` must be complete, and NES values must be finite. If `pval` is supplied, it is also validated. Key precedence is explicit `id_col`, then `go_term_id` when present, otherwise `go_description`. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
 
 If your result table uses different column names, map them when reading it:
 
@@ -115,7 +115,6 @@ fgsea_results <- read_gsea_result_csv(
   'fgsea_results.csv',
   term_col = 'pathway',
   nes_col = 'NES',
-  pvalue_col = 'pval',
   padj_col = 'padj'
 )
 ```
@@ -144,7 +143,7 @@ print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
 
 # Ranked GSEA waterfall plots
 
-`plot_gsea_waterfall()` selects one NES direction, ranks by `NES`, `padj`, `pvalue`, or `pval`, and retains `top_n` terms. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
+`plot_gsea_waterfall()` selects one NES direction, ranks by `NES` or `padj` by default, and retains `top_n` terms. Nominal-p-value ranking is available when an optional `pval` column is supplied. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
 
 For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
@@ -214,10 +213,11 @@ negative_waterfall_plot <- plot_gsea_waterfall(
 )
 ```
 
-Use `rank_by = 'padj'` or `rank_by = 'pvalue'` when statistical significance,
-rather than NES magnitude, should determine the displayed order. `label_n`
-selects labels automatically when exact terms are not supplied; use
-`label_terms` when specific terms should be shown.
+Use `rank_by = 'padj'` when adjusted-p-value ranking, rather than NES magnitude,
+should determine the displayed order. `rank_by = 'pvalue'` is available when an
+optional nominal `pval` column is supplied. `label_n` selects labels
+automatically when exact terms are not supplied; use `label_terms` when
+specific terms should be shown.
 
 ```{r negative-waterfall-figure, results='asis', out.width='80%', fig.alt='Negative NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
@@ -300,8 +300,8 @@ positive_half_volcano_plot <- plot_gsea_half_volcano(
 ```
 
 `inner_nes_limit = 1` keeps terms with positive NES at least 1 in magnitude.
-Set `p_col = 'pvalue'` to show nominal p-values instead; significance coloring
-continues to use `padj_cutoff`.
+Set `p_col = 'pvalue'` to show nominal p-values when the optional `pval` column
+is supplied; significance coloring continues to use `padj_cutoff`.
 
 ```{r positive-half-volcano-figure, results='asis', out.width='72%', fig.alt='Positive NES half-volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
@@ -381,7 +381,7 @@ axes directly comparable.
 | `plot_gsea_half_volcano()` | returns a directional ggplot after the explicit NES boundary |
 | `plot_gsea_nes_scatter()` | returns a ggplot from the exact shared term-key intersection |
 
-Source documentation defines the complete argument contracts, including the common `term_col`, `nes_col`, `pvalue_col`, `padj_col`, and optional `id_col` arguments.
+Source documentation defines the complete argument contracts, including the common `term_col`, `nes_col`, `padj_col`, and optional `id_col` arguments. Nominal-p-value mapping is only needed when using the optional `pval`-based controls.
 
 # References
 
