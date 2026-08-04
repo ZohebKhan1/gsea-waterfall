@@ -137,6 +137,7 @@ read_gsea_result_csv <- function(path,
   blue = '#0055AAFF',
   red = '#BE3428FF',
   gold = '#DABD61FF',
+  purple = '#8E77B8FF',
   green = '#2CB11BFF')
 
 .gsea_direction_colors <- c(
@@ -144,11 +145,28 @@ read_gsea_result_csv <- function(path,
   'Negative' = unname(.gsea_category_colors[['blue']]),
   'Not significant' = .gsea_nonsignificant_color)
 
-.gsea_default_category_colors <- function(number) {
-  if (number <= length(.gsea_category_colors)) {
-    return(unname(.gsea_category_colors[seq_len(number)]))
+.gsea_default_category_colors <- function(group_names) {
+  named_defaults <- c(
+    'Ion channel' = unname(.gsea_category_colors[['blue']]),
+    'Metabolism' = unname(.gsea_category_colors[['red']]),
+    'Muscle contraction' = unname(.gsea_category_colors[['purple']]),
+    'Heart development' = unname(.gsea_category_colors[['green']]),
+    'Ribosomal' = unname(.gsea_category_colors[['blue']]),
+    'Mitosis' = unname(.gsea_category_colors[['red']]),
+    'DNA replication' = unname(.gsea_category_colors[['gold']]))
+  default_colors <- unname(named_defaults[group_names])
+  missing_colors <- is.na(default_colors)
+  if (any(missing_colors)) {
+    fallback_pool <- unname(.gsea_category_colors)
+    missing_count <- sum(missing_colors)
+    fallback_colors <- if (missing_count <= length(fallback_pool)) {
+      fallback_pool[seq_len(missing_count)]
+    } else {
+      grDevices::colorRampPalette(fallback_pool)(missing_count)
+    }
+    default_colors[missing_colors] <- fallback_colors
   }
-  grDevices::colorRampPalette(unname(.gsea_category_colors))(number)
+  stats::setNames(default_colors, group_names)
 }
 
 .gsea_p_value_axis_title <- function(p_col) {
@@ -243,9 +261,7 @@ read_gsea_result_csv <- function(path,
   }
   group_names <- names(term_groups)
   if (is.null(term_group_colors)) {
-    term_group_colors <- stats::setNames(
-      .gsea_default_category_colors(length(group_names)),
-      group_names)
+    term_group_colors <- .gsea_default_category_colors(group_names)
   }
 
   term_group_colors <- .gsea_resolve_named_colors(
@@ -677,7 +693,7 @@ plot_gsea_waterfall <- function(gsea_results,
     ggplot2::scale_y_continuous(breaks = y_breaks, expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = c(0, nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
     ggplot2::labs(title = title, x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
-    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size + 0.5))) +
+    ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size * 2))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
       axis.ticks.length = grid::unit(1.4, 'pt'),
@@ -685,7 +701,9 @@ plot_gsea_waterfall <- function(gsea_results,
       legend.justification = legend_anchor,
       legend.background = ggplot2::element_blank(),
       legend.box.background = ggplot2::element_blank(),
-      legend.title = ggplot2::element_text(hjust = 0),
+      legend.title = ggplot2::element_text(size = 16, hjust = 0),
+      legend.text = ggplot2::element_text(size = 15, color = 'black'),
+      legend.key.size = grid::unit(0.5, 'cm'),
       legend.box.just = 'left',
       plot.title = ggplot2::element_text(size = 10, face = 'bold', color = 'black', hjust = 0),
       plot.margin = ggplot2::margin(8, 10, 8, 8))

@@ -244,7 +244,10 @@ save_gsea_figure(
     top_n = waterfall_top_n,
     rank_by = 'NES',
     x_label = 'Ranked GO terms by NES',
-    label_n = 10L,
+    label_terms = c(
+      'maturation of 5.8S rRNA',
+      'spliceosomal complex assembly',
+      'rRNA processing'),
     term_groups = negative_term_groups,
     point_size = waterfall_point_size,
     font_family = gsea_figure_font_family),

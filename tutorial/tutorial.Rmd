@@ -183,19 +183,32 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_v
 ## Negative NES waterfall
 
 ```r
+negative_term_groups <- list(
+  'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
+  'Mitosis' = c(
+    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
+    'spindle', 'Mitotic', 'Meiotic'),
+  'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
+```
+
+```r
 negative_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
   top_n = 100L,
   rank_by = 'NES',
-  label_n = 10L
+  label_terms = c(
+    'maturation of 5.8S rRNA',
+    'spliceosomal complex assembly',
+    'rRNA processing'),
+  term_groups = negative_term_groups
 )
 ```
 
 Use `rank_by = 'padj'` or `rank_by = 'pvalue'` when statistical significance,
 rather than NES magnitude, should determine the displayed order. `label_n`
-selects labels automatically; use `label_terms` when specific terms should be
-shown.
+selects labels automatically when exact terms are not supplied; use
+`label_terms` when specific terms should be shown.
 
 ```{r negative-waterfall-figure, results='asis', out.width='80%', fig.alt='Negative NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
