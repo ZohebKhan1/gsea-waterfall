@@ -338,7 +338,7 @@ body > #header,
 
 .book .book-body .page-wrapper .page-inner section.normal div.sourceCode,
 .book .book-body .page-wrapper .page-inner section.normal pre {
-  font-size: 0.86em;
+  font-size: 0.96em;
   line-height: 1.45;
   margin: 1.65rem 0 2.1rem;
   max-width: var(--tutorial-content-width);
@@ -432,14 +432,14 @@ body > #header,
   margin-top: 1.15rem;
 }
 
-.book .book-body .page-wrapper .page-inner section.normal #input-contract > table {
-  font-size: 0.86em;
-  line-height: 1.25;
+.book .book-body .page-wrapper .page-inner section.normal #input-data > table {
+  font-size: 0.78em;
+  line-height: 1.2;
 }
 
-.book .book-body .page-wrapper .page-inner section.normal #input-contract > table th,
-.book .book-body .page-wrapper .page-inner section.normal #input-contract > table td {
-  padding: 0.28rem 0.55rem;
+.book .book-body .page-wrapper .page-inner section.normal #input-data > table th,
+.book .book-body .page-wrapper .page-inner section.normal #input-data > table td {
+  padding: 0.22rem 0.45rem;
   white-space: nowrap;
 }
 

@@ -133,10 +133,28 @@ read_gsea_result_csv <- function(path,
 .gsea_neutral_color <- '#9E9E9E'
 .gsea_nonsignificant_color <- '#D9D9D9'
 
+.gsea_category_colors <- c(
+  blue = '#0055AAFF',
+  red = '#BE3428FF',
+  gold = '#DABD61FF',
+  green = '#2CB11BFF')
+
 .gsea_direction_colors <- c(
-  'Significantly up' = '#CC79A7',
-  'Significantly down' = '#0072B2',
+  'Positive' = unname(.gsea_category_colors[['red']]),
+  'Negative' = unname(.gsea_category_colors[['blue']]),
   'Not significant' = .gsea_nonsignificant_color)
+
+.gsea_default_category_colors <- function(number) {
+  if (number <= length(.gsea_category_colors)) {
+    return(unname(.gsea_category_colors[seq_len(number)]))
+  }
+  grDevices::colorRampPalette(unname(.gsea_category_colors))(number)
+}
+
+.gsea_p_value_axis_title <- function(p_col) {
+  p_value_label <- if (p_col == 'padj') 'adjusted p-value' else 'nominal p-value'
+  bquote(-log[10](.(p_value_label)))
+}
 
 .gsea_validate_number <- function(value,
                                   parameter_name,
@@ -225,13 +243,8 @@ read_gsea_result_csv <- function(path,
   }
   group_names <- names(term_groups)
   if (is.null(term_group_colors)) {
-    brewer_n <- min(9L, max(3L, length(group_names)))
-    palette_colors <- RColorBrewer::brewer.pal(brewer_n, 'Set1')
-    if (length(group_names) > brewer_n) {
-      palette_colors <- grDevices::colorRampPalette(palette_colors)(length(group_names))
-    }
     term_group_colors <- stats::setNames(
-      palette_colors[seq_along(group_names)],
+      .gsea_default_category_colors(length(group_names)),
       group_names)
   }
 
@@ -483,13 +496,15 @@ read_gsea_result_csv <- function(path,
 #' @param rank_by Column used to rank terms before taking `top_n`. Use `NES`,
 #'   `padj`, `pvalue`, or `pval`.
 #' @param x_label Optional x-axis title. Defaults to a rank-by label.
+#' @param title Optional plot title. Defaults to a direction-specific positive
+#'   or negative NES waterfall title.
 #' @param label_terms Optional exact term descriptions or GO IDs to label.
 #' @param label_ranks Optional plotted ranks to label after ranking and
 #'   filtering.
 #' @param label_n Number of labels to automatically select across the ranked
 #'   terms when neither `label_terms` nor `label_ranks` is supplied.
 #' @param term_groups Optional named GO category seeds for coloring. When
-#'   omitted, built-in description-based categories are used.
+#'   omitted, all terms are assigned to the neutral `Other` category.
 #' @param term_group_colors Optional named colors for `term_groups`.
 #' @param point_size Point size.
 #' @param label_size Label font size in points.
@@ -519,13 +534,14 @@ plot_gsea_waterfall <- function(gsea_results,
                                 top_n = 100L,
                                 rank_by = c('NES', 'padj', 'pvalue', 'pval'),
                                 x_label = NULL,
+                                title = NULL,
                                 label_terms = NULL,
                                 label_ranks = NULL,
                                 label_n = 12L,
                                 term_groups = NULL,
                                 term_group_colors = NULL,
-                                point_size = 1.3,
-                                label_size = 7.5,
+                                point_size = 1.8,
+                                label_size = 8.0,
                                 label_fontface = 'plain',
                                 label_words_per_line = 2L,
                                 label_repel_direction = 'y',
@@ -604,6 +620,13 @@ plot_gsea_waterfall <- function(gsea_results,
   if (is.null(x_label)) {
     x_label <- paste0('Ranked GO terms (by ', rank_by, ')')
   }
+  if (is.null(title)) {
+    title <- if (direction == 'positive') {
+      'Positive NES waterfall'
+    } else {
+      'Negative NES waterfall'
+    }
+  }
   if (is.null(legend_position)) {
     legend_position <- if (direction == 'positive') c(0.98, 0.98) else c(0.03, 0.98)
   }
@@ -653,7 +676,7 @@ plot_gsea_waterfall <- function(gsea_results,
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = c(0, 0.02))) +
     ggplot2::scale_y_continuous(breaks = y_breaks, expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = c(0, nrow(plot_tbl) + 1), ylim = y_limits, clip = 'off') +
-    ggplot2::labs(x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
+    ggplot2::labs(title = title, x = x_label, y = 'Normalized enrichment score (NES)', color = 'GO:BP category') +
     ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size + 0.5))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
@@ -664,6 +687,7 @@ plot_gsea_waterfall <- function(gsea_results,
       legend.box.background = ggplot2::element_blank(),
       legend.title = ggplot2::element_text(hjust = 0),
       legend.box.just = 'left',
+      plot.title = ggplot2::element_text(size = 10, face = 'bold', color = 'black', hjust = 0),
       plot.margin = ggplot2::margin(8, 10, 8, 8))
 }
 
@@ -671,7 +695,7 @@ plot_gsea_waterfall <- function(gsea_results,
 
 # 1.0 create symmetric volcano plot -----------------
 
-# retain the established SVG panel footprint with the portable plain-text y-axis label
+# retain the established SVG panel footprint with the portable y-axis label
 .gsea_volcano_y_title_margin_pt <- 5.42
 
 #' Make a symmetric GSEA volcano plot
@@ -694,8 +718,8 @@ plot_gsea_waterfall <- function(gsea_results,
 #'   range includes additional annotation space above this value.
 #' @param y_min Lower y-axis limit for capped -log10 adjusted p-values.
 #' @param point_size Point size.
-#' @param point_colors Optional named colors for `Significantly up`,
-#'   `Significantly down`, and `Not significant`.
+#' @param point_colors Optional named colors for `Positive`, `Negative`, and
+#'   `Not significant`.
 #' @param label_size Label font size in points.
 #' @param label_color Text color for GO term labels.
 #' @param label_nudge_x Horizontal starting offset for labeled terms.
@@ -721,7 +745,7 @@ plot_gsea_volcano <- function(gsea_results,
                               y_min = 0,
                               point_size = 1.3,
                               point_colors = NULL,
-                              label_size = 7.5,
+                              label_size = 8.0,
                               label_color = 'black',
                               label_nudge_x = 0.18,
                               label_nudge_y = 0,
@@ -752,11 +776,11 @@ plot_gsea_volcano <- function(gsea_results,
   plot_tbl$significant <- plot_tbl$padj < padj_cutoff
   plot_tbl$point_group <- ifelse(
     plot_tbl$significant & plot_tbl$NES >= 0,
-    'Significantly up',
-    ifelse(plot_tbl$significant & plot_tbl$NES < 0, 'Significantly down', 'Not significant'))
+    'Positive',
+    ifelse(plot_tbl$significant & plot_tbl$NES < 0, 'Negative', 'Not significant'))
   plot_tbl$point_group <- factor(
     plot_tbl$point_group,
-    levels = c('Significantly up', 'Significantly down', 'Not significant'))
+    levels = c('Positive', 'Negative', 'Not significant'))
   color_values <- .gsea_direction_colors[levels(plot_tbl$point_group)]
   custom_colors <- .gsea_resolve_named_colors(
     color_values = point_colors,
@@ -844,14 +868,14 @@ plot_gsea_volcano <- function(gsea_results,
       'label',
       x = x_limits[[1L]],
       y = count_y,
-      label = paste0('Significantly down: ', negative_count),
+      label = paste0('Negative: ', negative_count),
       hjust = 0,
       vjust = 0,
       family = font_family,
       size = count_label_size / ggplot2::.pt,
       fontface = 'bold',
       color = 'white',
-      fill = color_values[['Significantly down']],
+      fill = color_values[['Negative']],
       linewidth = 0,
       label.padding = grid::unit(0.12, 'lines'),
       label.r = grid::unit(0.08, 'lines')) +
@@ -859,14 +883,14 @@ plot_gsea_volcano <- function(gsea_results,
       'label',
       x = x_limits[[2L]],
       y = count_y,
-      label = paste0('Significantly up: ', positive_count),
+      label = paste0('Positive: ', positive_count),
       hjust = 1,
       vjust = 0,
       family = font_family,
       size = count_label_size / ggplot2::.pt,
       fontface = 'bold',
       color = 'white',
-      fill = color_values[['Significantly up']],
+      fill = color_values[['Positive']],
       linewidth = 0,
       label.padding = grid::unit(0.12, 'lines'),
       label.r = grid::unit(0.08, 'lines')) +
@@ -880,9 +904,9 @@ plot_gsea_volcano <- function(gsea_results,
       breaks = c(0, 1, 2, 5, 10, 25),
       expand = c(0, 0)) +
     ggplot2::coord_cartesian(xlim = x_limits, ylim = y_limits, clip = 'off') +
-    ggplot2::labs(x = x_axis_label, y = '\u2212log10(Adjusted p-value)') +
+    ggplot2::labs(x = x_axis_label, y = .gsea_p_value_axis_title('padj')) +
     ggplot2::guides(color = ggplot2::guide_legend(
-      title = 'GSEA direction',
+      title = 'fgsea NES direction',
       nrow = 1,
       byrow = TRUE,
       title.position = 'top',
@@ -925,7 +949,8 @@ plot_gsea_volcano <- function(gsea_results,
 #' @param inner_nes_limit Inner absolute NES cutoff shown on the x-axis.
 #' @param point_size Point size.
 #' @param point_colors Optional named colors for the direction label and
-#'   `Not significant` when `term_groups` is omitted.
+#'   `Not significant` when `term_groups` is omitted. Direction labels are
+#'   `Positive` and `Negative`.
 #' @param label_size Label font size in points.
 #' @param label_color Text color for GO term labels.
 #' @param contrast_label Optional concise contrast label for the NES axis.
@@ -953,7 +978,7 @@ plot_gsea_half_volcano <- function(gsea_results,
                                    inner_nes_limit = 1,
                                    point_size = 1.6,
                                    point_colors = NULL,
-                                   label_size = 7.5,
+                                   label_size = 8.0,
                                    label_color = 'black',
                                    contrast_label = NULL,
                                    label_words_per_line = 3L,
@@ -995,7 +1020,7 @@ plot_gsea_half_volcano <- function(gsea_results,
   plot_tbl$neg_log10_p <- .gsea_neg_log10(plot_tbl[[p_col]])
   plot_tbl$significant <- plot_tbl$padj < padj_cutoff
   if (is.null(term_groups)) {
-    direction_label <- if (direction == 'positive') 'Significantly up' else 'Significantly down'
+    direction_label <- if (direction == 'positive') 'Positive' else 'Negative'
     plot_tbl$point_group <- ifelse(plot_tbl$significant, direction_label, 'Not significant')
     plot_tbl$point_group <- factor(plot_tbl$point_group, levels = c(direction_label, 'Not significant'))
     color_values <- .gsea_direction_colors[levels(plot_tbl$point_group)]
@@ -1006,7 +1031,7 @@ plot_gsea_half_volcano <- function(gsea_results,
     if (!is.null(custom_colors)) {
       color_values <- custom_colors
     }
-    legend_title <- 'GSEA direction'
+    legend_title <- 'fgsea NES direction'
     background_groups <- 'Not significant'
   } else {
     plot_tbl$point_group <- .gsea_assign_term_groups(
@@ -1123,7 +1148,7 @@ plot_gsea_half_volcano <- function(gsea_results,
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = 0.015)) +
     ggplot2::scale_y_continuous(expand = c(0, 0), position = if (direction == 'negative') 'right' else 'left') +
     ggplot2::coord_cartesian(xlim = x_limits, ylim = y_limits, clip = 'off') +
-    ggplot2::labs(x = x_axis_label, y = paste0('-log10(', p_col, ')'), color = legend_title) +
+    ggplot2::labs(x = x_axis_label, y = .gsea_p_value_axis_title(p_col), color = legend_title) +
     ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(size = point_size + 0.5))) +
     .gsea_theme(font_family) +
     ggplot2::theme(
@@ -1193,8 +1218,8 @@ plot_gsea_half_volcano <- function(gsea_results,
 #'
 plot_gsea_nes_scatter <- function(gsea_x,
                                   gsea_y,
-                                  x_label,
-                                  y_label,
+                                  x_label = 'NES in x contrast',
+                                  y_label = 'NES in y contrast',
                                   term_col = 'go_description',
                                   nes_col = 'NES',
                                   pvalue_col = 'pval',
@@ -1212,7 +1237,7 @@ plot_gsea_nes_scatter <- function(gsea_x,
                                   label_n_both = 0L,
                                   label_terms = NULL,
                                   point_size = 1.3,
-                                  label_size = 7.5,
+                                  label_size = 8.0,
                                   label_color = 'black',
                                   label_words_per_line = 2L,
                                   padj_cutoff = 0.05,
@@ -1312,9 +1337,11 @@ plot_gsea_nes_scatter <- function(gsea_x,
       paste0('Significant in ', y_name, ' only'),
       'Not significant in either')
     if (is.null(point_colors)) {
-      brewer_colors <- RColorBrewer::brewer.pal(4L, 'Set1')
       color_values <- stats::setNames(
-        c(brewer_colors[[4L]], brewer_colors[[1L]], brewer_colors[[2L]], .gsea_nonsignificant_color),
+        c(.gsea_category_colors[['blue']],
+          .gsea_category_colors[['red']],
+          .gsea_category_colors[['gold']],
+          .gsea_nonsignificant_color),
         group_names)
     } else {
       color_values <- .gsea_resolve_named_colors(

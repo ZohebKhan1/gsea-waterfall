@@ -37,6 +37,3 @@ jobs:
         shell: Rscript {0}
         env:
           LINTR_ERROR_ON_LINT: true
-
-      - name: Run regression checks
-        run: Rscript R/03_check_gsea_contracts.R

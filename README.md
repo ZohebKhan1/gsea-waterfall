@@ -6,7 +6,7 @@ comparative NES scatterplots. The functions return `ggplot` objects. They are a
 visualization layer applied after GSEA has been performed; they do not run GSEA
 or write files.
 
-[GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
+View the [GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
 
 ## Example data and preprocessing
 
@@ -33,30 +33,34 @@ functional patterns visible in the same ranked context. Caller-defined
 annotations only and do not perform redundancy reduction or additional
 statistics.
 
-The visual design was informed by pathway-level figures from Ciceri et al.
-(2024), Xu et al. (2025), Vuong et al. (2026), and Risgaard et al. (2026). Full
-citations are provided at the end of this README.
+The visual design was informed by pathway-level figures from [Ciceri et al.
+(2024)](https://doi.org/10.1038/s41586-023-06984-8), [Xu et al.
+(2025)](https://doi.org/10.1038/s41556-025-01751-5), [Vuong et al.
+(2026)](https://doi.org/10.1126/science.aea1259), and [Risgaard et al.
+(2026)](https://doi.org/10.1126/science.aea1549). Full citations are provided
+at the end of this README.
 
-## Repository layout
+## Repository contents
 
 ```text
-functions/          single downloadable plotting source file
-R/                  bundled figure generation and site rendering
-tutorial/data/      fixed precomputed example GSEA tables
-tutorial/assets/    generated tutorial figures and bundled fonts
-tutorial/tutorial.Rmd
-docs/               generated GitHub Pages deployment output
+functions/
+└── gsea_visualizations.R       downloadable plotting functions
+
+tutorial/
+├── tutorial.Rmd                step-by-step workflow and examples
+├── data/                       example precomputed GSEA result tables
+└── assets/figures/             example plots
 ```
 
-The tutorial source lives under `tutorial/`; `docs/` contains the generated
-files published by GitHub Pages and should not be edited directly.
+Start with `functions/gsea_visualizations.R` to use the functions in your own
+analysis, or open `tutorial/tutorial.Rmd` for the complete workflow.
 
 ## Quick start
 
 Install the plotting dependencies:
 
 ```r
-install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
+install.packages(c('ggplot2', 'ggrepel', 'scales'))
 ```
 
 Download and source the consolidated plotting file:
@@ -116,7 +120,21 @@ fgsea_results <- read_gsea_result_csv(
 )
 ```
 
-## Most-used parameters
+## Public API
+
+Each plot function returns a `ggplot` object and does not write files. The
+source files contain the complete argument documentation; the table below is
+the practical overview of the public functions.
+
+| Function | Purpose |
+| :-- | :-- |
+| `read_gsea_result_csv()` | Reads and validates one completed GSEA result table, with optional source-column mapping. |
+| `plot_gsea_waterfall()` | Ranks positive or negative NES terms and optionally groups or labels them. |
+| `plot_gsea_volcano()` | Shows both NES directions against adjusted-p-value significance in one panel. |
+| `plot_gsea_half_volcano()` | Shows one NES direction with nominal or adjusted p-value on the y-axis. |
+| `plot_gsea_nes_scatter()` | Compares matching term NES values across two GSEA contrasts. |
+
+## Important parameters
 
 The following controls cover the main user decisions. Styling and layout
 arguments remain available in the function definitions.
@@ -125,6 +143,7 @@ arguments remain available in the function definitions.
 
 | Parameter | Practical effect |
 | :-- | :-- |
+| `title` | Uses a direction-specific positive or negative NES waterfall title by default; set it to customize the plot title. |
 | `direction` | Shows positive or negative NES terms. |
 | `top_n` | Retains this many terms after direction filtering and ranking. |
 | `rank_by` | Sets the ordering measure: NES, adjusted p-value, or nominal p-value. |
@@ -158,31 +177,13 @@ arguments remain available in the function definitions.
 All plot functions return `ggplot` objects. They only select rows for display;
 they do not rewrite the supplied GSEA statistics or write files.
 
-## Public API
-
-Each plot function returns a `ggplot` object and does not write files. The
-source files contain the complete argument documentation; the table below is
-the practical overview of the public functions.
-
-| Function | Purpose |
-| :-- | :-- |
-| `read_gsea_result_csv()` | Reads and validates one completed GSEA result table, with optional source-column mapping. |
-| `plot_gsea_waterfall()` | Ranks positive or negative NES terms and optionally groups or labels them. |
-| `plot_gsea_volcano()` | Shows both NES directions against adjusted-p-value significance in one panel. |
-| `plot_gsea_half_volcano()` | Shows one NES direction with nominal or adjusted p-value on the y-axis. |
-| `plot_gsea_nes_scatter()` | Compares matching term NES values across two GSEA contrasts. |
-
-The [GSEA visualization examples shown here](https://zohebkhan1.github.io/gsea-waterfall/)
-walk through the same workflow with copyable calls and figure-specific
-parameter explanations.
-
 ## Citations
 
-1. Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. *PNAS*. 2005. [Link](https://www.pnas.org/doi/10.1073/pnas.0506580102)
-2. Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. *Nature*. 2024;626:881–890. [Link](https://doi.org/10.1038/s41586-023-06984-8)
-3. Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. *Nature Cell Biology*. 2025;27:1411–1421. [Link](https://doi.org/10.1038/s41556-025-01751-5)
-4. Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. *Science*. 2026;392:eaea1259. [Link](https://doi.org/10.1126/science.aea1259)
-5. Risgaard RD, et al. Molecular and cellular processes disrupted in the early postnatal Down syndrome prefrontal cortex. *Science*. 2026;392:eaea1549. [Link](https://doi.org/10.1126/science.aea1549)
+1. Subramanian A, Tamayo P, Mootha VK, et al. [Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles](https://www.pnas.org/doi/10.1073/pnas.0506580102). *PNAS*. 2005.
+2. Ciceri G, Baggiolini A, Cho HS, et al. [An epigenetic barrier sets the timing of human neuronal maturation](https://doi.org/10.1038/s41586-023-06984-8). *Nature*. 2024;626:881–890.
+3. Xu N, Cho HS, Hackland JOS, et al. [Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing](https://doi.org/10.1038/s41556-025-01751-5). *Nature Cell Biology*. 2025;27:1411–1421.
+4. Vuong CK, Weber A, Seong P, et al. [A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex](https://doi.org/10.1126/science.aea1259). *Science*. 2026;392:eaea1259.
+5. Risgaard RD, et al. [Molecular and cellular processes disrupted in the early postnatal Down syndrome prefrontal cortex](https://doi.org/10.1126/science.aea1549). *Science*. 2026;392:eaea1549.
 
 The [`fgsea`](https://bioconductor.org/packages/fgsea/) package is one source
 of precomputed tables compatible with this plotting contract.

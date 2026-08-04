@@ -24,7 +24,6 @@ knitr::opts_chunk$set(
 <div><span>Compiled:</span> 2026-08-02</div>
 <div><span>Environment:</span> R version 4.6.1 (2026-06-24)</div>
 <div><span>Bioconductor:</span> 3.23</div>
-<div><span>Example:</span> GSE122380 GO biological-process GSEA contrasts</div>
 <div><span>Source:</span> <a href="https://github.com/ZohebKhan1/gsea-waterfall">GitHub repository</a></div>
 </div>
 </div>
@@ -41,13 +40,6 @@ The examples use fixed GO biological-process results from the GSE122380
 cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
 group, and label displayed rows; significance classes use the explicit
 adjusted-p-value cutoff without altering the supplied statistics.
-
-The code below is the user-facing workflow. The exact export settings used to
-produce the bundled SVG files are maintained in `R/01_generate_gsea_figures.R`;
-the tutorial keeps those export-only styling details out of the main workflow.
-The figures below are the bundled examples produced by that export script, so
-their labels and category seeds may be more specific than the compact calls
-shown here.
 
 ## Example data and preprocessing
 
@@ -83,7 +75,7 @@ citations are provided at the end of this tutorial.
 Install the plotting dependencies once:
 
 ```r
-install.packages(c('ggplot2', 'ggrepel', 'RColorBrewer', 'scales'))
+install.packages(c('ggplot2', 'ggrepel', 'scales'))
 ```
 
 Download and source the consolidated plotting file:
@@ -151,7 +143,7 @@ print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
 
 `plot_gsea_waterfall()` selects one NES direction, ranks by `NES`, `padj`, `pvalue`, or `pval`, and retains `top_n` terms. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
 
-For the bundled waterfall figures, classifications use caller-defined keyword
+For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
 ribosomal, mitotic, and DNA-replication terms; unmatched terms remain `Other`.
 
@@ -206,7 +198,7 @@ cat('<div id="fig-negative-waterfall" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Bundled negative NES example with caller-defined ribosomal, mitotic, and DNA-replication term groups.</div>
+<div class="tutorial-figure-caption"><strong>Figure 2.</strong> Negative NES terms ranked by NES, with caller-defined ribosomal, mitotic, and DNA-replication term groups.</div>
 
 # Volcano plots
 
@@ -258,7 +250,7 @@ cat('<div id="fig-positive-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Bundled positive NES half-volcano with caller-defined term groups and labels.</div>
+<div class="tutorial-figure-caption"><strong>Figure 4.</strong> Positive NES half-volcano with caller-defined term groups and labels.</div>
 
 ```r
 negative_half_volcano_plot <- plot_gsea_half_volcano(
@@ -277,7 +269,7 @@ cat('<div id="fig-negative-half-volcano" class="figure-anchor"></div>\n')
 knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg')
 ```
 
-<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Bundled negative NES half-volcano with caller-defined term groups and labels.</div>
+<div class="tutorial-figure-caption"><strong>Figure 5.</strong> Negative NES half-volcano with caller-defined term groups and labels.</div>
 
 # Comparative NES scatterplot
 

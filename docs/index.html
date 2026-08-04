@@ -206,9 +206,6 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 <span>Bioconductor:</span> 3.23
 </div>
 <div>
-<span>Example:</span> GSE122380 GO biological-process GSEA contrasts
-</div>
-<div>
 <span>Source:</span> <a href="https://github.com/ZohebKhan1/gsea-waterfall">GitHub repository</a>
 </div>
 </div>
@@ -224,12 +221,6 @@ supplied statistics or write files.</p>
 cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
 group, and label displayed rows; significance classes use the explicit
 adjusted-p-value cutoff without altering the supplied statistics.</p>
-<p>The code below is the user-facing workflow. The exact export settings used to
-produce the bundled SVG files are maintained in <code>R/01_generate_gsea_figures.R</code>;
-the tutorial keeps those export-only styling details out of the main workflow.
-The figures below are the bundled examples produced by that export script, so
-their labels and category seeds may be more specific than the compact calls
-shown here.</p>
 <div id="example-data-and-preprocessing" class="section level2 hasAnchor" number="1.1">
 <h2><span class="header-section-number">1.1</span> Example data and preprocessing<a href="#example-data-and-preprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The bundled tables are derived from the public <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO accession
@@ -261,7 +252,7 @@ citations are provided at the end of this tutorial.</p>
 <div id="install-and-source" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">2</span> Install and source<a href="#install-and-source" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Install the plotting dependencies once:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;RColorBrewer&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
 <p>Download and source the consolidated plotting file:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">download.file</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R&#39;</span>,</span>
@@ -345,7 +336,7 @@ tables.</p>
 <div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code>, <code>padj</code>, <code>pvalue</code>, or <code>pval</code>, and retains <code>top_n</code> terms. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
-<p>For the bundled waterfall figures, classifications use caller-defined keyword
+<p>For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
 ribosomal, mitotic, and DNA-replication terms; unmatched terms remain <code>Other</code>.</p>
 <div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
@@ -392,7 +383,7 @@ shown.</p>
 </div>
 <p><img src="assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES waterfall for Cardiomyocyte versus Mesoderm" width="80%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 2.</strong> Bundled negative NES example with caller-defined ribosomal, mitotic, and DNA-replication term groups.
+<strong>Figure 2.</strong> Negative NES terms ranked by NES, with caller-defined ribosomal, mitotic, and DNA-replication term groups.
 </div>
 </div>
 </div>
@@ -438,7 +429,7 @@ continues to use <code>padj_cutoff</code>.</p>
 </div>
 <p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_positive.svg" alt="Positive NES half-volcano for Cardiomyocyte versus Mesoderm" width="72%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 4.</strong> Bundled positive NES half-volcano with caller-defined term groups and labels.
+<strong>Figure 4.</strong> Positive NES half-volcano with caller-defined term groups and labels.
 </div>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
@@ -454,7 +445,7 @@ continues to use <code>padj_cutoff</code>.</p>
 </div>
 <p><img src="assets/figures/GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg" alt="Negative NES half-volcano for Cardiomyocyte versus Mesoderm" width="72%" style="display: block; margin: auto;" /></p>
 <div class="tutorial-figure-caption">
-<strong>Figure 5.</strong> Bundled negative NES half-volcano with caller-defined term groups and labels.
+<strong>Figure 5.</strong> Negative NES half-volcano with caller-defined term groups and labels.
 </div>
 </div>
 </div>

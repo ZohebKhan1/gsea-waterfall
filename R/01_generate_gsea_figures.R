@@ -61,7 +61,7 @@ nes_scatter_figure_height = 6.38
 gsea_padj_cutoff = 0.05
 waterfall_top_n = 100L
 half_volcano_inner_nes_limit = 1
-waterfall_point_size = 1.30
+waterfall_point_size = 1.80
 volcano_point_size = 1.30
 half_volcano_point_size = 1.60
 nes_scatter_point_size = 1.30
@@ -88,19 +88,12 @@ negative_term_groups <- list(
     'spindle', 'Mitotic', 'Meiotic'),
   'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
 
-negative_term_group_colors <- c(
-  'Ribosomal' = '#377EB8',
-  'Mitosis' = '#984EA3',
-  'DNA replication' = '#E41A1C')
-
 positive_waterfall_label_terms <- c(
   'myofibril assembly',
-  'cardiac muscle contraction',
   'cardiac muscle cell action potential',
   'calcium-mediated signaling',
   'electron transport chain',
   'muscle cell differentiation',
-  'ATP metabolic process',
   'cardiac cell development',
   'cardiac chamber morphogenesis',
   'muscle contraction',
@@ -111,7 +104,6 @@ positive_waterfall_label_terms <- c(
   'heart trabecula morphogenesis')
 
 volcano_label_terms <- c(
-  'cardiac muscle contraction',
   'muscle cell differentiation',
   'cardiac chamber morphogenesis',
   'heart growth',
@@ -124,7 +116,6 @@ volcano_label_terms <- c(
 
 positive_half_volcano_label_terms <- c(
   'myofibril assembly',
-  'cardiac muscle contraction',
   'cardiac muscle cell action potential',
   'electron transport chain',
   'muscle cell differentiation',
@@ -235,7 +226,7 @@ save_gsea_figure(
     direction = 'positive',
     top_n = waterfall_top_n,
     rank_by = 'NES',
-    x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
+    x_label = 'Ranked GO terms by NES',
     label_terms = positive_waterfall_label_terms,
     term_groups = positive_term_groups,
     point_size = waterfall_point_size,
@@ -252,10 +243,9 @@ save_gsea_figure(
     direction = 'negative',
     top_n = waterfall_top_n,
     rank_by = 'NES',
-    x_label = 'Ranked GO terms by NES for Cardiomyocyte vs. Mesoderm',
+    x_label = 'Ranked GO terms by NES',
     label_n = 10L,
     term_groups = negative_term_groups,
-    term_group_colors = negative_term_group_colors,
     point_size = waterfall_point_size,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
@@ -305,7 +295,6 @@ save_gsea_figure(
     padj_cutoff = gsea_padj_cutoff,
     label_terms = negative_half_volcano_label_terms,
     term_groups = negative_term_groups,
-    term_group_colors = negative_term_group_colors,
     inner_nes_limit = half_volcano_inner_nes_limit,
     contrast_label = gsea_contrast_label,
     point_size = half_volcano_point_size,
