@@ -123,19 +123,21 @@ For comparative plots, use `id_col` with a stable term identifier whenever one
 is available. Without stable IDs, term descriptions must match exactly across
 tables.
 
-Load the bundled examples from the repository root:
+Load the bundled examples:
 
-```r
+```{r input-data-preview, echo=TRUE}
+source('../functions/gsea_visualizations.R')
+
 gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
-  'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv'
+  'data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv'
 )
 
 gsea_day9_vs_day6 <- read_gsea_result_csv(
-  'tutorial/data/GSE122380_gsea_day9_vs_day6.csv'
+  'data/GSE122380_gsea_day9_vs_day6.csv'
 )
 
 gsea_day3_vs_day1 <- read_gsea_result_csv(
-  'tutorial/data/GSE122380_gsea_day3_vs_day1.csv'
+  'data/GSE122380_gsea_day3_vs_day1.csv'
 )
 
 print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
@@ -152,6 +154,10 @@ ribosomal, mitotic, and DNA-replication terms; unmatched terms remain `Other`.
 ## Positive NES waterfall
 
 ```r
+gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
+  'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv'
+)
+
 positive_term_groups <- list(
   'Cardiac development' = c('cardiac', 'heart', 'muscle'),
   'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')
@@ -182,6 +188,10 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_v
 ## Negative NES waterfall
 
 ```r
+gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
+  'tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv'
+)
+
 negative_term_groups <- list(
   'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
   'Mitosis' = c(
@@ -200,9 +210,7 @@ negative_waterfall_label_terms <- c(
   'regulation of cell cycle phase transition',
   'regulation of mitotic cell cycle phase transition',
   'spliceosomal complex assembly')
-```
 
-```r
 negative_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
   direction = 'negative',
