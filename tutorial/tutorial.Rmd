@@ -1,5 +1,5 @@
 ---
-title: "GSEA waterfall, volcano, and comparative NES plots"
+title: "Gene set enrichment analysis NES waterfall, volcano, and comparative scatter plots visualization functions"
 description: "Standalone R functions for plotting precomputed GSEA results."
 site: bookdown::bookdown_site
 documentclass: book
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 <div class="tutorial-title-block">
-<h1 class="title">GSEA waterfall, volcano, and comparative NES plots</h1>
+<h1 class="title">Gene set enrichment analysis NES waterfall, volcano, and comparative scatter plots visualization functions</h1>
 <div class="tutorial-subtitle">Standalone R functions for visualizing ranked GO biological-process enrichment results.</div>
 
 <div class="tutorial-meta-block">
