@@ -201,7 +201,6 @@ negative_term_groups <- list(
 
 negative_waterfall_label_terms <- c(
   'DNA replication',
-  'rRNA processing',
   'chromosome segregation',
   'double-strand break repair',
   'cell cycle G2/M phase transition',
@@ -241,27 +240,21 @@ Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_ha
 
 ## Symmetric volcano
 
-The example labels eight padj-significant terms across each NES direction, from
+The example labels four padj-significant terms across each NES direction, from
 approximately NES 2 to the most extreme observed value. The same terms are
-used in the directional half-volcano plots.
+used in the symmetric volcano. Directional half-volcano labels are selected
+separately from significant terms assigned to caller-defined groups; `Other`
+and `Not significant` terms are not labeled.
 
 ```r
 negative_volcano_label_terms <- c(
   'DNA-templated DNA replication',
-  'DNA replication',
-  'recombinational repair',
   'double-strand break repair',
-  'RNA-templated DNA biosynthetic process',
   'interstrand cross-link repair',
-  'regulation of double-strand break repair',
   'positive regulation of mitotic cell cycle')
 
 positive_volcano_label_terms <- c(
-  'vacuolar transport',
-  'endocardial cushion development',
-  'tricarboxylic acid cycle',
   'muscle tissue development',
-  'regulation of muscle contraction',
   'heart process',
   'muscle cell development',
   'myofibril assembly')
@@ -269,6 +262,26 @@ positive_volcano_label_terms <- c(
 volcano_label_terms <- c(
   negative_volcano_label_terms,
   positive_volcano_label_terms)
+
+positive_half_volcano_label_terms <- c(
+  'response to oxidative stress',
+  'lipid localization',
+  'ribose phosphate biosynthetic process',
+  'smooth muscle cell proliferation',
+  'cardiac ventricle development',
+  'ATP biosynthetic process',
+  'heart process',
+  'myofibril assembly')
+
+negative_half_volcano_label_terms <- c(
+  'DNA-templated DNA replication',
+  'mitotic cell cycle checkpoint signaling',
+  'spliceosomal tri-snRNP complex assembly',
+  'base-excision repair',
+  'positive regulation of mitotic cell cycle',
+  'negative regulation of telomere maintenance',
+  'regulation of RNA splicing',
+  'DNA-templated transcription elongation')
 ```
 
 ```r
@@ -300,7 +313,7 @@ positive_half_volcano_plot <- plot_gsea_half_volcano(
   direction = 'positive',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_terms = positive_volcano_label_terms,
+  label_terms = positive_half_volcano_label_terms,
   term_groups = positive_term_groups,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'
@@ -325,7 +338,7 @@ negative_half_volcano_plot <- plot_gsea_half_volcano(
   direction = 'negative',
   p_col = 'padj',
   padj_cutoff = 0.05,
-  label_terms = negative_volcano_label_terms,
+  label_terms = negative_half_volcano_label_terms,
   term_groups = negative_term_groups,
   inner_nes_limit = 1,
   contrast_label = 'Cardiomyocyte vs. Mesoderm'

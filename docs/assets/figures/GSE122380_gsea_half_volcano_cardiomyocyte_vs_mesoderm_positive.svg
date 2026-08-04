@@ -1312,22 +1312,24 @@
 <circle cx='159.56' cy='256.08' r='1.71' style='stroke-width: 0.00; stroke: #0055AA; fill: #0055AA;' />
 <circle cx='161.73' cy='256.27' r='1.71' style='stroke-width: 0.00; stroke: #6F4FA3; fill: #6F4FA3;' />
 <line x1='37.46' y1='256.39' x2='522.84' y2='256.39' style='stroke-width: 0.47; stroke-dasharray: 4.00,4.00; stroke-linecap: butt;' />
-<line x1='467.33' y1='35.38' x2='461.51' y2='18.94' style='stroke-width: 0.34;' />
-<line x1='439.38' y1='68.95' x2='430.07' y2='33.55' style='stroke-width: 0.34;' />
-<line x1='479.91' y1='94.24' x2='498.60' y2='66.21' style='stroke-width: 0.34;' />
-<line x1='437.99' y1='131.54' x2='398.89' y2='118.88' style='stroke-width: 0.34;' />
-<line x1='270.48' y1='203.49' x2='269.58' y2='204.02' style='stroke-width: 0.34;' />
-<line x1='351.94' y1='217.95' x2='334.72' y2='216.27' style='stroke-width: 0.34;' />
-<line x1='336.52' y1='242.74' x2='304.62' y2='220.62' style='stroke-width: 0.34;' />
-<text x='467.47' y='43.00' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>muscle cell development</text>
-<text x='391.68' y='25.60' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>muscle tissue development</text>
-<text x='465.44' y='72.43' text-anchor='middle' style='font-size: 8.00px;fill: #2CB11B; font-family: "Nimbus Sans";'>heart process</text>
-<text x='478.37' y='101.86' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>myofibril assembly</text>
-<text x='475.41' y='131.31' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>regulation of muscle</text>
-<text x='475.41' y='139.95' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>contraction</text>
-<text x='278.76' y='201.69' text-anchor='middle' style='font-size: 8.00px;fill: #9E9E9E; font-family: "Nimbus Sans";'>vacuolar transport</text>
-<text x='393.33' y='220.89' text-anchor='middle' style='font-size: 8.00px;fill: #9E9E9E; font-family: "Nimbus Sans";'>tricarboxylic acid cycle</text>
-<text x='359.77' y='250.35' text-anchor='middle' style='font-size: 8.00px;fill: #9E9E9E; font-family: "Nimbus Sans";'>endocardial cushion development</text>
+<line x1='441.08' y1='32.43' x2='431.72' y2='31.60' style='stroke-width: 0.34;' />
+<line x1='383.22' y1='180.50' x2='371.72' y2='170.32' style='stroke-width: 0.34;' />
+<line x1='287.65' y1='171.17' x2='303.93' y2='194.88' style='stroke-width: 0.34;' />
+<line x1='249.97' y1='207.77' x2='241.57' y2='227.42' style='stroke-width: 0.34;' />
+<line x1='213.10' y1='195.62' x2='175.30' y2='246.90' style='stroke-width: 0.34;' />
+<line x1='145.39' y1='214.28' x2='121.92' y2='252.10' style='stroke-width: 0.34;' />
+<line x1='87.46' y1='184.85' x2='115.74' y2='253.08' style='stroke-width: 0.34;' />
+<text x='467.14' y='35.35' text-anchor='middle' style='font-size: 8.00px;fill: #2CB11B; font-family: "Nimbus Sans";'>heart process</text>
+<text x='469.43' y='70.14' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>myofibril assembly</text>
+<text x='429.44' y='184.62' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>ATP biosynthetic process</text>
+<text x='286.20' y='169.37' text-anchor='middle' style='font-size: 8.00px;fill: #2CB11B; font-family: "Nimbus Sans";'>cardiac ventricle development</text>
+<text x='285.67' y='203.25' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>smooth muscle cell</text>
+<text x='285.67' y='211.89' text-anchor='middle' style='font-size: 8.00px;fill: #6F4FA3; font-family: "Nimbus Sans";'>proliferation</text>
+<text x='267.43' y='192.94' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>ribose phosphate biosynthetic</text>
+<text x='267.43' y='201.58' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>process</text>
+<text x='147.03' y='212.48' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>lipid localization</text>
+<text x='86.65' y='174.41' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>response to oxidative</text>
+<text x='86.65' y='183.05' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>stress</text>
 <polyline points='37.46,279.25 37.46,7.97 ' style='stroke-width: 0.51; stroke-linecap: square;' />
 <text x='33.43' y='275.78' text-anchor='end' style='font-size: 8.00px; font-family: "Nimbus Sans";'>0</text>
 <text x='33.43' y='212.44' text-anchor='end' style='font-size: 8.00px; font-family: "Nimbus Sans";'>5</text>

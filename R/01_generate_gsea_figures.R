@@ -90,7 +90,6 @@ negative_term_groups <- list(
 
 negative_waterfall_label_terms <- c(
   'DNA replication',
-  'rRNA processing',
   'chromosome segregation',
   'double-strand break repair',
   'cell cycle G2/M phase transition',
@@ -117,20 +116,12 @@ positive_waterfall_label_terms <- c(
 
 negative_volcano_label_terms <- c(
   'DNA-templated DNA replication',
-  'DNA replication',
-  'recombinational repair',
   'double-strand break repair',
-  'RNA-templated DNA biosynthetic process',
   'interstrand cross-link repair',
-  'regulation of double-strand break repair',
   'positive regulation of mitotic cell cycle')
 
 positive_volcano_label_terms <- c(
-  'vacuolar transport',
-  'endocardial cushion development',
-  'tricarboxylic acid cycle',
   'muscle tissue development',
-  'regulation of muscle contraction',
   'heart process',
   'muscle cell development',
   'myofibril assembly')
@@ -140,10 +131,24 @@ volcano_label_terms <- c(
   positive_volcano_label_terms)
 
 positive_half_volcano_label_terms <- c(
-  positive_volcano_label_terms)
+  'response to oxidative stress',
+  'lipid localization',
+  'ribose phosphate biosynthetic process',
+  'smooth muscle cell proliferation',
+  'cardiac ventricle development',
+  'ATP biosynthetic process',
+  'heart process',
+  'myofibril assembly')
 
 negative_half_volcano_label_terms <- c(
-  negative_volcano_label_terms)
+  'DNA-templated DNA replication',
+  'mitotic cell cycle checkpoint signaling',
+  'spliceosomal tri-snRNP complex assembly',
+  'base-excision repair',
+  'positive regulation of mitotic cell cycle',
+  'negative regulation of telomere maintenance',
+  'regulation of RNA splicing',
+  'DNA-templated transcription elongation')
 
 nes_scatter_label_terms <- c(
   'mesenchyme development',

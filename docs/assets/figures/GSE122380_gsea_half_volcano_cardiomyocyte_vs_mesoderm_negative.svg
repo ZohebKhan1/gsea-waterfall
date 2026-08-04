@@ -576,25 +576,26 @@
 <circle cx='352.60' cy='262.71' r='1.71' style='stroke-width: 0.00; stroke: #DABD61; fill: #DABD61;' />
 <circle cx='363.79' cy='262.72' r='1.71' style='stroke-width: 0.00; stroke: #DABD61; fill: #DABD61;' />
 <line x1='9.96' y1='263.49' x2='495.34' y2='263.49' style='stroke-width: 0.47; stroke-dasharray: 4.00,4.00; stroke-linecap: butt;' />
-<line x1='49.37' y1='27.72' x2='49.31' y2='19.06' style='stroke-width: 0.34;' />
-<line x1='44.26' y1='62.91' x2='34.34' y2='75.48' style='stroke-width: 0.34;' />
-<line x1='116.90' y1='130.77' x2='142.20' y2='125.42' style='stroke-width: 0.34;' />
-<line x1='87.99' y1='157.57' x2='107.22' y2='144.99' style='stroke-width: 0.34;' />
-<line x1='140.68' y1='235.72' x2='180.39' y2='224.09' style='stroke-width: 0.34;' />
-<line x1='249.20' y1='200.75' x2='255.39' y2='226.06' style='stroke-width: 0.34;' />
-<line x1='196.82' y1='259.82' x2='217.77' y2='239.03' style='stroke-width: 0.34;' />
-<line x1='318.30' y1='219.24' x2='294.49' y2='241.15' style='stroke-width: 0.34;' />
-<text x='49.37' y='35.34' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>DNA replication</text>
-<text x='101.84' y='64.63' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>DNA-templated DNA replication</text>
-<text x='68.43' y='133.99' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>double-strand break repair</text>
-<text x='68.50' y='165.18' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>recombinational repair</text>
-<text x='80.33' y='235.36' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>RNA-templated DNA biosynthetic</text>
-<text x='80.33' y='244.00' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>process</text>
-<text x='249.14' y='190.31' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>regulation of double-strand</text>
-<text x='249.14' y='198.95' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>break repair</text>
-<text x='192.08' y='267.44' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>interstrand cross-link repair</text>
-<text x='356.48' y='215.54' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>positive regulation of</text>
-<text x='356.48' y='224.18' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>mitotic cell cycle</text>
+<line x1='54.75' y1='63.26' x2='34.83' y2='76.02' style='stroke-width: 0.34;' />
+<line x1='95.60' y1='162.49' x2='97.18' y2='148.88' style='stroke-width: 0.34;' />
+<line x1='138.30' y1='235.14' x2='160.32' y2='221.94' style='stroke-width: 0.34;' />
+<line x1='204.99' y1='258.21' x2='227.14' y2='240.41' style='stroke-width: 0.34;' />
+<line x1='310.99' y1='201.93' x2='293.76' y2='240.62' style='stroke-width: 0.34;' />
+<line x1='401.65' y1='231.18' x2='384.56' y2='257.89' style='stroke-width: 0.34;' />
+<line x1='414.24' y1='163.90' x2='400.28' y2='259.82' style='stroke-width: 0.34;' />
+<text x='77.55' y='61.46' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>DNA-templated DNA replication</text>
+<text x='57.79' y='165.16' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>mitotic cell cycle</text>
+<text x='57.79' y='173.80' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>checkpoint signaling</text>
+<text x='79.16' y='236.26' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>spliceosomal tri-snRNP complex</text>
+<text x='79.16' y='244.90' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>assembly</text>
+<text x='195.65' y='265.83' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>base-excision repair</text>
+<text x='311.58' y='191.49' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>positive regulation of</text>
+<text x='311.58' y='200.13' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>mitotic cell cycle</text>
+<text x='402.94' y='220.74' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>regulation of RNA</text>
+<text x='402.94' y='229.38' text-anchor='middle' style='font-size: 8.00px;fill: #0055AA; font-family: "Nimbus Sans";'>splicing</text>
+<text x='414.29' y='162.10' text-anchor='middle' style='font-size: 8.00px;fill: #DABD61; font-family: "Nimbus Sans";'>DNA-templated transcription elongation</text>
+<text x='321.38' y='258.80' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>negative regulation of</text>
+<text x='321.38' y='267.44' text-anchor='middle' style='font-size: 8.00px;fill: #BE3428; font-family: "Nimbus Sans";'>telomere maintenance</text>
 <polyline points='495.34,279.25 495.34,7.97 ' style='stroke-width: 0.51; stroke-linecap: square;' />
 <polyline points='497.58,271.53 495.34,271.53 ' style='stroke-width: 0.43; stroke-linecap: butt;' />
 <polyline points='497.58,209.75 495.34,209.75 ' style='stroke-width: 0.43; stroke-linecap: butt;' />

@@ -400,24 +400,23 @@ each seed is matched case-insensitively against term IDs or descriptions.</p>
 <span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
 <span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>negative_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="st">&#39;rRNA processing&#39;</span>,</span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="st">&#39;chromosome segregation&#39;</span>,</span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="st">&#39;cell cycle G2/M phase transition&#39;</span>,</span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="st">&#39;regulation of cell cycle phase transition&#39;</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="st">&#39;regulation of mitotic cell cycle phase transition&#39;</span>,</span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  <span class="st">&#39;spliceosomal complex assembly&#39;</span>)</span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a></span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
-<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>)</span></code></pre></div>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="st">&#39;chromosome segregation&#39;</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="st">&#39;cell cycle G2/M phase transition&#39;</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="st">&#39;regulation of cell cycle phase transition&#39;</span>,</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="st">&#39;regulation of mitotic cell cycle phase transition&#39;</span>,</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="st">&#39;spliceosomal complex assembly&#39;</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>)</span></code></pre></div>
 <p>Use <code>rank_by = 'padj'</code> when adjusted-p-value ranking, rather than NES magnitude,
 should determine the displayed order. <code>rank_by = 'pvalue'</code> is available when an
 optional nominal <code>pval</code> column is supplied. <code>label_n</code> selects labels
@@ -437,32 +436,46 @@ specific terms should be shown.</p>
 <p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for a directional view. All examples use the established adjusted p-value cutoff of 0.05.</p>
 <div id="symmetric-volcano" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Symmetric volcano<a href="#symmetric-volcano" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The example labels eight padj-significant terms across each NES direction, from
+<p>The example labels four padj-significant terms across each NES direction, from
 approximately NES 2 to the most extreme observed value. The same terms are
-used in the directional half-volcano plots.</p>
+used in the symmetric volcano. Directional half-volcano labels are selected
+separately from significant terms assigned to caller-defined groups; <code>Other</code>
+and <code>Not significant</code> terms are not labeled.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>negative_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="st">&#39;recombinational repair&#39;</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="st">&#39;RNA-templated DNA biosynthetic process&#39;</span>,</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="st">&#39;interstrand cross-link repair&#39;</span>,</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="st">&#39;regulation of double-strand break repair&#39;</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  <span class="st">&#39;vacuolar transport&#39;</span>,</span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="st">&#39;endocardial cushion development&#39;</span>,</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  <span class="st">&#39;tricarboxylic acid cycle&#39;</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="st">&#39;muscle tissue development&#39;</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="st">&#39;regulation of muscle contraction&#39;</span>,</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="st">&#39;muscle cell development&#39;</span>,</span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a></span>
-<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  negative_volcano_label_terms,</span>
-<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  positive_volcano_label_terms)</span></code></pre></div>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="st">&#39;interstrand cross-link repair&#39;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="st">&#39;muscle tissue development&#39;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="st">&#39;muscle cell development&#39;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  negative_volcano_label_terms,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  positive_volcano_label_terms)</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>positive_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="st">&#39;response to oxidative stress&#39;</span>,</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="st">&#39;lipid localization&#39;</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="st">&#39;ribose phosphate biosynthetic process&#39;</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="st">&#39;smooth muscle cell proliferation&#39;</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="st">&#39;cardiac ventricle development&#39;</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  <span class="st">&#39;ATP biosynthetic process&#39;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>negative_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>  <span class="st">&#39;mitotic cell cycle checkpoint signaling&#39;</span>,</span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>  <span class="st">&#39;spliceosomal tri-snRNP complex assembly&#39;</span>,</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>  <span class="st">&#39;base-excision repair&#39;</span>,</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>  <span class="st">&#39;negative regulation of telomere maintenance&#39;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>  <span class="st">&#39;regulation of RNA splicing&#39;</span>,</span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>  <span class="st">&#39;DNA-templated transcription elongation&#39;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>symmetric_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
@@ -487,7 +500,7 @@ want to label exact terms.</p>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
 <span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
 <span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_volcano_label_terms,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_half_volcano_label_terms,</span>
 <span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
 <span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
 <span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
@@ -507,7 +520,7 @@ is supplied; significance coloring continues to use <code>padj_cutoff</code>.</p
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
 <span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_volcano_label_terms,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_half_volcano_label_terms,</span>
 <span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
 <span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
 <span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
