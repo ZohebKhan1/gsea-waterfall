@@ -28,15 +28,10 @@
 # - docs/assets/**
 # ----
 
-# 0.0 verify project root -----------------
-
-
 # 1.0 replace the generated GitHub Pages site -----------------
 
-# remove only bookdown-owned site artifacts before regeneration
-unlink(c('docs/index.html', 'docs/search_index.json', 'docs/style.css'))
-unlink('docs/libs', recursive = TRUE)
-unlink('docs/assets', recursive = TRUE)
+# remove stale copied dependencies and assets before regeneration
+unlink(c('docs/libs', 'docs/assets'), recursive = TRUE)
 
 bookdown::render_book(
   input = 'tutorial',

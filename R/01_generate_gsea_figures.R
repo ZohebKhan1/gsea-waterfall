@@ -65,7 +65,7 @@ nes_scatter_point_size = 1.30
 
 # 1.1 define labels, groupings for all plots -----------------
 
-# waterfall plot labeling/categorization 
+## waterfall plot labeling/categorization
 
 gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
@@ -122,7 +122,7 @@ negative_waterfall_label_terms <- c(
   'spliceosomal complex assembly'
 )
 
-# symmetrical volcano plot GO term labels
+## symmetrical volcano plot GO term labels
 
 positive_volcano_label_terms <- c(
   'muscle tissue development',
@@ -137,14 +137,12 @@ negative_volcano_label_terms <- c(
   'interstrand cross-link repair',
   'positive regulation of mitotic cell cycle'
 )
-
-
 volcano_label_terms <- c(
   negative_volcano_label_terms,
   positive_volcano_label_terms
 )
 
-# half volcano plot GO term labels
+## half volcano plot GO term labels
 
 positive_half_volcano_label_terms <- c(
   'response to oxidative stress',
@@ -167,6 +165,8 @@ negative_half_volcano_label_terms <- c(
   'regulation of RNA splicing',
   'DNA-templated transcription elongation'
 )
+
+## comparative NES scatterplot GO term labels
 
 nes_scatter_label_terms <- c(
   'mesenchyme development',
@@ -255,6 +255,7 @@ save_gsea_figure <- function(plot, figure_path, figure_width, figure_height) {
 save_gsea_figure(
   plot = plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_threshold = gsea_padj_cutoff,
     direction = 'positive',
     top_n = waterfall_top_n,
     rank_by = 'NES',
@@ -272,6 +273,7 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_threshold = gsea_padj_cutoff,
     direction = 'negative',
     top_n = waterfall_top_n,
     rank_by = 'NES',
@@ -289,6 +291,7 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_threshold = gsea_padj_cutoff,
     padj_cutoff = gsea_padj_cutoff,
     label_terms = volcano_label_terms,
     contrast_label = gsea_contrast_label,
@@ -304,6 +307,7 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_threshold = gsea_padj_cutoff,
     direction = 'positive',
     p_col = 'padj',
     padj_cutoff = gsea_padj_cutoff,
@@ -322,6 +326,7 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+    padj_threshold = gsea_padj_cutoff,
     direction = 'negative',
     p_col = 'padj',
     padj_cutoff = gsea_padj_cutoff,
@@ -334,7 +339,6 @@ save_gsea_figure(
   figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg'),
-  
   figure_width = half_volcano_figure_width,
   figure_height = half_volcano_figure_height)
 
@@ -342,6 +346,7 @@ save_gsea_figure(
   plot = plot_gsea_nes_scatter(
     gsea_x = gsea_day9_vs_day6,
     gsea_y = gsea_day3_vs_day1,
+    padj_threshold = gsea_padj_cutoff,
     x_label = 'Day 9 vs. Day 6 NES',
     y_label = 'Day 3 vs. Day 1 NES',
     color_by = 'significance',

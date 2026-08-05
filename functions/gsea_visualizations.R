@@ -23,11 +23,11 @@
 
 # independently supplied GSEA tables require an explicit unique term key
 .gsea_standardize_results <- function(gsea_results,
-                                      term_col = 'go_description',
-                                      nes_col = 'NES',
-                                      pvalue_col = NULL,
-                                      padj_col = 'padj',
-                                      id_col = NULL) {
+  term_col = 'go_description',
+  nes_col = 'NES',
+  pvalue_col = NULL,
+  padj_col = 'padj',
+  id_col = NULL) {
   if (is.null(id_col) && 'go_term_id' %in% names(gsea_results)) {
     id_col <- 'go_term_id'
   }
@@ -87,11 +87,11 @@
     stringsAsFactors = FALSE)
 
   if (anyNA(plot_data$NES) || anyNA(plot_data$padj) ||
-    any(!is.finite(plot_data$NES)) || any(!is.finite(plot_data$padj))) {
+      any(!is.finite(plot_data$NES)) || any(!is.finite(plot_data$padj))) {
     stop('GSEA term, NES, and adjusted p-value columns must be complete and finite.', call. = FALSE)
   }
   if (!all(is.na(plot_data$pvalue)) &&
-    (anyNA(plot_data$pvalue) || any(!is.finite(plot_data$pvalue)))) {
+      (anyNA(plot_data$pvalue) || any(!is.finite(plot_data$pvalue)))) {
     stop('The optional nominal p-value column must be complete and finite when supplied.', call. = FALSE)
   }
   invalid_probability <- plot_data$padj < 0 | plot_data$padj > 1
@@ -128,11 +128,11 @@
 #'   no nominal p-value column was supplied.
 #'
 read_gsea_result_csv <- function(path,
-                                 term_col = 'go_description',
-                                 nes_col = 'NES',
-                                 pvalue_col = NULL,
-                                 padj_col = 'padj',
-                                 id_col = NULL) {
+  term_col = 'go_description',
+  nes_col = 'NES',
+  pvalue_col = NULL,
+  padj_col = 'padj',
+  id_col = NULL) {
   .gsea_standardize_results(
     gsea_results = utils::read.csv(path, stringsAsFactors = FALSE, check.names = FALSE),
     term_col = term_col,
@@ -192,20 +192,37 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_validate_number <- function(value,
-                                  parameter_name,
-                                  minimum = -Inf,
-                                  maximum = Inf) {
+  parameter_name,
+  minimum = -Inf,
+  maximum = Inf) {
   if (length(value) != 1L || !is.numeric(value) || is.na(value) ||
-    !is.finite(value) || value < minimum || value > maximum) {
+      !is.finite(value) || value < minimum || value > maximum) {
     stop('`', parameter_name, '` has an invalid numeric value.', call. = FALSE)
   }
   as.numeric(value)
 }
 
+.gsea_filter_by_padj <- function(plot_tbl,
+  padj_threshold,
+  padj_cols = 'padj') {
+  if (is.null(padj_threshold)) {
+    return(plot_tbl)
+  }
+  padj_threshold <- .gsea_validate_number(
+    padj_threshold,
+    'padj_threshold',
+    minimum = 0,
+    maximum = 1)
+  keep_rows <- Reduce(
+    `|`,
+    lapply(padj_cols, function(padj_col) plot_tbl[[padj_col]] < padj_threshold))
+  plot_tbl[keep_rows, , drop = FALSE]
+}
+
 .gsea_validate_count <- function(value, parameter_name, minimum = 0L) {
   if (length(value) != 1L || !is.numeric(value) || is.na(value) ||
-    !is.finite(value) || value != floor(value) || value < minimum ||
-    value > .Machine$integer.max) {
+      !is.finite(value) || value != floor(value) || value < minimum ||
+      value > .Machine$integer.max) {
     stop('`', parameter_name, '` must be an integer of at least ', minimum, '.', call. = FALSE)
   }
   as.integer(value)
@@ -251,8 +268,8 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_resolve_named_colors <- function(color_values,
-                                       required_names,
-                                       parameter_name) {
+  required_names,
+  parameter_name) {
   if (is.null(color_values)) {
     return(NULL)
   }
@@ -272,7 +289,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_resolve_term_group_colors <- function(term_groups = NULL,
-                                            term_group_colors = NULL) {
+  term_group_colors = NULL) {
   if (is.null(term_groups)) {
     return(c('Other' = .gsea_neutral_color))
   }
@@ -289,7 +306,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_wrap_label <- function(labels,
-                             words_per_line = 2L) {
+  words_per_line = 2L) {
   words_per_line <- .gsea_validate_count(words_per_line, 'label_words_per_line', minimum = 1L)
 
   vapply(as.character(labels), function(label) {
@@ -305,8 +322,8 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_split_point_layers <- function(plot_tbl,
-                                     group_col,
-                                     background_groups) {
+  group_col,
+  background_groups) {
   group_values <- as.character(plot_tbl[[group_col]])
   background_rows <- is.na(group_values) | group_values %in% background_groups
   list(
@@ -320,7 +337,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_match_term_groups <- function(gsea_results,
-                                    term_groups) {
+  term_groups) {
   .gsea_validate_term_groups(term_groups)
 
   match_text_seed <- function(seed, descriptions) {
@@ -346,7 +363,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_assign_term_groups <- function(gsea_results,
-                                     term_groups = NULL) {
+  term_groups = NULL) {
   if (is.null(term_groups)) {
     return(.gsea_classify_terms(gsea_results$go_description))
   }
@@ -357,9 +374,9 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_select_labels <- function(plot_tbl,
-                                label_terms = NULL,
-                                label_n = 0L,
-                                rank_col = NULL) {
+  label_terms = NULL,
+  label_n = 0L,
+  rank_col = NULL) {
   if (nrow(plot_tbl) == 0L) {
     return(plot_tbl[0L, , drop = FALSE])
   }
@@ -420,7 +437,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_select_volcano_labels <- function(plot_tbl,
-                                        label_n = 12L) {
+  label_n = 12L) {
   if (label_n <= 0L || nrow(plot_tbl) == 0L) {
     return(plot_tbl[0L, , drop = FALSE])
   }
@@ -447,9 +464,9 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_geom_text_repel <- function(data,
-                                  mapping,
-                                  label_color = NULL,
-                                  ...) {
+  mapping,
+  label_color = NULL,
+  ...) {
   layer_args <- list(data = data, mapping = mapping, ...)
   if (!is.null(label_color)) {
     layer_args$color <- label_color
@@ -466,8 +483,8 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_rank_direction_terms <- function(plot_tbl,
-                                       direction,
-                                       rank_by = 'NES') {
+  direction,
+  rank_by = 'NES') {
   if (rank_by == 'NES') {
     if (direction == 'positive') {
       return(plot_tbl[order(-plot_tbl$NES, plot_tbl$padj, plot_tbl$go_description), , drop = FALSE])
@@ -481,7 +498,7 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_axis_limits <- function(values,
-                              buffer_fraction = 0.045) {
+  buffer_fraction = 0.045) {
   value_range <- range(values)
   value_span <- diff(value_range)
   if (value_span == 0) {
@@ -491,9 +508,9 @@ read_gsea_result_csv <- function(path,
 }
 
 .gsea_resolve_axis_limits <- function(values,
-                                      lower = NULL,
-                                      upper = NULL,
-                                      buffer_fraction = 0.18) {
+  lower = NULL,
+  upper = NULL,
+  buffer_fraction = 0.18) {
   axis_limits <- .gsea_axis_limits(values, buffer_fraction = buffer_fraction)
   if (!is.null(lower)) {
     axis_limits[[1L]] <- lower
@@ -535,6 +552,9 @@ read_gsea_result_csv <- function(path,
 #'   needed only when `rank_by = 'pvalue'` and the input does not already use
 #'   the standardized `pval` column.
 #' @param padj_col Column containing adjusted p-values.
+#' @param padj_threshold Optional adjusted p-value threshold applied before
+#'   direction filtering, ranking, and plotting. Terms must satisfy
+#'   `padj < padj_threshold`. Use `NULL` to disable this filter.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
 #' @param direction Direction to plot.
@@ -571,32 +591,33 @@ read_gsea_result_csv <- function(path,
 #' @return A ggplot object without file-system side effects
 #'
 plot_gsea_waterfall <- function(gsea_results,
-                                term_col = 'go_description',
-                                nes_col = 'NES',
-                                pvalue_col = NULL,
-                                padj_col = 'padj',
-                                id_col = NULL,
-                                direction = c('positive', 'negative'),
-                                top_n = 100L,
-                                rank_by = c('NES', 'padj', 'pvalue', 'pval'),
-                                x_label = NULL,
-                                title = NULL,
-                                label_terms = NULL,
-                                label_ranks = NULL,
-                                label_n = 12L,
-                                term_groups = NULL,
-                                term_group_colors = NULL,
-                                point_size = 1.8,
-                                label_size = 8.0,
-                                label_fontface = 'plain',
-                                label_words_per_line = 2L,
-                                label_repel_direction = 'y',
-                                label_x_nudge = NULL,
-                                label_y_nudge_fraction = 0.11,
-                                y_min = NULL,
-                                y_max = NULL,
-                                legend_position = NULL,
-                                font_family = 'Nimbus Sans') {
+  term_col = 'go_description',
+  nes_col = 'NES',
+  pvalue_col = NULL,
+  padj_col = 'padj',
+  padj_threshold = NULL,
+  id_col = NULL,
+  direction = c('positive', 'negative'),
+  top_n = 100L,
+  rank_by = c('NES', 'padj', 'pvalue', 'pval'),
+  x_label = NULL,
+  title = NULL,
+  label_terms = NULL,
+  label_ranks = NULL,
+  label_n = 12L,
+  term_groups = NULL,
+  term_group_colors = NULL,
+  point_size = 1.8,
+  label_size = 8.0,
+  label_fontface = 'plain',
+  label_words_per_line = 2L,
+  label_repel_direction = 'y',
+  label_x_nudge = NULL,
+  label_y_nudge_fraction = 0.11,
+  y_min = NULL,
+  y_max = NULL,
+  legend_position = NULL,
+  font_family = 'Nimbus Sans') {
   direction <- match.arg(direction)
   rank_by <- .gsea_normalize_rank_by(rank_by)
   top_n <- .gsea_validate_count(top_n, 'top_n', minimum = 1L)
@@ -606,9 +627,9 @@ plot_gsea_waterfall <- function(gsea_results,
   }
   .gsea_validate_limits(y_min, y_max, 'y_min', 'y_max')
   if (!is.null(label_ranks) &&
-    (!is.numeric(label_ranks) || anyNA(label_ranks) ||
-      any(!is.finite(label_ranks)) || any(label_ranks != floor(label_ranks)) ||
-      any(label_ranks < 1) || any(label_ranks > .Machine$integer.max))) {
+      (!is.numeric(label_ranks) || anyNA(label_ranks) ||
+          any(!is.finite(label_ranks)) || any(label_ranks != floor(label_ranks)) ||
+          any(label_ranks < 1) || any(label_ranks > .Machine$integer.max))) {
     stop('`label_ranks` must contain positive integers.', call. = FALSE)
   }
   gsea_results <- .gsea_standardize_results(
@@ -618,6 +639,9 @@ plot_gsea_waterfall <- function(gsea_results,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
+  gsea_results <- .gsea_filter_by_padj(
+    plot_tbl = gsea_results,
+    padj_threshold = padj_threshold)
   if (rank_by == 'pvalue' && all(is.na(gsea_results$pvalue))) {
     stop("`rank_by = 'pvalue'` requires an optional nominal p-value column.", call. = FALSE)
   }
@@ -629,7 +653,9 @@ plot_gsea_waterfall <- function(gsea_results,
   }
 
   if (nrow(plot_tbl) == 0L) {
-    stop('No GSEA terms remain for the requested direction.', call. = FALSE)
+    stop(
+      'No GSEA terms remain after applying the adjusted p-value threshold and requested direction.',
+      call. = FALSE)
   }
 
   plot_tbl <- .gsea_rank_direction_terms(plot_tbl, direction = direction, rank_by = rank_by)
@@ -759,6 +785,9 @@ plot_gsea_waterfall <- function(gsea_results,
 #' @param term_col Column containing term descriptions and the fallback key.
 #' @param nes_col Column containing normalized enrichment scores.
 #' @param padj_col Column containing adjusted p-values.
+#' @param padj_threshold Optional adjusted p-value threshold applied before
+#'   plotting. Terms must satisfy `padj < padj_threshold`. Use `NULL` to retain
+#'   all terms and use `padj_cutoff` only for significance classes.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
 #' @param padj_cutoff Adjusted p-value cutoff for coloring and shaded regions.
@@ -784,26 +813,27 @@ plot_gsea_waterfall <- function(gsea_results,
 #' @return A ggplot object without file-system side effects
 #'
 plot_gsea_volcano <- function(gsea_results,
-                              term_col = 'go_description',
-                              nes_col = 'NES',
-                              padj_col = 'padj',
-                              id_col = NULL,
-                              padj_cutoff = 0.05,
-                              label_n = 14L,
-                              label_terms = NULL,
-                              y_max = 25,
-                              y_min = 0,
-                              point_size = 1.3,
-                              point_colors = NULL,
-                              label_size = 8.0,
-                              label_color = NULL,
-                              label_nudge_x = 0.18,
-                              label_nudge_y = 0,
-                              count_label_size = 9,
-                              contrast_label = NULL,
-                              label_words_per_line = 3L,
-                              legend_position = 'top',
-                              font_family = 'Nimbus Sans') {
+  term_col = 'go_description',
+  nes_col = 'NES',
+  padj_col = 'padj',
+  padj_threshold = NULL,
+  id_col = NULL,
+  padj_cutoff = 0.05,
+  label_n = 14L,
+  label_terms = NULL,
+  y_max = 25,
+  y_min = 0,
+  point_size = 1.3,
+  point_colors = NULL,
+  label_size = 8.0,
+  label_color = NULL,
+  label_nudge_x = 0.18,
+  label_nudge_y = 0,
+  count_label_size = 9,
+  contrast_label = NULL,
+  label_words_per_line = 3L,
+  legend_position = 'top',
+  font_family = 'Nimbus Sans') {
   padj_cutoff <- .gsea_validate_number(
     padj_cutoff,
     'padj_cutoff',
@@ -820,6 +850,12 @@ plot_gsea_volcano <- function(gsea_results,
     nes_col = nes_col,
     padj_col = padj_col,
     id_col = id_col)
+  plot_tbl <- .gsea_filter_by_padj(
+    plot_tbl = plot_tbl,
+    padj_threshold = padj_threshold)
+  if (nrow(plot_tbl) == 0L) {
+    stop('No GSEA terms remain after applying the adjusted p-value threshold.', call. = FALSE)
+  }
   plot_tbl$neg_log10_padj <- .gsea_neg_log10(plot_tbl$padj)
   plot_tbl$plot_neg_log10_padj <- pmin(plot_tbl$neg_log10_padj, y_max)
   plot_tbl$significant <- plot_tbl$padj < padj_cutoff
@@ -949,7 +985,7 @@ plot_gsea_volcano <- function(gsea_results,
       linewidth = 0,
       label.padding = grid::unit(0.12, 'lines'),
       label.r = grid::unit(0.08, 'lines')) +
-    ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
+    ggplot2::scale_color_manual(values = color_values, drop = TRUE) +
     ggplot2::scale_x_continuous(
       trans = scales::pseudo_log_trans(sigma = 1),
       breaks = scales::breaks_pretty(n = 7)(x_limits),
@@ -994,6 +1030,9 @@ plot_gsea_volcano <- function(gsea_results,
 #'   needed only when `p_col = 'pvalue'` and the input does not already use the
 #'   standardized `pval` column.
 #' @param padj_col Column containing adjusted p-values.
+#' @param padj_threshold Optional adjusted p-value threshold applied before
+#'   direction and NES-boundary filtering. Terms must satisfy
+#'   `padj < padj_threshold`. Use `NULL` to disable this filter.
 #' @param id_col Optional column containing unique stable term identifiers;
 #'   overrides an existing `go_term_id` column.
 #' @param direction NES direction to plot.
@@ -1021,29 +1060,30 @@ plot_gsea_volcano <- function(gsea_results,
 #' @return A ggplot object without file-system side effects
 #'
 plot_gsea_half_volcano <- function(gsea_results,
-                                   term_col = 'go_description',
-                                   nes_col = 'NES',
-                                   pvalue_col = NULL,
-                                   padj_col = 'padj',
-                                   id_col = NULL,
-                                   direction = c('positive', 'negative'),
-                                   p_col = 'padj',
-                                   padj_cutoff = 0.05,
-                                   label_n = 12L,
-                                   label_terms = NULL,
-                                   term_groups = NULL,
-                                   term_group_colors = NULL,
-                                   inner_nes_limit = 1,
-                                   point_size = 1.6,
-                                   point_colors = NULL,
-                                   label_size = 8.0,
-                                   label_color = NULL,
-                                   contrast_label = NULL,
-                                   label_words_per_line = 3L,
-                                   y_min = NULL,
-                                   y_max = NULL,
-                                   legend_position = NULL,
-                                   font_family = 'Nimbus Sans') {
+  term_col = 'go_description',
+  nes_col = 'NES',
+  pvalue_col = NULL,
+  padj_col = 'padj',
+  padj_threshold = NULL,
+  id_col = NULL,
+  direction = c('positive', 'negative'),
+  p_col = 'padj',
+  padj_cutoff = 0.05,
+  label_n = 12L,
+  label_terms = NULL,
+  term_groups = NULL,
+  term_group_colors = NULL,
+  inner_nes_limit = 1,
+  point_size = 1.6,
+  point_colors = NULL,
+  label_size = 8.0,
+  label_color = NULL,
+  contrast_label = NULL,
+  label_words_per_line = 3L,
+  y_min = NULL,
+  y_max = NULL,
+  legend_position = NULL,
+  font_family = 'Nimbus Sans') {
   direction <- match.arg(direction)
   padj_cutoff <- .gsea_validate_number(
     padj_cutoff,
@@ -1066,6 +1106,9 @@ plot_gsea_half_volcano <- function(gsea_results,
     pvalue_col = pvalue_col,
     padj_col = padj_col,
     id_col = id_col)
+  plot_tbl <- .gsea_filter_by_padj(
+    plot_tbl = plot_tbl,
+    padj_threshold = padj_threshold)
   if (!p_col %in% c('pvalue', 'padj')) {
     stop("`p_col` must be either 'pvalue' or 'padj'.", call. = FALSE)
   }
@@ -1073,10 +1116,18 @@ plot_gsea_half_volcano <- function(gsea_results,
     stop("`p_col = 'pvalue'` requires an optional nominal p-value column.", call. = FALSE)
   }
 
-  plot_tbl <- plot_tbl[if (direction == 'positive') plot_tbl$NES > 0 else plot_tbl$NES < 0, , drop = FALSE]
-  plot_tbl <- plot_tbl[if (direction == 'positive') plot_tbl$NES >= inner_nes_limit else plot_tbl$NES <= -inner_nes_limit, , drop = FALSE]
+  direction_rows <- if (direction == 'positive') plot_tbl$NES > 0 else plot_tbl$NES < 0
+  plot_tbl <- plot_tbl[direction_rows, , drop = FALSE]
+  boundary_rows <- if (direction == 'positive') {
+    plot_tbl$NES >= inner_nes_limit
+  } else {
+    plot_tbl$NES <= -inner_nes_limit
+  }
+  plot_tbl <- plot_tbl[boundary_rows, , drop = FALSE]
   if (nrow(plot_tbl) == 0L) {
-    stop('No GSEA terms remain after applying the half-volcano NES boundary.', call. = FALSE)
+    stop(
+      'No GSEA terms remain after applying the adjusted p-value threshold and half-volcano NES boundary.',
+      call. = FALSE)
   }
   plot_tbl$neg_log10_p <- .gsea_neg_log10(plot_tbl[[p_col]])
   plot_tbl$significant <- plot_tbl$padj < padj_cutoff
@@ -1211,7 +1262,7 @@ plot_gsea_half_volcano <- function(gsea_results,
       max.overlaps = Inf,
       seed = 42,
       show.legend = FALSE) +
-    ggplot2::scale_color_manual(values = color_values, drop = FALSE) +
+    ggplot2::scale_color_manual(values = color_values, drop = TRUE) +
     ggplot2::scale_x_continuous(breaks = x_breaks, expand = ggplot2::expansion(mult = 0.015)) +
     ggplot2::scale_y_continuous(expand = c(0, 0), position = if (direction == 'negative') 'right' else 'left') +
     ggplot2::coord_cartesian(xlim = x_limits, ylim = y_limits, clip = 'off') +
@@ -1243,6 +1294,9 @@ plot_gsea_half_volcano <- function(gsea_results,
 #'   both tables.
 #' @param nes_col Column containing normalized enrichment scores in both tables.
 #' @param padj_col Column containing adjusted p-values in both tables.
+#' @param padj_threshold Optional adjusted p-value threshold applied after the
+#'   exact term-key intersection. A shared term is retained when either input
+#'   satisfies `padj < padj_threshold`. Use `NULL` to disable this filter.
 #' @param id_col Optional column containing unique stable term identifiers in
 #'   both tables; overrides existing `go_term_id` columns.
 #' @param color_by Color points by significance or matched GO term group.
@@ -1283,40 +1337,41 @@ plot_gsea_half_volcano <- function(gsea_results,
 #'   without file-system side effects
 #'
 plot_gsea_nes_scatter <- function(gsea_x,
-                                  gsea_y,
-                                  x_label = 'NES in x contrast',
-                                  y_label = 'NES in y contrast',
-                                  term_col = 'go_description',
-                                  nes_col = 'NES',
-                                  padj_col = 'padj',
-                                  id_col = NULL,
-                                  color_by = c('significance', 'term_group'),
-                                  term_groups = NULL,
-                                  term_group_colors = NULL,
-                                  point_colors = NULL,
-                                  quadrant = c('all', 'q1', 'q3'),
-                                  x_name = 'x contrast',
-                                  y_name = 'y contrast',
-                                  label_n_x_only = 0L,
-                                  label_n_y_only = 0L,
-                                  label_n_both = 0L,
-                                  label_terms = NULL,
-                                  point_size = 1.3,
-                                  label_size = 8.0,
-                                  label_color = 'black',
-                                  label_words_per_line = 2L,
-                                  padj_cutoff = 0.05,
-                                  include_nonsignificant = FALSE,
-                                  equal_axis_limits = FALSE,
-                                  quadrant_min_abs_nes = 0,
-                                  x_min = NULL,
-                                  x_max = NULL,
-                                  y_min = NULL,
-                                  y_max = NULL,
-                                  show_fit_line = FALSE,
-                                  legend_nrow = NULL,
-                                  legend_position = 'top',
-                                  font_family = 'Nimbus Sans') {
+  gsea_y,
+  x_label = 'NES in x contrast',
+  y_label = 'NES in y contrast',
+  term_col = 'go_description',
+  nes_col = 'NES',
+  padj_col = 'padj',
+  padj_threshold = NULL,
+  id_col = NULL,
+  color_by = c('significance', 'term_group'),
+  term_groups = NULL,
+  term_group_colors = NULL,
+  point_colors = NULL,
+  quadrant = c('all', 'q1', 'q3'),
+  x_name = 'x contrast',
+  y_name = 'y contrast',
+  label_n_x_only = 0L,
+  label_n_y_only = 0L,
+  label_n_both = 0L,
+  label_terms = NULL,
+  point_size = 1.3,
+  label_size = 8.0,
+  label_color = 'black',
+  label_words_per_line = 2L,
+  padj_cutoff = 0.05,
+  include_nonsignificant = FALSE,
+  equal_axis_limits = FALSE,
+  quadrant_min_abs_nes = 0,
+  x_min = NULL,
+  x_max = NULL,
+  y_min = NULL,
+  y_max = NULL,
+  show_fit_line = FALSE,
+  legend_nrow = NULL,
+  legend_position = 'top',
+  font_family = 'Nimbus Sans') {
   color_by <- match.arg(color_by)
   quadrant <- match.arg(quadrant)
   include_nonsignificant <- .gsea_validate_flag(
@@ -1373,6 +1428,13 @@ plot_gsea_nes_scatter <- function(gsea_x,
   plot_tbl$go_description <- plot_tbl$go_description_x
   plot_tbl$go_description_x <- NULL
   plot_tbl$go_description_y <- NULL
+  plot_tbl <- .gsea_filter_by_padj(
+    plot_tbl = plot_tbl,
+    padj_threshold = padj_threshold,
+    padj_cols = c('padj_x', 'padj_y'))
+  if (nrow(plot_tbl) == 0L) {
+    stop('No shared GSEA terms remain after applying the adjusted p-value threshold.', call. = FALSE)
+  }
 
   plot_tbl$significant_x <- plot_tbl$padj_x < padj_cutoff
   plot_tbl$significant_y <- plot_tbl$padj_y < padj_cutoff
@@ -1384,7 +1446,10 @@ plot_gsea_nes_scatter <- function(gsea_x,
   plot_tbl$scatter_quadrant <- ifelse(
     plot_tbl$NES_x >= 0 & plot_tbl$NES_y >= 0,
     'Q1',
-    ifelse(plot_tbl$NES_x < 0 & plot_tbl$NES_y >= 0, 'Q2', ifelse(plot_tbl$NES_x < 0 & plot_tbl$NES_y < 0, 'Q3', 'Q4')))
+    ifelse(
+      plot_tbl$NES_x < 0 & plot_tbl$NES_y >= 0,
+      'Q2',
+      ifelse(plot_tbl$NES_x < 0 & plot_tbl$NES_y < 0, 'Q3', 'Q4')))
 
   if (color_by == 'significance') {
     plot_tbl$point_group <- ifelse(
@@ -1393,7 +1458,10 @@ plot_gsea_nes_scatter <- function(gsea_x,
       ifelse(
         plot_tbl$significant_x & !plot_tbl$significant_y,
         paste0('Significant in ', x_name, ' only'),
-        ifelse(!plot_tbl$significant_x & plot_tbl$significant_y, paste0('Significant in ', y_name, ' only'), 'Not significant in either')))
+        ifelse(
+          !plot_tbl$significant_x & plot_tbl$significant_y,
+          paste0('Significant in ', y_name, ' only'),
+          'Not significant in either')))
     group_names <- c(
       'Significant in both',
       paste0('Significant in ', x_name, ' only'),
@@ -1442,7 +1510,12 @@ plot_gsea_nes_scatter <- function(gsea_x,
     if (label_n <= 0L || nrow(label_tbl) == 0L) {
       return(label_tbl[0L, , drop = FALSE])
     }
-    label_tbl <- label_tbl[order(-label_tbl$label_score, label_tbl$padj_x, label_tbl$padj_y, label_tbl$go_description), , drop = FALSE]
+    label_order <- order(
+      -label_tbl$label_score,
+      label_tbl$padj_x,
+      label_tbl$padj_y,
+      label_tbl$go_description)
+    label_tbl <- label_tbl[label_order, , drop = FALSE]
     if (quadrant != 'all') {
       return(utils::head(label_tbl, label_n))
     }
@@ -1606,7 +1679,10 @@ plot_gsea_nes_scatter <- function(gsea_x,
       position = if (quadrant == 'q3') 'right' else 'left',
       expand = if (is.null(axis_y_limits)) ggplot2::expansion(mult = 0.06) else ggplot2::expansion(mult = 0)) +
     coord_layer +
-    ggplot2::labs(x = x_label, y = y_label, color = if (color_by == 'significance') 'GSEA enrichment' else 'GO:BP category') +
+    ggplot2::labs(
+      x = x_label,
+      y = y_label,
+      color = if (color_by == 'significance') 'GSEA enrichment' else 'GO:BP category') +
     ggplot2::guides(color = ggplot2::guide_legend(
       nrow = legend_nrow,
       byrow = TRUE,

@@ -20,8 +20,8 @@ knitr::opts_chunk$set(
 
 <div class="tutorial-meta-block">
 <div><span>Author:</span> Zoheb Khan</div>
-<div><span>Modified:</span> 2026-08-02</div>
-<div><span>Compiled:</span> 2026-08-02</div>
+<div><span>Modified:</span> 2026-08-05</div>
+<div><span>Compiled:</span> 2026-08-05</div>
 <div><span>Environment:</span> R version 4.6.1 (2026-06-24)</div>
 <div><span>Bioconductor:</span> 3.23</div>
 <div><span>Source:</span> <a href="https://github.com/ZohebKhan1/gsea-waterfall">GitHub repository</a></div>
@@ -30,98 +30,138 @@ knitr::opts_chunk$set(
 
 # Overview
 
-`gsea-waterfall` visualizes **precomputed** Gene Set Enrichment Analysis
-(GSEA) results as ranked NES waterfalls, volcano plots, and cross-contrast
-comparative NES scatterplots. The functions return `ggplot` objects. They are a
-visualization layer applied after GSEA has been performed and do not change
-supplied statistics or write files.
+This repository contains several functions that generate useful visualizations of precomputed
+Gene Set Enrichment Analysis (GSEA) results. These visualizations include (1) ranked (by NES)
+waterfall plots with biological categorizations, (2) NES volcano plots for a specific DEG
+contrast, and cross-contrast comparative NES scatterplots.
 
-The examples use fixed GO biological-process results from the GSE122380
-cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
-group, and label displayed rows; significance classes use the explicit
-adjusted-p-value cutoff without altering the supplied statistics.
+The functions in this repository all return `ggplot` class objects.
 
-## Example data and preprocessing
+Note that the functions demonstrated in this workflow assume GSEA has been performed on your
+DEG contrast of interest. Therefore, I recommended generating the required GSEA results data
+using one of the many options available via Bioconductor, such as `fgsea` or `clusterProfiler`.
 
-The bundled tables are derived from the public [NCBI GEO accession
-GSE122380](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380), a
-bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
+## Issues with GSEA dotplots/barplots
+
+GSEA results are most commonly visualized as running enrichment score plots for an individual
+GO/KEGG/Reactome pathway result, or as dotplot/barplot-style summaries of a short list of terms
+in which dot size or color indicates some quantitative GSEA metric (NES or adjusted p-value, for
+example). Those GSEA visualizations typically shown for the top ~n=10 enriched GO terms (by NES)
+due to space constraints with a greater number of pathways. Therefore the broader ranked GSEA
+results are often lost if only the top 10 pathways are shown. For example, if there are 200 total
+significantly enriched GO terms (by adjusted p-value < 0.05) and only the top 10 GO terms (by
++NES) are visualized, then 190/200 = 95% of total enriched terms are not shown. This loss of
+information can be particularly problematic if, for example, the top 10 enriched GO terms by
+GSEA NES are concentrated in the same biological function or some particular pathway, which can
+often be the case for more general, larger GO term families (e.g: cell cycle replication,
+extracellular matrix, etc).
+
+## Use case
+
+The ranked GSEA waterfall plots shown in the tutorial workflow are intended to address the
+limitation of the aformentioned GSEA dotplot/barplot. Ranked GSEA waterfall plots allow for
+visualization from 50–200 ranked GO terms one concise, visually cohesive, and customizable figure
+panel. The GSEA-derived metric used to rank GO terms for the waterfall plot can be selected by the
+user; though I recommend use NES, as this makes comparisons between the magnitude of enrichment
+between GO terms containing differing numbers of genes (and effect size is a more biologically
+informative metric than statistical significance for GSEA).
+
+Because it would be impractical to write out the GO term labels for all 100 pathways (not enough
+space in a single figure panel for this. Even if it were possible to do this, it would be visually
+incoherent), user-defined `term_groups` are used to organize the top n=X ranked GO terms by
+biological theme/functional process. Note that these classifications
+
+For the waterfall plots, the user can select specific colors to define these biological groupins.
+In the example workflow, for example, I categorized GO term pathways by `Ion channel`,
+`Metabolism`, `Muscle contraction`, `Heart development`, and `Other`. Here, `Other` simply means .
+
+I want to note that these categorizations/classifications are simply user-defined annotations only
+and do not perform redundancy reduction. For example, for the positive NES waterfall plot,
+
+`'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')`
+
+The visual design was informed by figures shown in [Ciceri et al.
+(2024)](https://doi.org/10.1038/s41586-023-06984-8), [Xu et al.
+(2025)](https://doi.org/10.1038/s41556-025-01751-5), [Vuong et al.
+(2026)](https://doi.org/10.1126/science.aea1259), and [Risgaard et al.
+(2026)](https://doi.org/10.1126/science.aea1549). In particular, see the following subpanels from
+Xu et al. Figure 3X; from Vuong et al. Figure 3X; from Ciceri et al. Figure 3X; from Risgaard et al.
+Figure 3X. Full citations are provided at the end of this README.
+
+## Example data used in workflow/tutorial
+
+The bundled tables used for the figures generated in the workflow/tutorial are derived from the
+public [NCBI GEO accession GSE122380](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380),
+a bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
 Basic sequencing and sample-level QC was performed before differential
 expression analysis. A DESeq2 comparison of day 9 (cardiomyocyte) versus day 3
 (mesoderm) generated the cardiomyocyte-versus-mesoderm contrast used for the
 bundled GSEA results.
 
-## Use case
-
-GSEA results are commonly shown as running enrichment plots for individual
-pathways or as dotplot/barplot-style summaries of a short list of terms. Those
-views work well for a focused pathway or compact top-term summary, but they
-provide limited room to inspect the broader ranked result.
-
-The waterfall plots are intended for that complementary use case. They allow
-roughly 100–200 ranked GO terms to be viewed together, including terms beyond
-the usual top 10–20. This can make related parent/child terms and broader
-functional patterns visible in the same ranked context. Caller-defined
-`term_groups` can organize displayed terms by biological theme; they are
-annotations only and do not perform redundancy reduction or additional
-statistics.
-
-The visual design was informed by pathway-level figures from Ciceri et al.
-(2024), Xu et al. (2025), Vuong et al. (2026), and Risgaard et al. (2026). Full
-citations are provided at the end of this tutorial.
-
 # Install and source
 
-Install the plotting dependencies once:
+To download the R scripts containing the functions used to generate the GSEA results
+visualizations, run the following line of code below in your R console. The below command will
+download the R script to your present working directory.
+
+```r
+download.file(
+  'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R',
+  'gsea_visualizations.R'
+)
+```
+
+In the relevant R script, source the downloaded R command, assuming it's in your project root
+directory.
+
+`gsea_visualizations.R` contains the following functions: `read_gsea_result_csv()`,
+`plot_gsea_waterfall()`, `plot_gsea_volcano()`, `plot_gsea_half_volcano()`, and
+`plot_gsea_nes_scatter()`. The visualizations generated by these functions can be seen in the
+published GitHub Pages site linked at the start of this README.md.
+
+```r
+source('gsea_visualizations.R')
+```
+
+## Required R dependencies
+
+The following R libraries listed below are required for the visualization functions:
 
 ```r
 install.packages(c('ggplot2', 'ggrepel', 'scales'))
 ```
 
-Download and source the consolidated plotting file:
+# Required input GSEA data format
 
-```r
-download.file(
-  'https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R',
-  'gsea_visualizations.R')
+For all GSEA visualizations in this repository, the input dataframe represents one GSEA contrast
+with one row per unique term:
 
-source('gsea_visualizations.R')
-```
-
-This provides `read_gsea_result_csv()`, `plot_gsea_waterfall()`,
-`plot_gsea_volcano()`, `plot_gsea_half_volcano()`, and
-`plot_gsea_nes_scatter()`.
-
-# Input data
-
-Each table represents one GSEA contrast with one row per unique term. Results
-can come from any GSEA workflow, including `fgsea`, `clusterProfiler`, or
-another package. The default columns are:
+The completed result table can come from any GSEA workflow, including `fgsea`,
+`clusterProfiler`, or another package. If the source uses different column
+names, map them when reading the table as shown below.
 
 | Column | Required | Meaning |
-|:---|:---|:---|
-| `go_description` | yes | GO term description and fallback matching key |
+| :-- | :-- | :-- |
+| `go_description` | yes | term description and fallback matching key |
 | `go_term_id` | no | stable matching key used automatically when present |
 | `NES` | yes | normalized enrichment score |
 | `pval` | no | optional nominal GSEA p-value; used only for nominal-p-value ranking or y-axes |
 | `padj` | yes | adjusted p-value in `[0, 1]` |
 
-`go_description`, `NES`, and `padj` must be complete, and NES values must be finite. If `pval` is supplied, it is also validated. Key precedence is explicit `id_col`, then `go_term_id` when present, otherwise `go_description`. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.
-
-If your result table uses different column names, map them when reading it:
+`go_description`, `NES`, and `padj` must be complete; NES values must be finite.
+If `pval` is supplied, it is also validated. Key precedence is explicit
+`id_col`, then `go_term_id` when present, otherwise `go_description`.
+Comparative plots use the exact shared-key intersection and do not impute absent
+terms.
 
 ```r
 fgsea_results <- read_gsea_result_csv(
-  'fgsea_results.csv',
-  term_col = 'pathway',
-  nes_col = 'NES',
-  padj_col = 'padj'
+  'fgsea_results.csv',  # unformatted GSEA results .csv file
+  term_col = 'pathway', # column name for GO term description
+  nes_col = 'NES',      # column name for normalized enrichment score
+  padj_col = 'padj'     # column name for adjusted p-value (for filtering)
 )
 ```
-
-For comparative plots, use `id_col` with a stable term identifier whenever one
-is available. Without stable IDs, term descriptions must match exactly across
-tables.
 
 Load the bundled examples:
 
@@ -145,7 +185,10 @@ print(head(gsea_cardiomyocyte_vs_mesoderm, 5L))
 
 # Ranked GSEA waterfall plots
 
-`plot_gsea_waterfall()` selects one NES direction, ranks by `NES` or `padj` by default, and retains `top_n` terms. Nominal-p-value ranking is available when an optional `pval` column is supplied. `term_groups` controls colors and `label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
+`plot_gsea_waterfall()` first applies the optional `padj_threshold`, selects one NES direction,
+ranks by `NES` or `padj` by default, and retains `top_n` terms. Nominal-p-value ranking is
+available when an optional `pval` column is supplied. `term_groups` controls colors and
+`label_terms` controls labels. Matches are case-insensitive against term descriptions or IDs.
 
 For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
@@ -159,23 +202,57 @@ gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
 )
 
 positive_term_groups <- list(
-  'Cardiac development' = c('cardiac', 'heart', 'muscle'),
-  'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')
+  'Ion channel' = c(
+    'Calcium', 'Sodium', 'Potassium', 'Ion', 'Voltage', 'Channel',
+    'electrical', 'Action potential', 'transmembrane', 'conduction'
+  ),
+  'Metabolism' = c(
+    'Metabolic', 'Metabolism', 'Electron transport chain', 'Mitochondria',
+    'Mitochondrial', 'Oxidative', 'Phosphorylation', 'ATP', 'lipid',
+    'biosynthetic', 'respiration'
+  ),
+  'Muscle contraction' = c(
+    'Muscle contraction', 'Muscle cell differentiation', 'Striated',
+    'Sarcomere', 'Myofibril', 'Actin', 'Muscle'
+  ),
+  'Heart development' = c(
+    'atrial', 'ventricular', 'heart', 'cardiac'
+  )
+)
+
+positive_waterfall_label_terms <- c(
+  'myofibril assembly',
+  'cardiac muscle cell action potential',
+  'calcium-mediated signaling',
+  'electron transport chain',
+  'muscle cell differentiation',
+  'cardiac cell development',
+  'cardiac chamber morphogenesis',
+  'muscle contraction',
+  'cardiac conduction',
+  'cardiac muscle cell contraction',
+  'heart growth',
+  'cardiac atrium development',
+  'heart trabecula morphogenesis'
 )
 
 positive_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+  padj_threshold = 0.05,
   direction = 'positive',
   top_n = 100L,
   rank_by = 'NES',
-  label_n = 12L,
-  term_groups = positive_term_groups
+  x_label = 'Ranked GO terms by NES',
+  label_terms = positive_waterfall_label_terms,
+  term_groups = positive_term_groups,
+  point_size = 1.80
 )
 ```
 
-`direction` chooses the NES side to display. `top_n` is applied after that
-filter and after ranking. Terms are neutral unless `term_groups` is supplied;
-each seed is matched case-insensitively against term IDs or descriptions.
+`padj_threshold = 0.05` retains only terms with adjusted p-value below 0.05 before ranking.
+`direction` then chooses the NES side to display, and `top_n` is applied after filtering and
+ranking. Terms are neutral unless `term_groups` is supplied; each seed is matched
+case-insensitively against term IDs or descriptions.
 
 ```{r positive-waterfall-figure, results='asis', out.width='80%', fig.alt='Positive NES waterfall for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-positive-waterfall" class="figure-anchor"></div>\n')
@@ -193,11 +270,17 @@ gsea_cardiomyocyte_vs_mesoderm <- read_gsea_result_csv(
 )
 
 negative_term_groups <- list(
-  'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
+  'Ribosomal' = c(
+    'ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'
+  ),
   'Mitosis' = c(
     'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
-    'spindle', 'Mitotic', 'Meiotic'),
-  'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
+    'spindle', 'Mitotic', 'Meiotic'
+  ),
+  'DNA replication' = c(
+    'chromosome', 'DNA', 'base', 'repair', 'DNA-'
+  )
+)
 
 negative_waterfall_label_terms <- c(
   'DNA replication',
@@ -208,15 +291,19 @@ negative_waterfall_label_terms <- c(
   'mitotic nuclear division',
   'regulation of cell cycle phase transition',
   'regulation of mitotic cell cycle phase transition',
-  'spliceosomal complex assembly')
+  'spliceosomal complex assembly'
+)
 
 negative_waterfall_plot <- plot_gsea_waterfall(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+  padj_threshold = 0.05,
   direction = 'negative',
   top_n = 100L,
   rank_by = 'NES',
+  x_label = 'Ranked GO terms by NES',
   label_terms = negative_waterfall_label_terms,
-  term_groups = negative_term_groups
+  term_groups = negative_term_groups,
+  point_size = 1.80
 )
 ```
 
@@ -236,7 +323,9 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_waterfall_cardiomyocyte_v
 
 # Volcano plots
 
-Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_half_volcano()` for a directional view. All examples use the established adjusted p-value cutoff of 0.05.
+Use `plot_gsea_volcano()` for both NES directions in one panel and `plot_gsea_half_volcano()` for
+a directional view. All examples filter at `padj_threshold = 0.05` and use the same value for the
+significance-color cutoff.
 
 ## Symmetric volcano
 
@@ -251,17 +340,20 @@ negative_volcano_label_terms <- c(
   'DNA-templated DNA replication',
   'double-strand break repair',
   'interstrand cross-link repair',
-  'positive regulation of mitotic cell cycle')
+  'positive regulation of mitotic cell cycle'
+)
 
 positive_volcano_label_terms <- c(
   'muscle tissue development',
   'heart process',
   'muscle cell development',
-  'myofibril assembly')
+  'myofibril assembly'
+)
 
 volcano_label_terms <- c(
   negative_volcano_label_terms,
-  positive_volcano_label_terms)
+  positive_volcano_label_terms
+)
 
 positive_half_volcano_label_terms <- c(
   'response to oxidative stress',
@@ -271,7 +363,8 @@ positive_half_volcano_label_terms <- c(
   'cardiac ventricle development',
   'ATP biosynthetic process',
   'heart process',
-  'myofibril assembly')
+  'myofibril assembly'
+)
 
 negative_half_volcano_label_terms <- c(
   'DNA-templated DNA replication',
@@ -281,21 +374,25 @@ negative_half_volcano_label_terms <- c(
   'positive regulation of mitotic cell cycle',
   'negative regulation of telomere maintenance',
   'regulation of RNA splicing',
-  'DNA-templated transcription elongation')
+  'DNA-templated transcription elongation'
+)
 ```
 
 ```r
 symmetric_volcano_plot <- plot_gsea_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+  padj_threshold = 0.05,
   padj_cutoff = 0.05,
   label_terms = volcano_label_terms,
-  contrast_label = 'Cardiomyocyte vs. Mesoderm'
+  contrast_label = 'Cardiomyocyte vs. Mesoderm',
+  label_words_per_line = 3L,
+  point_size = 1.30
 )
 ```
 
-`padj_cutoff` controls significance coloring and the displayed counts. It does
-not remove rows from the plot. Use `label_terms` instead of `label_n` when you
-want to label exact terms.
+`padj_threshold` removes terms before plotting. Separately, `padj_cutoff` controls significance
+coloring and the displayed counts among the retained terms. Use `label_terms` instead of `label_n`
+when you want to label exact terms.
 
 ```{r symmetric-volcano-figure, results='asis', out.width='58%', fig.alt='Symmetric GSEA volcano for Cardiomyocyte versus Mesoderm'}
 cat('<div id="fig-symmetric-volcano" class="figure-anchor"></div>\n')
@@ -310,13 +407,15 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_volcano_cardiomyocyte_vs_
 ```r
 positive_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+  padj_threshold = 0.05,
   direction = 'positive',
   p_col = 'padj',
   padj_cutoff = 0.05,
   label_terms = positive_half_volcano_label_terms,
   term_groups = positive_term_groups,
   inner_nes_limit = 1,
-  contrast_label = 'Cardiomyocyte vs. Mesoderm'
+  contrast_label = 'Cardiomyocyte vs. Mesoderm',
+  point_size = 1.60
 )
 ```
 
@@ -335,13 +434,15 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_half_volcano_cardiomyocyt
 ```r
 negative_half_volcano_plot <- plot_gsea_half_volcano(
   gsea_results = gsea_cardiomyocyte_vs_mesoderm,
+  padj_threshold = 0.05,
   direction = 'negative',
   p_col = 'padj',
   padj_cutoff = 0.05,
   label_terms = negative_half_volcano_label_terms,
   term_groups = negative_term_groups,
   inner_nes_limit = 1,
-  contrast_label = 'Cardiomyocyte vs. Mesoderm'
+  contrast_label = 'Cardiomyocyte vs. Mesoderm',
+  point_size = 1.60
 )
 ```
 
@@ -360,22 +461,32 @@ terms significant in at least one contrast and does not draw a fitted line. The
 line is descriptive when requested and does not alter enrichment statistics.
 
 ```r
+nes_scatter_label_terms <- c(
+  'mesenchyme development',
+  'mesoderm development',
+  'mesodermal cell differentiation',
+  'myofibril assembly',
+  'heart process',
+  'oxidative phosphorylation',
+  'regulation of nuclear division'
+)
+
 nes_scatter_plot <- plot_gsea_nes_scatter(
   gsea_x = gsea_day9_vs_day6,
   gsea_y = gsea_day3_vs_day1,
+  padj_threshold = 0.05,
   x_label = 'Day 9 vs. Day 6 NES',
   y_label = 'Day 3 vs. Day 1 NES',
   color_by = 'significance',
   quadrant = 'all',
   x_name = 'Day 9 vs. Day 6',
   y_name = 'Day 3 vs. Day 1',
-  label_n_x_only = 3L,
-  label_n_y_only = 3L,
-  label_n_both = 3L,
+  label_terms = nes_scatter_label_terms,
   padj_cutoff = 0.05,
   include_nonsignificant = TRUE,
   equal_axis_limits = TRUE,
-  show_fit_line = TRUE
+  show_fit_line = TRUE,
+  point_size = 1.30
 )
 ```
 
@@ -390,24 +501,28 @@ knitr::include_graphics('assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_da
 Set `include_nonsignificant = FALSE` to focus on terms significant in at least
 one contrast. Use `quadrant = 'q1'` or `quadrant = 'q3'` to focus on concordant
 positive or negative NES values. `equal_axis_limits = TRUE` makes the two NES
-axes directly comparable.
+axes directly comparable. `padj_threshold = 0.05` retains a shared term when at
+least one of the two contrasts has an adjusted p-value below 0.05.
 
 # API summary
 
 | Function | Contract |
 |:---|:---|
 | `read_gsea_result_csv()` | reads and validates one precomputed CSV without filtering rows |
-| `plot_gsea_waterfall()` | returns a ranked one-direction ggplot |
-| `plot_gsea_volcano()` | returns a symmetric NES-versus-adjusted-p-value ggplot |
-| `plot_gsea_half_volcano()` | returns a directional ggplot after the explicit NES boundary |
-| `plot_gsea_nes_scatter()` | returns a ggplot from the exact shared term-key intersection |
+| `plot_gsea_waterfall()` | returns a filtered, ranked one-direction ggplot |
+| `plot_gsea_volcano()` | returns a filtered symmetric NES-versus-adjusted-p-value ggplot |
+| `plot_gsea_half_volcano()` | returns a filtered directional ggplot after the explicit NES boundary |
+| `plot_gsea_nes_scatter()` | returns a filtered ggplot from the exact shared term-key intersection |
 
-Source documentation defines the complete argument contracts, including the common `term_col`, `nes_col`, `padj_col`, and optional `id_col` arguments. Nominal-p-value mapping is only needed when using the optional `pval`-based controls.
+Source documentation defines the complete argument contracts, including the common `term_col`,
+`nes_col`, `padj_col`, `padj_threshold`, and optional `id_col` arguments. Nominal-p-value mapping
+is only needed when using the optional `pval`-based controls.
 
 # References
 
 <ol class="reference-list">
 <li>Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005. <a href="https://www.pnas.org/doi/10.1073/pnas.0506580102">https://www.pnas.org/doi/10.1073/pnas.0506580102</a></li>
+<li>Strober BJ, Elorbany R, Rhodes K, Krishnan N, Tayeb K, Battle A, Gilad Y. Dynamic genetic regulation of gene expression during cellular differentiation. <em>Science</em>. 2019;364(6447):1287-1290. <a href="https://doi.org/10.1126/science.aaw0040">https://doi.org/10.1126/science.aaw0040</a>. Data: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO GSE122380</a>.</li>
 <li>Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. <em>Nature</em>. 2024;626:881-890. <a href="https://doi.org/10.1038/s41586-023-06984-8">https://doi.org/10.1038/s41586-023-06984-8</a></li>
 <li>Xu N, Cho HS, Hackland JOS, et al. Genome-wide CRISPR screen identifies Menin and SUZ12 as regulators of human developmental timing. <em>Nature Cell Biology</em>. 2025;27:1411-1421. <a href="https://doi.org/10.1038/s41556-025-01751-5">https://doi.org/10.1038/s41556-025-01751-5</a></li>
 <li>Vuong CK, Weber A, Seong P, et al. A single-cell multiomic analysis identifies molecular and gene-regulatory mechanisms dysregulated in developing Down syndrome neocortex. <em>Science</em>. 2026;392:eaea1259. <a href="https://doi.org/10.1126/science.aea1259">https://doi.org/10.1126/science.aea1259</a></li>

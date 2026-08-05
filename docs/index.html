@@ -141,11 +141,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="divider"></li>
 <li class="chapter" data-level="1" data-path=""><a href="#overview"><i class="fa fa-check"></i><b>1</b> Overview</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path=""><a href="#example-data-and-preprocessing"><i class="fa fa-check"></i><b>1.1</b> Example data and preprocessing</a></li>
+<li class="chapter" data-level="1.1" data-path=""><a href="#issues-with-gsea-dotplotsbarplots"><i class="fa fa-check"></i><b>1.1</b> Issues with GSEA dotplots/barplots</a></li>
 <li class="chapter" data-level="1.2" data-path=""><a href="#use-case"><i class="fa fa-check"></i><b>1.2</b> Use case</a></li>
+<li class="chapter" data-level="1.3" data-path=""><a href="#example-data-used-in-workflowtutorial"><i class="fa fa-check"></i><b>1.3</b> Example data used in workflow/tutorial</a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a></li>
-<li class="chapter" data-level="3" data-path=""><a href="#input-data"><i class="fa fa-check"></i><b>3</b> Input data</a></li>
+<li class="chapter" data-level="2" data-path=""><a href="#install-and-source"><i class="fa fa-check"></i><b>2</b> Install and source</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path=""><a href="#required-r-dependencies"><i class="fa fa-check"></i><b>2.1</b> Required R dependencies</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path=""><a href="#required-input-gsea-data-format"><i class="fa fa-check"></i><b>3</b> Required input GSEA data format</a></li>
 <li class="chapter" data-level="4" data-path=""><a href="#ranked-gsea-waterfall-plots"><i class="fa fa-check"></i><b>4</b> Ranked GSEA waterfall plots</a>
 <ul>
 <li class="chapter" data-level="4.1" data-path=""><a href="#positive-nes-waterfall"><i class="fa fa-check"></i><b>4.1</b> Positive NES waterfall</a></li>
@@ -194,10 +198,10 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 <span>Author:</span> Zoheb Khan
 </div>
 <div>
-<span>Modified:</span> 2026-08-02
+<span>Modified:</span> 2026-08-05
 </div>
 <div>
-<span>Compiled:</span> 2026-08-02
+<span>Compiled:</span> 2026-08-05
 </div>
 <div>
 <span>Environment:</span> R version 4.6.1 (2026-06-24)
@@ -212,62 +216,96 @@ Standalone R functions for visualizing ranked GO biological-process enrichment r
 </div>
 <div id="overview" class="section level1 hasAnchor" number="1">
 <h1><span class="header-section-number">1</span> Overview<a href="#overview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><code>gsea-waterfall</code> visualizes <strong>precomputed</strong> Gene Set Enrichment Analysis
-(GSEA) results as ranked NES waterfalls, volcano plots, and cross-contrast
-comparative NES scatterplots. The functions return <code>ggplot</code> objects. They are a
-visualization layer applied after GSEA has been performed and do not change
-supplied statistics or write files.</p>
-<p>The examples use fixed GO biological-process results from the GSE122380
-cardiomyocyte iPSC time-course bulk RNA-seq contrasts. Plot controls select,
-group, and label displayed rows; significance classes use the explicit
-adjusted-p-value cutoff without altering the supplied statistics.</p>
-<div id="example-data-and-preprocessing" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> Example data and preprocessing<a href="#example-data-and-preprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>The bundled tables are derived from the public <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO accession
-GSE122380</a>, a
-bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
+<p>This repository contains several functions that generate useful visualizations of precomputed
+Gene Set Enrichment Analysis (GSEA) results. These visualizations include (1) ranked (by NES)
+waterfall plots with biological categorizations, (2) NES volcano plots for a specific DEG
+contrast, and cross-contrast comparative NES scatterplots.</p>
+<p>The functions in this repository all return <code>ggplot</code> class objects.</p>
+<p>Note that the functions demonstrated in this workflow assume GSEA has been performed on your
+DEG contrast of interest. Therefore, I recommended generating the required GSEA results data
+using one of the many options available via Bioconductor, such as <code>fgsea</code> or <code>clusterProfiler</code>.</p>
+<div id="issues-with-gsea-dotplotsbarplots" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> Issues with GSEA dotplots/barplots<a href="#issues-with-gsea-dotplotsbarplots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>GSEA results are most commonly visualized as running enrichment score plots for an individual
+GO/KEGG/Reactome pathway result, or as dotplot/barplot-style summaries of a short list of terms
+in which dot size or color indicates some quantitative GSEA metric (NES or adjusted p-value, for
+example). Those GSEA visualizations typically shown for the top ~n=10 enriched GO terms (by NES)
+due to space constraints with a greater number of pathways. Therefore the broader ranked GSEA
+results are often lost if only the top 10 pathways are shown. For example, if there are 200 total
+significantly enriched GO terms (by adjusted p-value &lt; 0.05) and only the top 10 GO terms (by
++NES) are visualized, then 190/200 = 95% of total enriched terms are not shown. This loss of
+information can be particularly problematic if, for example, the top 10 enriched GO terms by
+GSEA NES are concentrated in the same biological function or some particular pathway, which can
+often be the case for more general, larger GO term families (e.g: cell cycle replication,
+extracellular matrix, etc).</p>
+</div>
+<div id="use-case" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> Use case<a href="#use-case" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The ranked GSEA waterfall plots shown in the tutorial workflow are intended to address the
+limitation of the aformentioned GSEA dotplot/barplot. Ranked GSEA waterfall plots allow for
+visualization from 50–200 ranked GO terms one concise, visually cohesive, and customizable figure
+panel. The GSEA-derived metric used to rank GO terms for the waterfall plot can be selected by the
+user; though I recommend use NES, as this makes comparisons between the magnitude of enrichment
+between GO terms containing differing numbers of genes (and effect size is a more biologically
+informative metric than statistical significance for GSEA).</p>
+<p>Because it would be impractical to write out the GO term labels for all 100 pathways (not enough
+space in a single figure panel for this. Even if it were possible to do this, it would be visually
+incoherent), user-defined <code>term_groups</code> are used to organize the top n=X ranked GO terms by
+biological theme/functional process. Note that these classifications</p>
+<p>For the waterfall plots, the user can select specific colors to define these biological groupins.
+In the example workflow, for example, I categorized GO term pathways by <code>Ion channel</code>,
+<code>Metabolism</code>, <code>Muscle contraction</code>, <code>Heart development</code>, and <code>Other</code>. Here, <code>Other</code> simply means .</p>
+<p>I want to note that these categorizations/classifications are simply user-defined annotations only
+and do not perform redundancy reduction. For example, for the positive NES waterfall plot,</p>
+<p><code>'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')</code></p>
+<p>The visual design was informed by figures shown in <a href="https://doi.org/10.1038/s41586-023-06984-8">Ciceri et al.
+(2024)</a>, <a href="https://doi.org/10.1038/s41556-025-01751-5">Xu et al.
+(2025)</a>, <a href="https://doi.org/10.1126/science.aea1259">Vuong et al.
+(2026)</a>, and <a href="https://doi.org/10.1126/science.aea1549">Risgaard et al.
+(2026)</a>. In particular, see the following subpanels from
+Xu et al. Figure 3X; from Vuong et al. Figure 3X; from Ciceri et al. Figure 3X; from Risgaard et al.
+Figure 3X. Full citations are provided at the end of this README.</p>
+</div>
+<div id="example-data-used-in-workflowtutorial" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Example data used in workflow/tutorial<a href="#example-data-used-in-workflowtutorial" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The bundled tables used for the figures generated in the workflow/tutorial are derived from the
+public <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO accession GSE122380</a>,
+a bulk RNA-seq time course of human iPSC differentiation into cardiomyocytes.
 Basic sequencing and sample-level QC was performed before differential
 expression analysis. A DESeq2 comparison of day 9 (cardiomyocyte) versus day 3
 (mesoderm) generated the cardiomyocyte-versus-mesoderm contrast used for the
 bundled GSEA results.</p>
 </div>
-<div id="use-case" class="section level2 hasAnchor" number="1.2">
-<h2><span class="header-section-number">1.2</span> Use case<a href="#use-case" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>GSEA results are commonly shown as running enrichment plots for individual
-pathways or as dotplot/barplot-style summaries of a short list of terms. Those
-views work well for a focused pathway or compact top-term summary, but they
-provide limited room to inspect the broader ranked result.</p>
-<p>The waterfall plots are intended for that complementary use case. They allow
-roughly 100–200 ranked GO terms to be viewed together, including terms beyond
-the usual top 10–20. This can make related parent/child terms and broader
-functional patterns visible in the same ranked context. Caller-defined
-<code>term_groups</code> can organize displayed terms by biological theme; they are
-annotations only and do not perform redundancy reduction or additional
-statistics.</p>
-<p>The visual design was informed by pathway-level figures from Ciceri et al.
-(2024), Xu et al. (2025), Vuong et al. (2026), and Risgaard et al. (2026). Full
-citations are provided at the end of this tutorial.</p>
-</div>
 </div>
 <div id="install-and-source" class="section level1 hasAnchor" number="2">
 <h1><span class="header-section-number">2</span> Install and source<a href="#install-and-source" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Install the plotting dependencies once:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
-<p>Download and source the consolidated plotting file:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">download.file</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R&#39;</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="st">&#39;gsea_visualizations.R&#39;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_visualizations.R&#39;</span>)</span></code></pre></div>
-<p>This provides <code>read_gsea_result_csv()</code>, <code>plot_gsea_waterfall()</code>,
-<code>plot_gsea_volcano()</code>, <code>plot_gsea_half_volcano()</code>, and
-<code>plot_gsea_nes_scatter()</code>.</p>
+<p>To download the R scripts containing the functions used to generate the GSEA results
+visualizations, run the following line of code below in your R console. The below command will
+download the R script to your present working directory.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">download.file</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="st">&#39;https://raw.githubusercontent.com/ZohebKhan1/gsea-waterfall/main/functions/gsea_visualizations.R&#39;</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="st">&#39;gsea_visualizations.R&#39;</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>In the relevant R script, source the downloaded R command, assuming it’s in your project root
+directory.</p>
+<p><code>gsea_visualizations.R</code> contains the following functions: <code>read_gsea_result_csv()</code>,
+<code>plot_gsea_waterfall()</code>, <code>plot_gsea_volcano()</code>, <code>plot_gsea_half_volcano()</code>, and
+<code>plot_gsea_nes_scatter()</code>. The visualizations generated by these functions can be seen in the
+published GitHub Pages site linked at the start of this README.md.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;gsea_visualizations.R&#39;</span>)</span></code></pre></div>
+<div id="required-r-dependencies" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Required R dependencies<a href="#required-r-dependencies" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The following R libraries listed below are required for the visualization functions:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>, <span class="st">&#39;ggrepel&#39;</span>, <span class="st">&#39;scales&#39;</span>))</span></code></pre></div>
 </div>
-<div id="input-data" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">3</span> Input data<a href="#input-data" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Each table represents one GSEA contrast with one row per unique term. Results
-can come from any GSEA workflow, including <code>fgsea</code>, <code>clusterProfiler</code>, or
-another package. The default columns are:</p>
+</div>
+<div id="required-input-gsea-data-format" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">3</span> Required input GSEA data format<a href="#required-input-gsea-data-format" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>For all GSEA visualizations in this repository, the input dataframe represents one GSEA contrast
+with one row per unique term:</p>
+<p>The completed result table can come from any GSEA workflow, including <code>fgsea</code>,
+<code>clusterProfiler</code>, or another package. If the source uses different column
+names, map them when reading the table as shown below.</p>
 <table>
 <colgroup>
 <col width="33%" />
@@ -285,7 +323,7 @@ another package. The default columns are:</p>
 <tr class="odd">
 <td align="left"><code>go_description</code></td>
 <td align="left">yes</td>
-<td align="left">GO term description and fallback matching key</td>
+<td align="left">term description and fallback matching key</td>
 </tr>
 <tr class="even">
 <td align="left"><code>go_term_id</code></td>
@@ -309,33 +347,33 @@ another package. The default columns are:</p>
 </tr>
 </tbody>
 </table>
-<p><code>go_description</code>, <code>NES</code>, and <code>padj</code> must be complete, and NES values must be finite. If <code>pval</code> is supplied, it is also validated. Key precedence is explicit <code>id_col</code>, then <code>go_term_id</code> when present, otherwise <code>go_description</code>. Comparative scatterplots use the exact shared-key intersection and do not impute absent terms.</p>
-<p>If your result table uses different column names, map them when reading it:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fgsea_results <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="st">&#39;fgsea_results.csv&#39;</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">term_col =</span> <span class="st">&#39;pathway&#39;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">nes_col =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">padj_col =</span> <span class="st">&#39;padj&#39;</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span></code></pre></div>
-<p>For comparative plots, use <code>id_col</code> with a stable term identifier whenever one
-is available. Without stable IDs, term descriptions must match exactly across
-tables.</p>
+<p><code>go_description</code>, <code>NES</code>, and <code>padj</code> must be complete; NES values must be finite.
+If <code>pval</code> is supplied, it is also validated. Key precedence is explicit
+<code>id_col</code>, then <code>go_term_id</code> when present, otherwise <code>go_description</code>.
+Comparative plots use the exact shared-key intersection and do not impute absent
+terms.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>fgsea_results <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="st">&#39;fgsea_results.csv&#39;</span>,  <span class="co"># unformatted GSEA results .csv file</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">term_col =</span> <span class="st">&#39;pathway&#39;</span>, <span class="co"># column name for GO term description</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">nes_col =</span> <span class="st">&#39;NES&#39;</span>,      <span class="co"># column name for normalized enrichment score</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">padj_col =</span> <span class="st">&#39;padj&#39;</span>     <span class="co"># column name for adjusted p-value (for filtering)</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span></code></pre></div>
 <p>Load the bundled examples:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;../functions/gsea_visualizations.R&#39;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>)</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>gsea_day9_vs_day6 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_day9_vs_day6.csv&#39;</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>)</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>gsea_day3_vs_day1 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>)</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(gsea_cardiomyocyte_vs_mesoderm, <span class="dv">5</span><span class="dt">L</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;../functions/gsea_visualizations.R&#39;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>gsea_day9_vs_day6 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_day9_vs_day6.csv&#39;</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>gsea_day3_vs_day1 <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="st">&#39;data/GSE122380_gsea_day3_vs_day1.csv&#39;</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">head</span>(gsea_cardiomyocyte_vs_mesoderm, <span class="dv">5</span><span class="dt">L</span>))</span></code></pre></div>
 <pre><code>##                        go_term_id                  go_description       NES
 ## 1                 DNA replication                 DNA replication -3.251308
 ## 2          chromosome segregation          chromosome segregation -2.816035
@@ -351,32 +389,69 @@ tables.</p>
 </div>
 <div id="ranked-gsea-waterfall-plots" class="section level1 hasAnchor" number="4">
 <h1><span class="header-section-number">4</span> Ranked GSEA waterfall plots<a href="#ranked-gsea-waterfall-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p><code>plot_gsea_waterfall()</code> selects one NES direction, ranks by <code>NES</code> or <code>padj</code> by default, and retains <code>top_n</code> terms. Nominal-p-value ranking is available when an optional <code>pval</code> column is supplied. <code>term_groups</code> controls colors and <code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
+<p><code>plot_gsea_waterfall()</code> first applies the optional <code>padj_threshold</code>, selects one NES direction,
+ranks by <code>NES</code> or <code>padj</code> by default, and retains <code>top_n</code> terms. Nominal-p-value ranking is
+available when an optional <code>pval</code> column is supplied. <code>term_groups</code> controls colors and
+<code>label_terms</code> controls labels. Matches are case-insensitive against term descriptions or IDs.</p>
 <p>For the example waterfall figures, classifications use caller-defined keyword
 groups for ion-channel, metabolic, muscle-contraction, heart-development,
 ribosomal, mitotic, and DNA-replication terms; unmatched terms remain <code>Other</code>.</p>
 <div id="positive-nes-waterfall" class="section level2 hasAnchor" number="4.1">
 <h2><span class="header-section-number">4.1</span> Positive NES waterfall<a href="#positive-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>)</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>positive_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="st">&#39;Cardiac development&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;cardiac&#39;</span>, <span class="st">&#39;heart&#39;</span>, <span class="st">&#39;muscle&#39;</span>),</span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  <span class="st">&#39;Metabolism&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;mitochondrial&#39;</span>, <span class="st">&#39;metabolic&#39;</span>, <span class="st">&#39;oxidative&#39;</span>)</span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>)</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>positive_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  <span class="at">label_n =</span> <span class="dv">12</span><span class="dt">L</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups</span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>)</span></code></pre></div>
-<p><code>direction</code> chooses the NES side to display. <code>top_n</code> is applied after that
-filter and after ranking. Terms are neutral unless <code>term_groups</code> is supplied;
-each seed is matched case-insensitively against term IDs or descriptions.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>positive_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="st">&#39;Ion channel&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="st">&#39;Calcium&#39;</span>, <span class="st">&#39;Sodium&#39;</span>, <span class="st">&#39;Potassium&#39;</span>, <span class="st">&#39;Ion&#39;</span>, <span class="st">&#39;Voltage&#39;</span>, <span class="st">&#39;Channel&#39;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="st">&#39;electrical&#39;</span>, <span class="st">&#39;Action potential&#39;</span>, <span class="st">&#39;transmembrane&#39;</span>, <span class="st">&#39;conduction&#39;</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  ),</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="st">&#39;Metabolism&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>    <span class="st">&#39;Metabolic&#39;</span>, <span class="st">&#39;Metabolism&#39;</span>, <span class="st">&#39;Electron transport chain&#39;</span>, <span class="st">&#39;Mitochondria&#39;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>    <span class="st">&#39;Mitochondrial&#39;</span>, <span class="st">&#39;Oxidative&#39;</span>, <span class="st">&#39;Phosphorylation&#39;</span>, <span class="st">&#39;ATP&#39;</span>, <span class="st">&#39;lipid&#39;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>    <span class="st">&#39;biosynthetic&#39;</span>, <span class="st">&#39;respiration&#39;</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  ),</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="st">&#39;Muscle contraction&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>    <span class="st">&#39;Muscle contraction&#39;</span>, <span class="st">&#39;Muscle cell differentiation&#39;</span>, <span class="st">&#39;Striated&#39;</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>    <span class="st">&#39;Sarcomere&#39;</span>, <span class="st">&#39;Myofibril&#39;</span>, <span class="st">&#39;Actin&#39;</span>, <span class="st">&#39;Muscle&#39;</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  ),</span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="st">&#39;Heart development&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>    <span class="st">&#39;atrial&#39;</span>, <span class="st">&#39;ventricular&#39;</span>, <span class="st">&#39;heart&#39;</span>, <span class="st">&#39;cardiac&#39;</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  )</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>)</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>positive_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell action potential&#39;</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="st">&#39;calcium-mediated signaling&#39;</span>,</span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="st">&#39;electron transport chain&#39;</span>,</span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="st">&#39;muscle cell differentiation&#39;</span>,</span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>  <span class="st">&#39;cardiac cell development&#39;</span>,</span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>  <span class="st">&#39;cardiac chamber morphogenesis&#39;</span>,</span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>  <span class="st">&#39;muscle contraction&#39;</span>,</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a>  <span class="st">&#39;cardiac conduction&#39;</span>,</span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a>  <span class="st">&#39;cardiac muscle cell contraction&#39;</span>,</span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a>  <span class="st">&#39;heart growth&#39;</span>,</span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a>  <span class="st">&#39;cardiac atrium development&#39;</span>,</span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a>  <span class="st">&#39;heart trabecula morphogenesis&#39;</span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a>)</span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a>positive_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Ranked GO terms by NES&#39;</span>,</span>
+<span id="cb7-47"><a href="#cb7-47" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_waterfall_label_terms,</span>
+<span id="cb7-48"><a href="#cb7-48" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
+<span id="cb7-49"><a href="#cb7-49" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.80</span></span>
+<span id="cb7-50"><a href="#cb7-50" tabindex="-1"></a>)</span></code></pre></div>
+<p><code>padj_threshold = 0.05</code> retains only terms with adjusted p-value below 0.05 before ranking.
+<code>direction</code> then chooses the NES side to display, and <code>top_n</code> is applied after filtering and
+ranking. Terms are neutral unless <code>term_groups</code> is supplied; each seed is matched
+case-insensitively against term IDs or descriptions.</p>
 <div id="fig-positive-waterfall" class="figure-anchor">
 
 </div>
@@ -387,36 +462,46 @@ each seed is matched case-insensitively against term IDs or descriptions.</p>
 </div>
 <div id="negative-nes-waterfall" class="section level2 hasAnchor" number="4.2">
 <h2><span class="header-section-number">4.2</span> Negative NES waterfall<a href="#negative-nes-waterfall" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>negative_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="st">&#39;Ribosomal&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;ribosome&#39;</span>, <span class="st">&#39;ribosomal&#39;</span>, <span class="st">&#39;spliceosomal&#39;</span>, <span class="st">&#39;rRNA&#39;</span>, <span class="st">&#39;RNA&#39;</span>),</span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="st">&#39;Mitosis&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>    <span class="st">&#39;Mitosis&#39;</span>, <span class="st">&#39;Meiosis&#39;</span>, <span class="st">&#39;Nuclear division&#39;</span>, <span class="st">&#39;cell cycle&#39;</span>, <span class="st">&#39;telomere&#39;</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="st">&#39;spindle&#39;</span>, <span class="st">&#39;Mitotic&#39;</span>, <span class="st">&#39;Meiotic&#39;</span>),</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;chromosome&#39;</span>, <span class="st">&#39;DNA&#39;</span>, <span class="st">&#39;base&#39;</span>, <span class="st">&#39;repair&#39;</span>, <span class="st">&#39;DNA-&#39;</span>))</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>negative_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="st">&#39;chromosome segregation&#39;</span>,</span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="st">&#39;cell cycle G2/M phase transition&#39;</span>,</span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="st">&#39;regulation of cell cycle phase transition&#39;</span>,</span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>  <span class="st">&#39;regulation of mitotic cell cycle phase transition&#39;</span>,</span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="st">&#39;spliceosomal complex assembly&#39;</span>)</span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
-<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
-<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
-<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
-<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
-<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups</span>
-<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>gsea_cardiomyocyte_vs_mesoderm <span class="ot">&lt;-</span> <span class="fu">read_gsea_result_csv</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;tutorial/data/GSE122380_gsea_cardiomyocyte_vs_mesoderm.csv&#39;</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>negative_term_groups <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="st">&#39;Ribosomal&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="st">&#39;ribosome&#39;</span>, <span class="st">&#39;ribosomal&#39;</span>, <span class="st">&#39;spliceosomal&#39;</span>, <span class="st">&#39;rRNA&#39;</span>, <span class="st">&#39;RNA&#39;</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  ),</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;Mitosis&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    <span class="st">&#39;Mitosis&#39;</span>, <span class="st">&#39;Meiosis&#39;</span>, <span class="st">&#39;Nuclear division&#39;</span>, <span class="st">&#39;cell cycle&#39;</span>, <span class="st">&#39;telomere&#39;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>    <span class="st">&#39;spindle&#39;</span>, <span class="st">&#39;Mitotic&#39;</span>, <span class="st">&#39;Meiotic&#39;</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>  ),</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    <span class="st">&#39;chromosome&#39;</span>, <span class="st">&#39;DNA&#39;</span>, <span class="st">&#39;base&#39;</span>, <span class="st">&#39;repair&#39;</span>, <span class="st">&#39;DNA-&#39;</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  )</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>)</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>negative_waterfall_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="st">&#39;DNA replication&#39;</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="st">&#39;chromosome segregation&#39;</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="st">&#39;cell cycle G2/M phase transition&#39;</span>,</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  <span class="st">&#39;maturation of 5.8S rRNA&#39;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>  <span class="st">&#39;mitotic nuclear division&#39;</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="st">&#39;regulation of cell cycle phase transition&#39;</span>,</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>  <span class="st">&#39;regulation of mitotic cell cycle phase transition&#39;</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>  <span class="st">&#39;spliceosomal complex assembly&#39;</span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>)</span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>negative_waterfall_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_waterfall</span>(</span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>  <span class="at">top_n =</span> <span class="dv">100</span><span class="dt">L</span>,</span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>  <span class="at">rank_by =</span> <span class="st">&#39;NES&#39;</span>,</span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Ranked GO terms by NES&#39;</span>,</span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_waterfall_label_terms,</span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.80</span></span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a>)</span></code></pre></div>
 <p>Use <code>rank_by = 'padj'</code> when adjusted-p-value ranking, rather than NES magnitude,
 should determine the displayed order. <code>rank_by = 'pvalue'</code> is available when an
 optional nominal <code>pval</code> column is supplied. <code>label_n</code> selects labels
@@ -433,7 +518,9 @@ specific terms should be shown.</p>
 </div>
 <div id="volcano-plots" class="section level1 hasAnchor" number="5">
 <h1><span class="header-section-number">5</span> Volcano plots<a href="#volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for a directional view. All examples use the established adjusted p-value cutoff of 0.05.</p>
+<p>Use <code>plot_gsea_volcano()</code> for both NES directions in one panel and <code>plot_gsea_half_volcano()</code> for
+a directional view. All examples filter at <code>padj_threshold = 0.05</code> and use the same value for the
+significance-color cutoff.</p>
 <div id="symmetric-volcano" class="section level2 hasAnchor" number="5.1">
 <h2><span class="header-section-number">5.1</span> Symmetric volcano<a href="#symmetric-volcano" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The example labels four padj-significant terms across each NES direction, from
@@ -441,50 +528,58 @@ approximately NES 2 to the most extreme observed value. The same terms are
 used in the symmetric volcano. Directional half-volcano labels are selected
 separately from significant terms assigned to caller-defined groups; <code>Other</code>
 and <code>Not significant</code> terms are not labeled.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>negative_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="st">&#39;interstrand cross-link repair&#39;</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="st">&#39;muscle tissue development&#39;</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  <span class="st">&#39;muscle cell development&#39;</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>  negative_volcano_label_terms,</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  positive_volcano_label_terms)</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a></span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>positive_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="st">&#39;response to oxidative stress&#39;</span>,</span>
-<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="st">&#39;lipid localization&#39;</span>,</span>
-<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="st">&#39;ribose phosphate biosynthetic process&#39;</span>,</span>
-<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="st">&#39;smooth muscle cell proliferation&#39;</span>,</span>
-<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="st">&#39;cardiac ventricle development&#39;</span>,</span>
-<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  <span class="st">&#39;ATP biosynthetic process&#39;</span>,</span>
-<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
-<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>)</span>
-<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a></span>
-<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>negative_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
-<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a>  <span class="st">&#39;mitotic cell cycle checkpoint signaling&#39;</span>,</span>
-<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a>  <span class="st">&#39;spliceosomal tri-snRNP complex assembly&#39;</span>,</span>
-<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a>  <span class="st">&#39;base-excision repair&#39;</span>,</span>
-<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>,</span>
-<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a>  <span class="st">&#39;negative regulation of telomere maintenance&#39;</span>,</span>
-<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a>  <span class="st">&#39;regulation of RNA splicing&#39;</span>,</span>
-<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a>  <span class="st">&#39;DNA-templated transcription elongation&#39;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>symmetric_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">label_terms =</span> volcano_label_terms,</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>)</span></code></pre></div>
-<p><code>padj_cutoff</code> controls significance coloring and the displayed counts. It does
-not remove rows from the plot. Use <code>label_terms</code> instead of <code>label_n</code> when you
-want to label exact terms.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>negative_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="st">&#39;double-strand break repair&#39;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="st">&#39;interstrand cross-link repair&#39;</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>positive_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="st">&#39;muscle tissue development&#39;</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="st">&#39;muscle cell development&#39;</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  negative_volcano_label_terms,</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  positive_volcano_label_terms</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>positive_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>  <span class="st">&#39;response to oxidative stress&#39;</span>,</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>  <span class="st">&#39;lipid localization&#39;</span>,</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>  <span class="st">&#39;ribose phosphate biosynthetic process&#39;</span>,</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>  <span class="st">&#39;smooth muscle cell proliferation&#39;</span>,</span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="st">&#39;cardiac ventricle development&#39;</span>,</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a>  <span class="st">&#39;ATP biosynthetic process&#39;</span>,</span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb9-28"><a href="#cb9-28" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span></span>
+<span id="cb9-29"><a href="#cb9-29" tabindex="-1"></a>)</span>
+<span id="cb9-30"><a href="#cb9-30" tabindex="-1"></a></span>
+<span id="cb9-31"><a href="#cb9-31" tabindex="-1"></a>negative_half_volcano_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-32"><a href="#cb9-32" tabindex="-1"></a>  <span class="st">&#39;DNA-templated DNA replication&#39;</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" tabindex="-1"></a>  <span class="st">&#39;mitotic cell cycle checkpoint signaling&#39;</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" tabindex="-1"></a>  <span class="st">&#39;spliceosomal tri-snRNP complex assembly&#39;</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" tabindex="-1"></a>  <span class="st">&#39;base-excision repair&#39;</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" tabindex="-1"></a>  <span class="st">&#39;positive regulation of mitotic cell cycle&#39;</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" tabindex="-1"></a>  <span class="st">&#39;negative regulation of telomere maintenance&#39;</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" tabindex="-1"></a>  <span class="st">&#39;regulation of RNA splicing&#39;</span>,</span>
+<span id="cb9-39"><a href="#cb9-39" tabindex="-1"></a>  <span class="st">&#39;DNA-templated transcription elongation&#39;</span></span>
+<span id="cb9-40"><a href="#cb9-40" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>symmetric_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_volcano</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">label_terms =</span> volcano_label_terms,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">label_words_per_line =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.30</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>)</span></code></pre></div>
+<p><code>padj_threshold</code> removes terms before plotting. Separately, <code>padj_cutoff</code> controls significance
+coloring and the displayed counts among the retained terms. Use <code>label_terms</code> instead of <code>label_n</code>
+when you want to label exact terms.</p>
 <div id="fig-symmetric-volcano" class="figure-anchor">
 
 </div>
@@ -495,16 +590,18 @@ want to label exact terms.</p>
 </div>
 <div id="directional-half-volcano-plots" class="section level2 hasAnchor" number="5.2">
 <h2><span class="header-section-number">5.2</span> Directional half-volcano plots<a href="#directional-half-volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>positive_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
-<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_half_volcano_label_terms,</span>
-<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
-<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>positive_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;positive&#39;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">label_terms =</span> positive_half_volcano_label_terms,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">term_groups =</span> positive_term_groups,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.60</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>)</span></code></pre></div>
 <p><code>inner_nes_limit = 1</code> keeps terms with positive NES at least 1 in magnitude.
 Set <code>p_col = 'pvalue'</code> to show nominal p-values when the optional <code>pval</code> column
 is supplied; significance coloring continues to use <code>padj_cutoff</code>.</p>
@@ -515,16 +612,18 @@ is supplied; significance coloring continues to use <code>padj_cutoff</code>.</p
 <div class="tutorial-figure-caption">
 <strong>Figure 4.</strong> Positive NES half-volcano with caller-defined term groups and labels.
 </div>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_half_volcano_label_terms,</span>
-<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
-<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
-<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span></span>
-<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>negative_half_volcano_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_half_volcano</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">gsea_results =</span> gsea_cardiomyocyte_vs_mesoderm,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="at">direction =</span> <span class="st">&#39;negative&#39;</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="at">p_col =</span> <span class="st">&#39;padj&#39;</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">label_terms =</span> negative_half_volcano_label_terms,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">term_groups =</span> negative_term_groups,</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">inner_nes_limit =</span> <span class="dv">1</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="at">contrast_label =</span> <span class="st">&#39;Cardiomyocyte vs. Mesoderm&#39;</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.60</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>)</span></code></pre></div>
 <div id="fig-negative-half-volcano" class="figure-anchor">
 
 </div>
@@ -539,23 +638,33 @@ is supplied; significance coloring continues to use <code>padj_cutoff</code>.</p
 <p><code>plot_gsea_nes_scatter()</code> compares exact shared term keys. By default it keeps
 terms significant in at least one contrast and does not draw a fitted line. The
 line is descriptive when requested and does not alter enrichment statistics.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>nes_scatter_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&#39;Day 3 vs. Day 1 NES&#39;</span>,</span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&#39;significance&#39;</span>,</span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&#39;all&#39;</span>,</span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&#39;Day 9 vs. Day 6&#39;</span>,</span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&#39;Day 3 vs. Day 1&#39;</span>,</span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="at">label_n_x_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="at">label_n_y_only =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="at">label_n_both =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
-<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>  <span class="at">show_fit_line =</span> <span class="cn">TRUE</span></span>
-<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>nes_scatter_label_terms <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  <span class="st">&#39;mesenchyme development&#39;</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="st">&#39;mesoderm development&#39;</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>  <span class="st">&#39;mesodermal cell differentiation&#39;</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>  <span class="st">&#39;myofibril assembly&#39;</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>  <span class="st">&#39;heart process&#39;</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>  <span class="st">&#39;oxidative phosphorylation&#39;</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>  <span class="st">&#39;regulation of nuclear division&#39;</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>)</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>nes_scatter_plot <span class="ot">&lt;-</span> <span class="fu">plot_gsea_nes_scatter</span>(</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>  <span class="at">gsea_x =</span> gsea_day9_vs_day6,</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>  <span class="at">gsea_y =</span> gsea_day3_vs_day1,</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>  <span class="at">padj_threshold =</span> <span class="fl">0.05</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>  <span class="at">x_label =</span> <span class="st">&#39;Day 9 vs. Day 6 NES&#39;</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>  <span class="at">y_label =</span> <span class="st">&#39;Day 3 vs. Day 1 NES&#39;</span>,</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>  <span class="at">color_by =</span> <span class="st">&#39;significance&#39;</span>,</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>  <span class="at">quadrant =</span> <span class="st">&#39;all&#39;</span>,</span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>  <span class="at">x_name =</span> <span class="st">&#39;Day 9 vs. Day 6&#39;</span>,</span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>  <span class="at">y_name =</span> <span class="st">&#39;Day 3 vs. Day 1&#39;</span>,</span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>  <span class="at">label_terms =</span> nes_scatter_label_terms,</span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>  <span class="at">padj_cutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>  <span class="at">include_nonsignificant =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>  <span class="at">equal_axis_limits =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>  <span class="at">show_fit_line =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a>  <span class="at">point_size =</span> <span class="fl">1.30</span></span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a>)</span></code></pre></div>
 <div id="fig-all-quadrants-scatter" class="figure-anchor">
 
 </div>
@@ -566,7 +675,8 @@ line is descriptive when requested and does not alter enrichment statistics.</p>
 <p>Set <code>include_nonsignificant = FALSE</code> to focus on terms significant in at least
 one contrast. Use <code>quadrant = 'q1'</code> or <code>quadrant = 'q3'</code> to focus on concordant
 positive or negative NES values. <code>equal_axis_limits = TRUE</code> makes the two NES
-axes directly comparable.</p>
+axes directly comparable. <code>padj_threshold = 0.05</code> retains a shared term when at
+least one of the two contrasts has an adjusted p-value below 0.05.</p>
 </div>
 <div id="api-summary" class="section level1 hasAnchor" number="7">
 <h1><span class="header-section-number">7</span> API summary<a href="#api-summary" class="anchor-section" aria-label="Anchor link to header"></a></h1>
@@ -588,29 +698,34 @@ axes directly comparable.</p>
 </tr>
 <tr class="even">
 <td align="left"><code>plot_gsea_waterfall()</code></td>
-<td align="left">returns a ranked one-direction ggplot</td>
+<td align="left">returns a filtered, ranked one-direction ggplot</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>plot_gsea_volcano()</code></td>
-<td align="left">returns a symmetric NES-versus-adjusted-p-value ggplot</td>
+<td align="left">returns a filtered symmetric NES-versus-adjusted-p-value ggplot</td>
 </tr>
 <tr class="even">
 <td align="left"><code>plot_gsea_half_volcano()</code></td>
-<td align="left">returns a directional ggplot after the explicit NES boundary</td>
+<td align="left">returns a filtered directional ggplot after the explicit NES boundary</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>plot_gsea_nes_scatter()</code></td>
-<td align="left">returns a ggplot from the exact shared term-key intersection</td>
+<td align="left">returns a filtered ggplot from the exact shared term-key intersection</td>
 </tr>
 </tbody>
 </table>
-<p>Source documentation defines the complete argument contracts, including the common <code>term_col</code>, <code>nes_col</code>, <code>padj_col</code>, and optional <code>id_col</code> arguments. Nominal-p-value mapping is only needed when using the optional <code>pval</code>-based controls.</p>
+<p>Source documentation defines the complete argument contracts, including the common <code>term_col</code>,
+<code>nes_col</code>, <code>padj_col</code>, <code>padj_threshold</code>, and optional <code>id_col</code> arguments. Nominal-p-value mapping
+is only needed when using the optional <code>pval</code>-based controls.</p>
 </div>
 <div id="references" class="section level1 hasAnchor" number="8">
 <h1><span class="header-section-number">8</span> References<a href="#references" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <ol class="reference-list">
 <li>
 Subramanian A, Tamayo P, Mootha VK, et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. <em>PNAS</em>. 2005. <a href="https://www.pnas.org/doi/10.1073/pnas.0506580102">https://www.pnas.org/doi/10.1073/pnas.0506580102</a>
+</li>
+<li>
+Strober BJ, Elorbany R, Rhodes K, Krishnan N, Tayeb K, Battle A, Gilad Y. Dynamic genetic regulation of gene expression during cellular differentiation. <em>Science</em>. 2019;364(6447):1287-1290. <a href="https://doi.org/10.1126/science.aaw0040">https://doi.org/10.1126/science.aaw0040</a>. Data: <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE122380">NCBI GEO GSE122380</a>.
 </li>
 <li>
 Ciceri G, Baggiolini A, Cho HS, et al. An epigenetic barrier sets the timing of human neuronal maturation. <em>Nature</em>. 2024;626:881-890. <a href="https://doi.org/10.1038/s41586-023-06984-8">https://doi.org/10.1038/s41586-023-06984-8</a>
