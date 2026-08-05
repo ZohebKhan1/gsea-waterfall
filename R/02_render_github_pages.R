@@ -30,9 +30,6 @@
 
 # 0.0 verify project root -----------------
 
-if (!file.exists('gsea.Rproj')) {
-  stop('Run R/02_render_github_pages.R from the gsea repository root.', call. = FALSE)
-}
 
 # 1.0 replace the generated GitHub Pages site -----------------
 

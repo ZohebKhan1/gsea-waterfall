@@ -28,16 +28,10 @@
 # - tutorial/assets/figures/GSE122380_gsea_scatter_day9_vs_day6_x_day3_vs_day1_all_quadrants.svg
 # ----
 
-# 0.0 verify project root and source functions -----------------
-
-if (!file.exists('gsea.Rproj')) {
-  stop('Run R/01_generate_gsea_figures.R from the gsea repository root.', call. = FALSE)
-}
-
 # source GSEA plotting functions
 source('functions/gsea_visualizations.R')
 
-# 1.0 define figure parameters and paths -----------------
+# 1.0 define relevant directory paths -----------------
 
 gsea_figure_dir = 'tutorial/assets/figures'
 
@@ -47,7 +41,10 @@ gsea_figure_font_paths <- c(
   plain = 'tutorial/assets/fonts/NimbusSans-Regular.otf',
   bold = 'tutorial/assets/fonts/NimbusSans-Bold.otf',
   italic = 'tutorial/assets/fonts/NimbusSans-Italic.otf',
-  bold_italic = 'tutorial/assets/fonts/NimbusSans-BoldItalic.otf')
+  bold_italic = 'tutorial/assets/fonts/NimbusSans-BoldItalic.otf'
+)
+
+# 1.1 define relevant figure parameter parameters -----------------
 
 waterfall_figure_width = 7.40
 waterfall_figure_height = 4.30
@@ -66,6 +63,10 @@ volcano_point_size = 1.30
 half_volcano_point_size = 1.60
 nes_scatter_point_size = 1.30
 
+# 1.1 define labels, groupings for all plots -----------------
+
+# waterfall plot labeling/categorization 
+
 gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
 positive_term_groups <- list(
@@ -79,25 +80,9 @@ positive_term_groups <- list(
   'Muscle contraction' = c(
     'Muscle contraction', 'Muscle cell differentiation', 'Striated',
     'Sarcomere', 'Myofibril', 'Actin', 'Muscle'),
-  'Heart development' = c('atrial', 'ventricular', 'heart', 'cardiac'))
-
-negative_term_groups <- list(
-  'Ribosomal' = c('ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
-  'Mitosis' = c(
-    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
-    'spindle', 'Mitotic', 'Meiotic'),
-  'DNA replication' = c('chromosome', 'DNA', 'base', 'repair', 'DNA-'))
-
-negative_waterfall_label_terms <- c(
-  'DNA replication',
-  'chromosome segregation',
-  'double-strand break repair',
-  'cell cycle G2/M phase transition',
-  'maturation of 5.8S rRNA',
-  'mitotic nuclear division',
-  'regulation of cell cycle phase transition',
-  'regulation of mitotic cell cycle phase transition',
-  'spliceosomal complex assembly')
+  'Heart development' = c(
+    'atrial', 'ventricular', 'heart', 'cardiac')
+)
 
 positive_waterfall_label_terms <- c(
   'myofibril assembly',
@@ -112,23 +97,54 @@ positive_waterfall_label_terms <- c(
   'cardiac muscle cell contraction',
   'heart growth',
   'cardiac atrium development',
-  'heart trabecula morphogenesis')
+  'heart trabecula morphogenesis'
+)
 
-negative_volcano_label_terms <- c(
-  'DNA-templated DNA replication',
+negative_term_groups <- list(
+  'Ribosomal' = c(
+    'ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
+  'Mitosis' = c(
+    'Mitosis', 'Meiosis', 'Nuclear division', 'cell cycle', 'telomere',
+    'spindle', 'Mitotic', 'Meiotic'),
+  'DNA replication' = c(
+    'chromosome', 'DNA', 'base', 'repair', 'DNA-')
+)
+
+negative_waterfall_label_terms <- c(
+  'DNA replication',
+  'chromosome segregation',
   'double-strand break repair',
-  'interstrand cross-link repair',
-  'positive regulation of mitotic cell cycle')
+  'cell cycle G2/M phase transition',
+  'maturation of 5.8S rRNA',
+  'mitotic nuclear division',
+  'regulation of cell cycle phase transition',
+  'regulation of mitotic cell cycle phase transition',
+  'spliceosomal complex assembly'
+)
+
+# symmetrical volcano plot GO term labels
 
 positive_volcano_label_terms <- c(
   'muscle tissue development',
   'heart process',
   'muscle cell development',
-  'myofibril assembly')
+  'myofibril assembly'
+)
+
+negative_volcano_label_terms <- c(
+  'DNA-templated DNA replication',
+  'double-strand break repair',
+  'interstrand cross-link repair',
+  'positive regulation of mitotic cell cycle'
+)
+
 
 volcano_label_terms <- c(
   negative_volcano_label_terms,
-  positive_volcano_label_terms)
+  positive_volcano_label_terms
+)
+
+# half volcano plot GO term labels
 
 positive_half_volcano_label_terms <- c(
   'response to oxidative stress',
@@ -138,7 +154,8 @@ positive_half_volcano_label_terms <- c(
   'cardiac ventricle development',
   'ATP biosynthetic process',
   'heart process',
-  'myofibril assembly')
+  'myofibril assembly'
+)
 
 negative_half_volcano_label_terms <- c(
   'DNA-templated DNA replication',
@@ -148,7 +165,8 @@ negative_half_volcano_label_terms <- c(
   'positive regulation of mitotic cell cycle',
   'negative regulation of telomere maintenance',
   'regulation of RNA splicing',
-  'DNA-templated transcription elongation')
+  'DNA-templated transcription elongation'
+)
 
 nes_scatter_label_terms <- c(
   'mesenchyme development',
@@ -157,7 +175,8 @@ nes_scatter_label_terms <- c(
   'myofibril assembly',
   'heart process',
   'oxidative phosphorylation',
-  'regulation of nuclear division')
+  'regulation of nuclear division'
+)
 
 # 1.1 read GSEA inputs -----------------
 
@@ -315,6 +334,7 @@ save_gsea_figure(
   figure_path = file.path(
     gsea_figure_dir,
     'GSE122380_gsea_half_volcano_cardiomyocyte_vs_mesoderm_negative.svg'),
+  
   figure_width = half_volcano_figure_width,
   figure_height = half_volcano_figure_height)
 
