@@ -159,7 +159,7 @@ read_gsea_result_csv <- function(path,
 
 .gsea_direction_colors <- c(
   'Positive' = unname(.gsea_category_colors[['red']]),
-  'Negative' = unname(.gsea_category_colors[['purple']]),
+  'Negative' = unname(.gsea_category_colors[['blue']]),
   'Not significant' = .gsea_nonsignificant_color)
 
 .gsea_default_category_colors <- function(group_names) {
