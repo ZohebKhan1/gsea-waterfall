@@ -56,9 +56,8 @@ nes_scatter_figure_width = 9.00
 nes_scatter_figure_height = 6.38
 
 gsea_padj_cutoff = 0.05
-waterfall_top_n = 100L
+waterfall_top_n = 100
 half_volcano_inner_nes_limit = 1
-waterfall_point_size = 1.80
 volcano_point_size = 1.30
 half_volcano_point_size = 1.60
 nes_scatter_point_size = 1.30
@@ -69,7 +68,7 @@ nes_scatter_point_size = 1.30
 
 gsea_contrast_label = 'Cardiomyocyte vs. Mesoderm'
 
-positive_term_groups <- list(
+color_by_group_categories <- list(
   'Ion channel' = c(
     'Calcium', 'Sodium', 'Potassium', 'Ion', 'Voltage', 'Channel',
     'electrical', 'Action potential', 'transmembrane', 'conduction'),
@@ -100,7 +99,7 @@ positive_waterfall_label_terms <- c(
   'heart trabecula morphogenesis'
 )
 
-negative_term_groups <- list(
+negative_color_by_group_categories <- list(
   'Ribosomal' = c(
     'ribosome', 'ribosomal', 'spliceosomal', 'rRNA', 'RNA'),
   'Mitosis' = c(
@@ -256,13 +255,11 @@ save_gsea_figure(
   plot = plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
     padj_threshold = gsea_padj_cutoff,
-    direction = 'positive',
+    NES_direction = 'positive',
     top_n = waterfall_top_n,
     rank_by = 'NES',
-    x_label = 'Ranked GO terms by NES',
-    label_terms = positive_waterfall_label_terms,
-    term_groups = positive_term_groups,
-    point_size = waterfall_point_size,
+    label_by_groups = positive_waterfall_label_terms,
+    color_by_groups = color_by_group_categories,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -274,13 +271,11 @@ save_gsea_figure(
   plot = plot_gsea_waterfall(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
     padj_threshold = gsea_padj_cutoff,
-    direction = 'negative',
+    NES_direction = 'negative',
     top_n = waterfall_top_n,
     rank_by = 'NES',
-    x_label = 'Ranked GO terms by NES',
-    label_terms = negative_waterfall_label_terms,
-    term_groups = negative_term_groups,
-    point_size = waterfall_point_size,
+    label_by_groups = negative_waterfall_label_terms,
+    color_by_groups = negative_color_by_group_categories,
     font_family = gsea_figure_font_family),
   figure_path = file.path(
     gsea_figure_dir,
@@ -291,7 +286,6 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    padj_threshold = gsea_padj_cutoff,
     padj_cutoff = gsea_padj_cutoff,
     label_terms = volcano_label_terms,
     contrast_label = gsea_contrast_label,
@@ -307,12 +301,11 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    padj_threshold = gsea_padj_cutoff,
     direction = 'positive',
     p_col = 'padj',
     padj_cutoff = gsea_padj_cutoff,
     label_terms = positive_half_volcano_label_terms,
-    term_groups = positive_term_groups,
+    term_groups = color_by_group_categories,
     inner_nes_limit = half_volcano_inner_nes_limit,
     contrast_label = gsea_contrast_label,
     point_size = half_volcano_point_size,
@@ -326,12 +319,11 @@ save_gsea_figure(
 save_gsea_figure(
   plot = plot_gsea_half_volcano(
     gsea_results = gsea_cardiomyocyte_vs_mesoderm,
-    padj_threshold = gsea_padj_cutoff,
     direction = 'negative',
     p_col = 'padj',
     padj_cutoff = gsea_padj_cutoff,
     label_terms = negative_half_volcano_label_terms,
-    term_groups = negative_term_groups,
+    term_groups = negative_color_by_group_categories,
     inner_nes_limit = half_volcano_inner_nes_limit,
     contrast_label = gsea_contrast_label,
     point_size = half_volcano_point_size,
@@ -346,7 +338,6 @@ save_gsea_figure(
   plot = plot_gsea_nes_scatter(
     gsea_x = gsea_day9_vs_day6,
     gsea_y = gsea_day3_vs_day1,
-    padj_threshold = gsea_padj_cutoff,
     x_label = 'Day 9 vs. Day 6 NES',
     y_label = 'Day 3 vs. Day 1 NES',
     color_by = 'significance',
@@ -355,7 +346,6 @@ save_gsea_figure(
     y_name = 'Day 3 vs. Day 1',
     label_terms = nes_scatter_label_terms,
     padj_cutoff = gsea_padj_cutoff,
-    include_nonsignificant = TRUE,
     equal_axis_limits = TRUE,
     show_fit_line = TRUE,
     point_size = nes_scatter_point_size,

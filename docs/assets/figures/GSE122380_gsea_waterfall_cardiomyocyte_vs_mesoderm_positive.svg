@@ -207,7 +207,7 @@
 <text x='318.31' y='289.11' text-anchor='middle' style='font-size: 8.00px; font-family: "Nimbus Sans";'>60</text>
 <text x='413.39' y='289.11' text-anchor='middle' style='font-size: 8.00px; font-family: "Nimbus Sans";'>80</text>
 <text x='508.48' y='289.11' text-anchor='middle' style='font-size: 8.00px; font-family: "Nimbus Sans";'>100</text>
-<text x='277.94' y='299.66' text-anchor='middle' style='font-size: 9.00px; font-family: "Nimbus Sans";'>Ranked GO terms by NES</text>
+<text x='277.94' y='299.66' text-anchor='middle' style='font-size: 9.00px; font-family: "Nimbus Sans";'>Ranked GO terms (by NES)</text>
 <text transform='translate(14.53,151.01) rotate(-90)' text-anchor='middle' style='font-size: 9.00px; font-family: "Nimbus Sans";'>Normalized enrichment score (NES)</text>
 <text x='433.75' y='38.27' style='font-size: 8.00px; font-weight: bold; font-family: "Nimbus Sans";'>GO:BP category</text>
 <rect x='433.75' y='43.63' width='7.09' height='7.11' style='stroke-width: 0.87; stroke: none; fill: #FFFFFF;' />
