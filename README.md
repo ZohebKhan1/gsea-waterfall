@@ -36,16 +36,12 @@ source('gsea_visualizations.R')
 ### Repository file tree
 
 ```text
-.
-├── .github/workflows/r-checks.yaml   automated parse and lint checks
-├── .lintr                            repository lint configuration
 ├── functions/
 │   └── gsea_visualizations.R         downloadable plotting functions
 ├── R/
 │   ├── 01_generate_gsea_figures.R    canonical tutorial figure generation
 │   └── 02_render_github_pages.R      GitHub Pages rendering
 ├── tutorial/
-│   ├── assets/                       fonts and generated figures
 │   ├── data/                         example precomputed GSEA result tables
 │   └── tutorial.Rmd                  workflow tutorial source
 └── README.md
@@ -59,21 +55,26 @@ The following R libraries listed below are required for the visualization functi
 install.packages(c('ggplot2', 'ggrepel', 'scales'))
 ```
 
-For local repository development, install `lintr` and run the tracked lint configuration:
+## Credit and attributions
 
-```r
-install.packages('lintr')
-lintr::lint_dir('.')
-```
+The visual design for the plots shown in the workflow were informed by figures shown in [Ciceri et al.
+(2024)](https://doi.org/10.1038/s41586-023-06984-8), [Xu et al.
+(2025)](https://doi.org/10.1038/s41556-025-01751-5), [Vuong et al.
+(2026)](https://doi.org/10.1126/science.aea1259), and [Risgaard et al.
+(2026)](https://doi.org/10.1126/science.aea1549). In particular, see the following subpanels from
+Xu et al. Figure 3X; from Vuong et al. Figure 3X; from Ciceri et al. Figure 3X; from Risgaard et al.
+Figure 3X. Full citations are provided at the end of this README.
 
 ## Issues with GSEA dotplots/barplots
 
 GSEA results are most commonly visualized as running enrichment score plots for an individual
 GO/KEGG/Reactome pathway result, or as dotplot/barplot-style summaries of a short list of terms
 in which dot size or color indicates some quantitative GSEA metric (NES or adjusted p-value, for
-example). Those GSEA visualizations typically shown for the top ~n=10 enriched GO terms (by NES)
+example). These types of GSEA results visualizations typically shown for the top ~n=10 enriched GO terms (by NES)
 due to space constraints with a greater number of pathways. Therefore the broader ranked GSEA
-results are often lost if only the top 10 pathways are shown. For example, if there are 200 total
+results are often lost if only the top 10 pathways are shown. 
+
+For example, if there are 200 total
 significantly enriched GO terms (by adjusted p-value < 0.05) and only the top 10 GO terms (by
 +NES) are visualized, then 190/200 = 95% of total enriched terms are not shown. This loss of
 information can be particularly problematic if, for example, the top 10 enriched GO terms by
@@ -81,7 +82,7 @@ GSEA NES are concentrated in the same biological function or some particular pat
 often be the case for more general, larger GO term families (e.g: cell cycle replication,
 extracellular matrix, etc).
 
-## Use case
+## Use case for GSEA ranked waterfall plots
 
 The ranked GSEA waterfall plots shown in the tutorial workflow are intended to address the
 limitation of the aformentioned GSEA dotplot/barplot. Ranked GSEA waterfall plots allow for
@@ -92,26 +93,20 @@ between GO terms containing differing numbers of genes (and effect size is a mor
 informative metric than statistical significance for GSEA).
 
 Because it would be impractical to write out the GO term labels for all 100 pathways (not enough
-space in a single figure panel for this. Even if it were possible to do this, it would be visually
+space in a single figure panel for this - even if it were possible to do this, it would be visually
 incoherent), user-defined `color_by_groups` are used to organize the top n=X ranked GO terms by
-biological theme/functional process. Note that these classifications
+biological theme/functional process. Note that these classifications are subjective and user-defined by
+categorizing pathways based certain words that appear in a given GO term ID. This coloration is meant to
+be a broad classification and statistically rigorous or quantitative.
 
-For the waterfall plots, the user can select specific colors to define these biological groupins.
+For the waterfall plots, the user can select specific colors to define these biological groupings.
 In the example workflow, for example, I categorized GO term pathways by `Ion channel`,
-`Metabolism`, `Muscle contraction`, `Heart development`, and `Other`. Here, `Other` simply means .
+`Metabolism`, `Muscle contraction`, `Heart development`, and `Other`. Here, `Other` simply means the GO term
+pathway did not fall cleanly into one of my pre-defined biological groupings.
 
-I want to note that these categorizations/classifications are simply user-defined annotations only
-and do not perform redundancy reduction. For example, for the positive NES waterfall plot,
+I want to note that these categorizations/classifications are simply user-defined annotations.
 
 `'Metabolism' = c('mitochondrial', 'metabolic', 'oxidative')`
-
-The visual design was informed by figures shown in [Ciceri et al.
-(2024)](https://doi.org/10.1038/s41586-023-06984-8), [Xu et al.
-(2025)](https://doi.org/10.1038/s41556-025-01751-5), [Vuong et al.
-(2026)](https://doi.org/10.1126/science.aea1259), and [Risgaard et al.
-(2026)](https://doi.org/10.1126/science.aea1549). In particular, see the following subpanels from
-Xu et al. Figure 3X; from Vuong et al. Figure 3X; from Ciceri et al. Figure 3X; from Risgaard et al.
-Figure 3X. Full citations are provided at the end of this README.
 
 ## Required input GSEA data format
 
@@ -160,8 +155,7 @@ documentation; the table below is the practical overview of the public functions
 
 ## Important parameters
 
-The following parameters cover the main subjective user decisions. Styling and layout arguments
-remain available in the function definitions.
+The following parameters cover the main subjective user decisions. 
 
 ### `plot_gsea_waterfall()`
 
@@ -201,8 +195,7 @@ remain available in the function definitions.
 | `equal_axis_limits` | Matches x/y limits for direct comparison. |
 | `show_fit_line` | Adds an optional descriptive fit line; off by default. |
 
-All plot functions return `ggplot` objects. They only select rows for display;
-they do not rewrite the supplied GSEA statistics or write files.
+All plot functions return `ggplot` objects. 
 
 ## Example data used in workflow/tutorial
 
